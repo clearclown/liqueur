@@ -14,4 +14,4 @@ anyhow = { workspace = true }
 # reinhardt-web = { path = "../../external/reinhardt-web" }  # submodule追加後に有効化
 
 [dev-dependencies]
-tokio = { workspace = true }
+tokio = { version = "1.35", features = ["full"] }
