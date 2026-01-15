@@ -1,0 +1,54 @@
+{
+  "name": "@liqueur/ai-provider",
+  "version": "0.1.0",
+  "description": "AI provider abstraction for LiquidView schema generation",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "anthropic",
+    "gemini",
+    "deepseek",
+    "schema-generation"
+  ],
+  "author": "Project Liquid Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "@liqueur/protocol": "file:../protocol"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google/generative-ai": "^0.21.0",
+    "@types/node": "^22.10.5",
+    "@vitest/coverage-v8": "^3.0.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.3"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@google/generative-ai": "^0.21.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@google/generative-ai": {
+      "optional": true
+    }
+  }
+}
