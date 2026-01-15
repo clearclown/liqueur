@@ -19,6 +19,8 @@ export interface LiquidViewSchema {
   version: ProtocolVersion;
   /** UI layout structure */
   layout: Layout;
+  /** UI components to render */
+  components: Component[];
   /** Data source definitions (can be empty object) */
   data_sources: Record<string, DataSource>;
 }
@@ -33,11 +35,6 @@ export type Layout = GridLayout | StackLayout;
  */
 export interface GridLayout {
   type: "grid";
-  props: GridLayoutProps;
-  children: Component[];
-}
-
-export interface GridLayoutProps {
   /** Number of columns (must be >= 1) */
   columns: number;
   /** Grid gap in pixels (default: 16) */
@@ -49,15 +46,10 @@ export interface GridLayoutProps {
  */
 export interface StackLayout {
   type: "stack";
-  props: StackLayoutProps;
-  children: Component[];
-}
-
-export interface StackLayoutProps {
   /** Stack direction */
   direction: "horizontal" | "vertical";
   /** Item spacing in pixels (default: 8) */
-  spacing?: number;
+  gap?: number;
 }
 
 /**

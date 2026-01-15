@@ -25,10 +25,7 @@ describe("SchemaValidator", () => {
   it("should validate a minimal valid schema", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 2 },
-        children: []
+      layout: { type: "grid", columns: 2 },\n      components: []
       },
       data_sources: {}
     };
@@ -44,7 +41,7 @@ describe("SchemaValidator", () => {
   it("should reject unsupported protocol version", () => {
     const schema = {
       version: "2.0",
-      layout: { type: "grid", props: { columns: 2 }, children: [] },
+      layout: { type: "grid", columns: 2 },\n      components: [] },
       data_sources: {}
     };
 
@@ -78,10 +75,7 @@ describe("SchemaValidator", () => {
   it("should reject invalid component type", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: [{ type: "invalid_component" }]
+      layout: { type: "grid", columns: 1 },\n      components: [{ type: "invalid_component" }]
       },
       data_sources: {}
     };
@@ -98,7 +92,7 @@ describe("SchemaValidator", () => {
    */
   it("should reject schema missing version field", () => {
     const schema = {
-      layout: { type: "grid", props: { columns: 2 }, children: [] },
+      layout: { type: "grid", columns: 2 },\n      components: [] },
       data_sources: {}
     };
 
@@ -131,7 +125,7 @@ describe("SchemaValidator", () => {
   it("should reject schema missing data_sources field", () => {
     const schema = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 2 }, children: [] }
+      layout: { type: "grid", columns: 2 },\n      components: [] }
     };
 
     const result = validator.validate(schema);
@@ -147,10 +141,7 @@ describe("SchemaValidator", () => {
   it("should reject grid layout with zero columns", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 0 },
-        children: []
+      layout: { type: "grid", columns: 0 },\n      components: []
       },
       data_sources: {}
     };
@@ -189,10 +180,7 @@ describe("SchemaValidator", () => {
   it("should reject chart component with invalid variant", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: [
+      layout: { type: "grid", columns: 1 },\n      components: [
           {
             type: "chart",
             variant: "invalid_variant",
@@ -216,10 +204,7 @@ describe("SchemaValidator", () => {
   it("should reject table component with empty columns array", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: [
+      layout: { type: "grid", columns: 1 },\n      components: [
           {
             type: "table",
             columns: [],
@@ -243,10 +228,7 @@ describe("SchemaValidator", () => {
   it("should reject component with non-existent data_source reference", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: [
+      layout: { type: "grid", columns: 1 },\n      components: [
           {
             type: "chart",
             variant: "bar",
@@ -271,10 +253,7 @@ describe("SchemaValidator", () => {
   it("should validate chart component with valid data_source reference", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: [
+      layout: { type: "grid", columns: 1 },\n      components: [
           {
             type: "chart",
             variant: "bar",
@@ -311,10 +290,7 @@ describe("SchemaValidator", () => {
   it("should validate table component with columns", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "stack",
-        props: { direction: "vertical", spacing: 16 },
-        children: [
+      layout: { type: "stack", direction: "vertical", gap: 16 },\n      components: [
           {
             type: "table",
             columns: ["name", "price", "quantity"],
@@ -344,10 +320,7 @@ describe("SchemaValidator", () => {
   it("should validate complex schema with 2+ components and 2+ data_sources", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 2, gap: 24 },
-        children: [
+      layout: { type: "grid", columns: 2, gap: 24 },\n      components: [
           {
             type: "chart",
             variant: "line",
@@ -416,10 +389,7 @@ describe("SchemaValidator", () => {
   it("should reject data_source with invalid filter operator", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: []
+      layout: { type: "grid", columns: 1 },\n      components: []
       },
       data_sources: {
         test_ds: {
@@ -444,10 +414,7 @@ describe("SchemaValidator", () => {
   it("should reject data_source with invalid aggregation type", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: []
+      layout: { type: "grid", columns: 1 },\n      components: []
       },
       data_sources: {
         test_ds: {
@@ -473,10 +440,7 @@ describe("SchemaValidator", () => {
   it("should reject data_source missing resource field", () => {
     const schema: any = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: []
+      layout: { type: "grid", columns: 1 },\n      components: []
       },
       data_sources: {
         test_ds: {
@@ -498,10 +462,7 @@ describe("SchemaValidator", () => {
   it("should validate stack layout with horizontal direction", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "stack",
-        props: { direction: "horizontal" },
-        children: [
+      layout: { type: "stack", direction: "horizontal" },\n      components: [
           {
             type: "chart",
             variant: "bar",
@@ -528,10 +489,7 @@ describe("SchemaValidator", () => {
   it("should validate data_source with all valid filter operators", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: {
-        type: "grid",
-        props: { columns: 1 },
-        children: []
+      layout: { type: "grid", columns: 1 },\n      components: []
       },
       data_sources: {
         complex_filters: {
@@ -561,7 +519,7 @@ describe("SchemaValidator", () => {
   it("should reject 'in' operator with non-array value", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -585,7 +543,7 @@ describe("SchemaValidator", () => {
   it("should reject 'eq' operator with array value", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -609,7 +567,7 @@ describe("SchemaValidator", () => {
   it("should reject filter missing field property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -633,7 +591,7 @@ describe("SchemaValidator", () => {
   it("should reject filter missing value property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -657,7 +615,7 @@ describe("SchemaValidator", () => {
   it("should reject filter missing op property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -681,7 +639,7 @@ describe("SchemaValidator", () => {
   it("should reject aggregation missing type field", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "sales",
@@ -705,7 +663,7 @@ describe("SchemaValidator", () => {
   it("should reject aggregation missing field property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "sales",
@@ -729,7 +687,7 @@ describe("SchemaValidator", () => {
   it("should reject sort with invalid direction", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -751,7 +709,7 @@ describe("SchemaValidator", () => {
   it("should reject sort missing field property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -773,7 +731,7 @@ describe("SchemaValidator", () => {
   it("should reject sort missing direction property", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -795,7 +753,7 @@ describe("SchemaValidator", () => {
   it("should reject negative limit value", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -817,7 +775,7 @@ describe("SchemaValidator", () => {
   it("should reject zero limit value", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -839,7 +797,7 @@ describe("SchemaValidator", () => {
   it("should reject non-number limit value", () => {
     const schema: any = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {
         test_ds: {
           resource: "products",
@@ -866,7 +824,7 @@ describe("Type Guards", () => {
   it("should identify valid LiquidViewSchema", () => {
     const schema: LiquidViewSchema = {
       version: "1.0",
-      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      layout: { type: "grid", columns: 1 },\n      components: [] },
       data_sources: {}
     };
 
@@ -889,12 +847,12 @@ describe("Type Guards", () => {
    * Test isGridLayout
    */
   it("should identify GridLayout", () => {
-    const layout = { type: "grid" as const, props: { columns: 2 }, children: [] };
+    const layout = { type: "grid" as const, columns: 2 };
     expect(isGridLayout(layout)).toBe(true);
   });
 
   it("should reject non-GridLayout", () => {
-    const layout = { type: "stack" as const, props: { direction: "vertical" as const }, children: [] };
+    const layout = { type: "stack" as const, direction: "vertical" as const };
     expect(isGridLayout(layout)).toBe(false);
   });
 
@@ -902,12 +860,12 @@ describe("Type Guards", () => {
    * Test isStackLayout
    */
   it("should identify StackLayout", () => {
-    const layout = { type: "stack" as const, props: { direction: "horizontal" as const }, children: [] };
+    const layout = { type: "stack" as const, direction: "horizontal" as const };
     expect(isStackLayout(layout)).toBe(true);
   });
 
   it("should reject non-StackLayout", () => {
-    const layout = { type: "grid" as const, props: { columns: 2 }, children: [] };
+    const layout = { type: "grid" as const, columns: 2 };
     expect(isStackLayout(layout)).toBe(false);
   });
 

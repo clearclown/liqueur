@@ -1,7 +1,7 @@
 import React from 'react';
-import type { StackLayoutProps } from '@liqueur/protocol';
+import type { StackLayout as StackLayoutType } from '@liqueur/protocol';
 
-export interface StackLayoutComponentProps extends StackLayoutProps {
+export interface StackLayoutComponentProps extends Omit<StackLayoutType, 'type'> {
   children: React.ReactNode;
 }
 

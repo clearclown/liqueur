@@ -54,6 +54,14 @@ export class SchemaValidator {
       });
     }
 
+    if (!Array.isArray(s.components)) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
+        message: "Missing required field: components (must be an array)",
+        path: "components"
+      });
+    }
+
     if (s.data_sources === undefined) {
       errors.push({
         code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
@@ -75,14 +83,21 @@ export class SchemaValidator {
       this.validateLayout(s.layout, errors);
     }
 
+    // Validate components
+    if (Array.isArray(s.components)) {
+      s.components.forEach((component: any, index: number) => {
+        this.validateComponent(component, errors, `components[${index}]`);
+      });
+    }
+
     // Validate data_sources
     if (s.data_sources) {
       this.validateDataSources(s.data_sources, errors);
     }
 
     // Cross-reference validation: Check data_source references
-    if (s.layout && s.data_sources) {
-      this.validateDataSourceReferences(s.layout, s.data_sources, errors);
+    if (s.components && s.data_sources) {
+      this.validateDataSourceReferences(s.components, s.data_sources, errors);
     }
 
     return {
@@ -119,22 +134,15 @@ export class SchemaValidator {
 
     // Validate Grid layout
     if (layout.type === "grid") {
-      if (layout.props?.columns !== undefined) {
-        if (typeof layout.props.columns !== "number" || layout.props.columns < 1) {
+      if (layout.columns !== undefined) {
+        if (typeof layout.columns !== "number" || layout.columns < 1) {
           errors.push({
             code: ValidationErrorCode.INVALID_GRID_COLUMNS,
-            message: `Grid columns must be >= 1, got: ${layout.props.columns}`,
-            path: "layout.props.columns"
+            message: `Grid columns must be >= 1, got: ${layout.columns}`,
+            path: "layout.columns"
           });
         }
       }
-    }
-
-    // Validate children components
-    if (Array.isArray(layout.children)) {
-      layout.children.forEach((component: any, index: number) => {
-        this.validateComponent(component, errors, `layout.children[${index}]`);
-      });
     }
   }
 
@@ -384,16 +392,16 @@ export class SchemaValidator {
   /**
    * Validates that all data_source references in components exist
    */
-  private validateDataSourceReferences(layout: any, dataSources: any, errors: ValidationError[]): void {
-    if (!Array.isArray(layout.children)) return;
+  private validateDataSourceReferences(components: any[], dataSources: any, errors: ValidationError[]): void {
+    if (!Array.isArray(components)) return;
 
-    layout.children.forEach((component: any, index: number) => {
+    components.forEach((component: any, index: number) => {
       if (component.data_source) {
         if (!dataSources[component.data_source]) {
           errors.push({
             code: ValidationErrorCode.DANGLING_DATA_SOURCE_REF,
             message: `Component references non-existent data_source: ${component.data_source}`,
-            path: `layout.children[${index}].data_source`
+            path: `components[${index}].data_source`
           });
         }
       }

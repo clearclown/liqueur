@@ -1,7 +1,7 @@
 import React from 'react';
-import type { GridLayoutProps } from '@liqueur/protocol';
+import type { GridLayout as GridLayoutType } from '@liqueur/protocol';
 
-export interface GridLayoutComponentProps extends GridLayoutProps {
+export interface GridLayoutComponentProps extends Omit<GridLayoutType, 'type'> {
   children: React.ReactNode;
 }
 
