@@ -129,7 +129,7 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
                 outerRadius={80}
                 label
               >
-                {chartData.map((entry, idx) => (
+                {chartData.map((_entry, idx) => (
                   <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
                 ))}
               </Pie>
