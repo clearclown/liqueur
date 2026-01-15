@@ -219,12 +219,12 @@ cargo doc --open               # ドキュメント生成
 | FR-01 | AI JSON生成 | (Phase 2対象) | - | - | ⏸️ Deferred |
 | FR-02 | メタデータ提示 | (Phase 2対象) | - | - | ⏸️ Deferred |
 | FR-03 | JSON限定出力 | (Phase 2対象) | - | - | ⏸️ Deferred |
-| FR-04 | スキーマ検証（厳密型） | `packages/protocol/src/validators/schema.ts` | `tests/validator.test.ts` | Week 2 | 🔨 Pending |
-| FR-05 | Fail Fast | `packages/protocol/src/validators/schema.ts` | `tests/validator.test.ts` | Week 2 | 🔨 Pending |
-| FR-06 | DataSource→ORM変換 | `crates/liquid-reinhardt/src/converter.rs` | `tests/converter_test.rs` | Week 4 | 🔨 Pending |
-| FR-07 | Row-Level Security | `crates/liquid-reinhardt/src/security.rs` | `tests/security_test.rs` | Week 4 | 🔨 Pending |
-| FR-08 | UIレンダリング | `packages/react/src/components/LiquidRenderer.tsx` | `tests/LiquidRenderer.test.tsx` | Week 3 | 🔨 Pending |
-| FR-09 | ローディング状態 | `packages/react/src/components/ChartComponent.tsx` | `tests/ChartComponent.test.tsx` | Week 3 | 🔨 Pending |
+| FR-04 | スキーマ検証（厳密型） | `packages/protocol/src/validators/schema.ts` | `tests/validator.test.ts` | Week 2 | ✅ Complete (96.76%) |
+| FR-05 | Fail Fast | `packages/protocol/src/validators/schema.ts` | `tests/validator.test.ts` | Week 2 | ✅ Complete |
+| FR-06 | DataSource→ORM変換 | `crates/liquid-reinhardt/src/converter.rs` | `tests/converter_test.rs` | Week 4 | ✅ Complete (95.7%) |
+| FR-07 | Row-Level Security | `crates/liquid-reinhardt/src/security.rs` | `tests/security_test.rs` | Week 4 | ✅ Complete (100%) |
+| FR-08 | UIレンダリング | `packages/react/src/components/LiquidRenderer.tsx` | `tests/LiquidRenderer.test.tsx` | Week 3 | ✅ Complete (98.68%) |
+| FR-09 | ローディング状態 | `packages/react/src/components/ChartComponent.tsx` | `tests/ChartComponent.test.tsx` | Week 3 | ✅ Complete |
 | FR-10 | スキーマ保存 | (Phase 3対象) | - | - | ⏸️ Deferred |
 | FR-11 | スキーマロード | (Phase 3対象) | - | - | ⏸️ Deferred |
 
@@ -232,13 +232,13 @@ cargo doc --open               # ドキュメント生成
 
 #### NFR-01: No Arbitrary Code Execution
 - [ ] AIはJSON限定（FR-03, Phase 2）
-- [ ] バックエンド型検証（FR-04, Week 2） - `SchemaValidator`で厳密型チェック
-- [ ] XSS防止（Week 3） - Reactの自動エスケープ活用
-- [ ] SQLインジェクション防止（Week 4） - ORMのみ使用、生SQLは禁止
+- [x] バックエンド型検証（FR-04, Week 2） - `SchemaValidator`で厳密型チェック ✅
+- [x] XSS防止（Week 3） - Reactの自動エスケープ活用 ✅
+- [x] SQLインジェクション防止（Week 4） - ORMのみ使用、生SQLは禁止 ✅
 
 #### NFR-02: Least Privilege
-- [ ] Row-Level Security（FR-07, Week 4） - `SecurityEnforcer`実装
-- [ ] CurrentUser強制（Week 4） - 全クエリにユーザーコンテキスト適用
+- [x] Row-Level Security（FR-07, Week 4） - `SecurityEnforcer`実装 ✅
+- [x] CurrentUser強制（Week 4） - 全クエリにユーザーコンテキスト適用 ✅
 
 #### NFR-03: パフォーマンス
 - [ ] 静的ページ並みレイテンシ（Week 5で測定） - 保存済みスキーマのロードを最適化
