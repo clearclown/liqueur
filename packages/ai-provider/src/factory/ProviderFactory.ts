@@ -7,6 +7,11 @@ import { LocalLLMProvider } from '../providers/LocalLLMProvider';
 import { AnthropicProvider } from '../providers/AnthropicProvider';
 import { GeminiProvider } from '../providers/GeminiProvider';
 import type { OpenAICompatibleConfig } from '../providers/BaseOpenAIProvider';
+import {
+  getOpenAICompatibleConfig,
+  getBasicProviderConfig,
+  getLocalLLMConfig,
+} from './envHelpers';
 
 /**
  * Factory for creating AI providers
@@ -62,106 +67,23 @@ export class ProviderFactory {
           model: 'mock-model',
         });
 
-      case 'openai': {
-        const apiKey = process.env.OPENAI_API_KEY;
-        const model = process.env.OPENAI_MODEL;
-        const baseURL = process.env.OPENAI_BASE_URL;
+      case 'openai':
+        return new OpenAIProvider(getOpenAICompatibleConfig('OPENAI'));
 
-        if (!apiKey) {
-          throw new Error('OpenAI API key is required: set OPENAI_API_KEY');
-        }
-        if (!model) {
-          throw new Error('OpenAI model is required: set OPENAI_MODEL');
-        }
+      case 'deepseek':
+        return new DeepSeekProvider(getOpenAICompatibleConfig('DEEPSEEK'));
 
-        return new OpenAIProvider({
-          apiKey,
-          model,
-          baseURL,
-        });
-      }
+      case 'glm':
+        return new GLMProvider(getOpenAICompatibleConfig('GLM'));
 
-      case 'deepseek': {
-        const apiKey = process.env.DEEPSEEK_API_KEY;
-        const model = process.env.DEEPSEEK_MODEL;
-        const baseURL = process.env.DEEPSEEK_BASE_URL;
+      case 'local':
+        return new LocalLLMProvider(getLocalLLMConfig());
 
-        if (!apiKey) {
-          throw new Error('DeepSeek API key is required: set DEEPSEEK_API_KEY');
-        }
-        if (!model) {
-          throw new Error('DeepSeek model is required: set DEEPSEEK_MODEL');
-        }
+      case 'anthropic':
+        return new AnthropicProvider(getBasicProviderConfig('ANTHROPIC_API_KEY', 'ANTHROPIC_MODEL'));
 
-        return new DeepSeekProvider({
-          apiKey,
-          model,
-          baseURL,
-        });
-      }
-
-      case 'glm': {
-        const apiKey = process.env.GLM_API_KEY;
-        const model = process.env.GLM_MODEL;
-        const baseURL = process.env.GLM_BASE_URL;
-
-        if (!apiKey) {
-          throw new Error('GLM API key is required: set GLM_API_KEY');
-        }
-        if (!model) {
-          throw new Error('GLM model is required: set GLM_MODEL');
-        }
-
-        return new GLMProvider({
-          apiKey,
-          model,
-          baseURL,
-        });
-      }
-
-      case 'local': {
-        const model = process.env.LOCAL_LLM_MODEL || 'local-model';
-        const baseURL = process.env.LOCAL_LLM_BASE_URL || 'http://localhost:1234/v1';
-
-        return new LocalLLMProvider({
-          model,
-          baseURL,
-        });
-      }
-
-      case 'anthropic': {
-        const apiKey = process.env.ANTHROPIC_API_KEY;
-        const model = process.env.ANTHROPIC_MODEL;
-
-        if (!apiKey) {
-          throw new Error('Anthropic API key is required: set ANTHROPIC_API_KEY');
-        }
-        if (!model) {
-          throw new Error('Anthropic model is required: set ANTHROPIC_MODEL');
-        }
-
-        return new AnthropicProvider({
-          apiKey,
-          model,
-        });
-      }
-
-      case 'gemini': {
-        const apiKey = process.env.GOOGLE_API_KEY;
-        const model = process.env.GEMINI_MODEL;
-
-        if (!apiKey) {
-          throw new Error('Gemini API key is required: set GOOGLE_API_KEY');
-        }
-        if (!model) {
-          throw new Error('Gemini model is required: set GEMINI_MODEL');
-        }
-
-        return new GeminiProvider({
-          apiKey,
-          model,
-        });
-      }
+      case 'gemini':
+        return new GeminiProvider(getBasicProviderConfig('GOOGLE_API_KEY', 'GEMINI_MODEL'));
 
       default:
         throw new Error(`Unknown provider type: ${providerType}`);
