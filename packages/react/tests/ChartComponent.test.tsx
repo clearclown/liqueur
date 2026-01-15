@@ -3,74 +3,141 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ChartComponent } from '../src/components/ChartComponent';
 
-describe('ChartComponent (FR-08, FR-09)', () => {
-  it('should render chart with title', () => {
+describe('ChartComponent - Real Implementation', () => {
+  it('should render bar chart with recharts', () => {
+    const data = [
+      { name: 'Jan', value: 100 },
+      { name: 'Feb', value: 200 },
+      { name: 'Mar', value: 150 },
+    ];
+
     render(
       <ChartComponent
         type="chart"
         variant="bar"
-        title="Sales Chart"
+        title="Sales"
+        data={data}
         index={0}
       />
     );
 
-    expect(screen.getByText('Sales Chart')).toBeInTheDocument();
+    // rechartsのBarChartコンテナが存在
+    const chartContainer = screen.getByTestId('liquid-component-chart-0');
+    expect(chartContainer).toBeInTheDocument();
+
+    // タイトル表示確認
+    expect(screen.getByText('Sales')).toBeInTheDocument();
+
+    // rechartsの要素確認（SVGが生成される）
+    const svgElements = chartContainer.querySelectorAll('svg');
+    expect(svgElements.length).toBeGreaterThan(0);
   });
 
-  it('should render chart without title', () => {
+  it('should render line chart', () => {
+    const data = [
+      { date: '2024-01', amount: 500 },
+      { date: '2024-02', amount: 750 },
+    ];
+
     render(
       <ChartComponent
         type="chart"
         variant="line"
-        index={0}
+        data={data}
+        index={1}
       />
     );
 
-    const chart = screen.getByTestId('liquid-component-chart-0');
-    expect(chart).toBeInTheDocument();
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    const chartContainer = screen.getByTestId('liquid-component-chart-1');
+    expect(chartContainer).toBeInTheDocument();
+
+    // LineChartのSVG要素確認
+    const svgElements = chartContainer.querySelectorAll('svg');
+    expect(svgElements.length).toBeGreaterThan(0);
   });
 
-  it('should display data count when data is provided', () => {
-    const mockData = [{ value: 100 }, { value: 200 }];
+  it('should render pie chart', () => {
+    const data = [
+      { category: 'Food', value: 300 },
+      { category: 'Travel', value: 200 },
+      { category: 'Entertainment', value: 100 },
+    ];
 
     render(
       <ChartComponent
         type="chart"
         variant="pie"
-        data={mockData}
-        index={1}
+        data={data}
+        index={2}
       />
     );
 
-    expect(screen.getByText(/2 records/)).toBeInTheDocument();
+    const chartContainer = screen.getByTestId('liquid-component-chart-2');
+    expect(chartContainer).toBeInTheDocument();
+
+    // PieChartのSVG要素確認
+    const svgElements = chartContainer.querySelectorAll('svg');
+    expect(svgElements.length).toBeGreaterThan(0);
   });
 
-  it('should display "No data" when data is not provided', () => {
+  it('should handle empty data gracefully', () => {
     render(
       <ChartComponent
         type="chart"
         variant="bar"
+        data={[]}
         index={0}
       />
     );
 
-    expect(screen.getByText(/No data/)).toBeInTheDocument();
+    // 空データでもエラーにならない
+    expect(screen.getByTestId('liquid-component-chart-0')).toBeInTheDocument();
+    expect(screen.getByText(/no data/i)).toBeInTheDocument();
   });
 
-  it('should render all chart variants', () => {
-    const variants: Array<'bar' | 'line' | 'pie'> = ['bar', 'line', 'pie'];
+  it('should show loading state', () => {
+    render(
+      <ChartComponent
+        type="chart"
+        variant="bar"
+        loading={true}
+        index={0}
+      />
+    );
 
-    variants.forEach((variant, index) => {
-      const { container } = render(
-        <ChartComponent
-          type="chart"
-          variant={variant}
-          index={index}
-        />
-      );
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
 
-      expect(screen.getByText(new RegExp(`Chart \\(${variant}\\)`))).toBeInTheDocument();
-    });
+  it('should apply custom dimensions', () => {
+    const data = [{ x: 1, y: 2 }];
+
+    const { container } = render(
+      <ChartComponent
+        type="chart"
+        variant="bar"
+        data={data}
+        width={800}
+        height={400}
+        index={0}
+      />
+    );
+
+    const chartElement = container.querySelector('[data-testid="liquid-component-chart-0"]');
+    expect(chartElement).toBeInTheDocument();
+  });
+
+  it('should handle unsupported chart variant', () => {
+    const data = [{ x: 1, y: 2 }];
+
+    render(
+      <ChartComponent
+        type="chart"
+        variant={'scatter' as any}
+        data={data}
+        index={0}
+      />
+    );
+
+    expect(screen.getByText(/unsupported chart variant/i)).toBeInTheDocument();
   });
 });

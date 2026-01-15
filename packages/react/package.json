@@ -13,7 +13,7 @@
   "dependencies": {
     "@liqueur/protocol": "^0.1.0",
     "react": "^18.0.0",
-    "recharts": "^2.10.0"
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.0",
