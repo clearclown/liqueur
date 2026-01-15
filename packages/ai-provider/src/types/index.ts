@@ -110,4 +110,4 @@ export type AIProviderFactory = (config: ProviderConfig) => AIProvider;
 /**
  * Provider types supported
  */
-export type ProviderType = 'anthropic' | 'gemini' | 'deepseek' | 'local' | 'mock';
+export type ProviderType = 'anthropic' | 'gemini' | 'openai' | 'deepseek' | 'glm' | 'local' | 'mock';
