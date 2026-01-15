@@ -21,3 +21,6 @@ export { GLMProvider } from './providers/GLMProvider';
 export { LocalLLMProvider } from './providers/LocalLLMProvider';
 export { AnthropicProvider } from './providers/AnthropicProvider';
 export { GeminiProvider } from './providers/GeminiProvider';
+
+// Factory
+export { ProviderFactory } from './factory/ProviderFactory';

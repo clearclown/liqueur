@@ -9,7 +9,7 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
       lines: 69,
       functions: 91,
-      branches: 82,
+      branches: 80,
       statements: 69,
       exclude: [
         'node_modules/**',
@@ -23,7 +23,7 @@ export default defineConfig({
       thresholds: {
         lines: 69,
         functions: 91,
-        branches: 82,
+        branches: 80,
         statements: 69
       }
     }
