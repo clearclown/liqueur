@@ -19,17 +19,14 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install root dependencies
-        run: npm install --ignore-scripts
-
       - name: Install protocol dependencies
-        run: npm install --workspace=@liqueur/protocol
+        run: cd packages/protocol && npm install
 
       - name: Type check
-        run: npm run typecheck --workspace=@liqueur/protocol
+        run: cd packages/protocol && npm run typecheck
 
       - name: Run tests
-        run: npm run test --workspace=@liqueur/protocol
+        run: cd packages/protocol && npm run test:coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
