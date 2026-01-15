@@ -554,6 +554,306 @@ describe("SchemaValidator", () => {
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
   });
+
+  /**
+   * Test 21: ❌ "in" operator with scalar value (should be array)
+   */
+  it("should reject 'in' operator with non-array value", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          filters: [
+            { field: "category", op: "in", value: "electronics" }
+          ]
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE })
+    );
+  });
+
+  /**
+   * Test 22: ❌ "eq" operator with array value (should be scalar)
+   */
+  it("should reject 'eq' operator with array value", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          filters: [
+            { field: "id", op: "eq", value: [1, 2, 3] }
+          ]
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE })
+    );
+  });
+
+  /**
+   * Test 23: ❌ Missing filter field
+   */
+  it("should reject filter missing field property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          filters: [
+            { op: "eq", value: 100 }
+          ]
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
+    );
+  });
+
+  /**
+   * Test 24: ❌ Missing filter value
+   */
+  it("should reject filter missing value property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          filters: [
+            { field: "price", op: "gt" }
+          ]
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
+    );
+  });
+
+  /**
+   * Test 25: ❌ Missing filter op
+   */
+  it("should reject filter missing op property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          filters: [
+            { field: "price", value: 100 }
+          ]
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
+    );
+  });
+
+  /**
+   * Test 26: ❌ Missing aggregation type
+   */
+  it("should reject aggregation missing type field", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "sales",
+          aggregation: {
+            field: "amount"
+          }
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_AGGREGATION_FIELD })
+    );
+  });
+
+  /**
+   * Test 27: ❌ Missing aggregation field
+   */
+  it("should reject aggregation missing field property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "sales",
+          aggregation: {
+            type: "sum"
+          }
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_AGGREGATION_FIELD })
+    );
+  });
+
+  /**
+   * Test 28: ❌ Invalid sort direction
+   */
+  it("should reject sort with invalid direction", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          sort: { field: "price", direction: "invalid" }
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_SORT_DIRECTION })
+    );
+  });
+
+  /**
+   * Test 29: ❌ Missing sort field
+   */
+  it("should reject sort missing field property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          sort: { direction: "asc" }
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_SORT_FIELD })
+    );
+  });
+
+  /**
+   * Test 30: ❌ Missing sort direction
+   */
+  it("should reject sort missing direction property", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          sort: { field: "price" }
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.MISSING_SORT_FIELD })
+    );
+  });
+
+  /**
+   * Test 31: ❌ Negative limit
+   */
+  it("should reject negative limit value", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          limit: -10
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
+    );
+  });
+
+  /**
+   * Test 32: ❌ Zero limit
+   */
+  it("should reject zero limit value", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          limit: 0
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
+    );
+  });
+
+  /**
+   * Test 33: ❌ Non-number limit
+   */
+  it("should reject non-number limit value", () => {
+    const schema: any = {
+      version: "1.0",
+      layout: { type: "grid", props: { columns: 1 }, children: [] },
+      data_sources: {
+        test_ds: {
+          resource: "products",
+          limit: "10"
+        }
+      }
+    };
+
+    const result = validator.validate(schema);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
+    );
+  });
 });
 
 /**

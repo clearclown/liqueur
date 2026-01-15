@@ -15,6 +15,7 @@ const VALID_COMPONENT_TYPES = ["chart", "table"] as const;
 const VALID_CHART_VARIANTS = ["bar", "line", "pie", "area"] as const;
 const VALID_FILTER_OPERATORS = ["eq", "neq", "gt", "gte", "lt", "lte", "in", "contains"] as const;
 const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
+const VALID_SORT_DIRECTIONS = ["asc", "desc"] as const;
 
 export class SchemaValidator {
   /**
@@ -207,25 +208,176 @@ export class SchemaValidator {
     // Validate filters
     if (ds.filters && Array.isArray(ds.filters)) {
       ds.filters.forEach((filter: any, index: number) => {
-        if (filter.op && !VALID_FILTER_OPERATORS.includes(filter.op)) {
-          errors.push({
-            code: ValidationErrorCode.INVALID_FILTER_OP,
-            message: `Invalid filter operator: ${filter.op}. Valid operators: ${VALID_FILTER_OPERATORS.join(", ")}`,
-            path: `${path}.filters[${index}].op`
-          });
-        }
+        this.validateFilter(filter, errors, `${path}.filters[${index}]`);
       });
     }
 
     // Validate aggregation
     if (ds.aggregation) {
-      if (ds.aggregation.type && !VALID_AGGREGATION_TYPES.includes(ds.aggregation.type)) {
-        errors.push({
-          code: ValidationErrorCode.INVALID_AGGREGATION_TYPE,
-          message: `Invalid aggregation type: ${ds.aggregation.type}. Valid types: ${VALID_AGGREGATION_TYPES.join(", ")}`,
-          path: `${path}.aggregation.type`
-        });
+      this.validateAggregation(ds.aggregation, errors, `${path}.aggregation`);
+    }
+
+    // Validate sort
+    if (ds.sort) {
+      this.validateSort(ds.sort, errors, `${path}.sort`);
+    }
+
+    // Validate limit
+    if (ds.limit !== undefined) {
+      this.validateLimit(ds.limit, errors, `${path}.limit`);
+    }
+  }
+
+  /**
+   * Validates a single Filter
+   */
+  private validateFilter(filter: any, errors: ValidationError[], path: string): void {
+    // Validate required fields
+    if (!filter.field) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_FILTER_FIELD,
+        message: "Filter must have a field property",
+        path: `${path}.field`
+      });
+    }
+
+    if (!filter.op) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_FILTER_FIELD,
+        message: "Filter must have an op property",
+        path: `${path}.op`
+      });
+    }
+
+    if (filter.value === undefined) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_FILTER_FIELD,
+        message: "Filter must have a value property",
+        path: `${path}.value`
+      });
+    }
+
+    // Validate operator
+    if (filter.op && !VALID_FILTER_OPERATORS.includes(filter.op)) {
+      errors.push({
+        code: ValidationErrorCode.INVALID_FILTER_OP,
+        message: `Invalid filter operator: ${filter.op}. Valid operators: ${VALID_FILTER_OPERATORS.join(", ")}`,
+        path: `${path}.op`
+      });
+      return;
+    }
+
+    // Validate value type based on operator
+    if (filter.op && filter.value !== undefined) {
+      const isArray = Array.isArray(filter.value);
+
+      if (filter.op === "in") {
+        // "in" operator requires array value
+        if (!isArray) {
+          errors.push({
+            code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE,
+            message: `Filter operator "in" requires an array value`,
+            path: `${path}.value`
+          });
+        }
+      } else {
+        // Other operators require scalar value (string | number | boolean)
+        if (isArray) {
+          errors.push({
+            code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE,
+            message: `Filter operator "${filter.op}" requires a scalar value (string | number | boolean)`,
+            path: `${path}.value`
+          });
+        }
       }
+    }
+  }
+
+  /**
+   * Validates Aggregation
+   */
+  private validateAggregation(aggregation: any, errors: ValidationError[], path: string): void {
+    // Validate required type field
+    if (!aggregation.type) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_AGGREGATION_FIELD,
+        message: "Aggregation must have a type field",
+        path: `${path}.type`
+      });
+    }
+
+    // Validate required field property
+    if (!aggregation.field) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_AGGREGATION_FIELD,
+        message: "Aggregation must have a field property",
+        path: `${path}.field`
+      });
+    }
+
+    // Validate aggregation type
+    if (aggregation.type && !VALID_AGGREGATION_TYPES.includes(aggregation.type)) {
+      errors.push({
+        code: ValidationErrorCode.INVALID_AGGREGATION_TYPE,
+        message: `Invalid aggregation type: ${aggregation.type}. Valid types: ${VALID_AGGREGATION_TYPES.join(", ")}`,
+        path: `${path}.type`
+      });
+    }
+  }
+
+  /**
+   * Validates Sort
+   */
+  private validateSort(sort: any, errors: ValidationError[], path: string): void {
+    // Validate required field property
+    if (!sort.field) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_SORT_FIELD,
+        message: "Sort must have a field property",
+        path: `${path}.field`
+      });
+    }
+
+    // Validate required direction property
+    if (!sort.direction) {
+      errors.push({
+        code: ValidationErrorCode.MISSING_SORT_FIELD,
+        message: "Sort must have a direction property",
+        path: `${path}.direction`
+      });
+    }
+
+    // Validate direction value
+    if (sort.direction && !VALID_SORT_DIRECTIONS.includes(sort.direction)) {
+      errors.push({
+        code: ValidationErrorCode.INVALID_SORT_DIRECTION,
+        message: `Invalid sort direction: ${sort.direction}. Valid values: ${VALID_SORT_DIRECTIONS.join(", ")}`,
+        path: `${path}.direction`
+      });
+    }
+  }
+
+  /**
+   * Validates Limit
+   */
+  private validateLimit(limit: any, errors: ValidationError[], path: string): void {
+    // Validate type
+    if (typeof limit !== "number") {
+      errors.push({
+        code: ValidationErrorCode.INVALID_LIMIT,
+        message: `Limit must be a number, got: ${typeof limit}`,
+        path
+      });
+      return;
+    }
+
+    // Validate range
+    if (limit <= 0) {
+      errors.push({
+        code: ValidationErrorCode.INVALID_LIMIT,
+        message: `Limit must be a positive integer, got: ${limit}`,
+        path
+      });
     }
   }
 
