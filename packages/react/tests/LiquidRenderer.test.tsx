@@ -255,6 +255,21 @@ describe('LiquidRenderer (FR-08: UIレンダリング)', () => {
         render(<LiquidRenderer schema={schema} />);
       }).toThrow('Data source "nonexistent_ds" not found');
     });
+
+    it('should throw error for unsupported layout type', () => {
+      const schema = {
+        version: '1.0',
+        layout: {
+          type: 'flex', // unsupported layout type
+        },
+        components: [],
+        data_sources: {},
+      } as any;
+
+      expect(() => {
+        render(<LiquidRenderer schema={schema} />);
+      }).toThrow('Unsupported layout type: flex');
+    });
   });
 
   describe('型安全性', () => {
