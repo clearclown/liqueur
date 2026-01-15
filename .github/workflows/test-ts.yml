@@ -20,7 +20,7 @@ jobs:
           node-version: "20"
 
       - name: Install protocol dependencies
-        run: cd packages/protocol && npm install
+        run: cd packages/protocol && npm install --legacy-peer-deps
 
       - name: Type check
         run: cd packages/protocol && npm run typecheck
