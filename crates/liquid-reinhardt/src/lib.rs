@@ -2,7 +2,11 @@
 //!
 //! reinhardt-web integration for Liquid Protocol
 //!
-//! This crate will provide DataSource conversion and Row-Level Security
-//! implementation in Week 4.
+//! This crate provides DataSource to ORM conversion (FR-06)
+//! and Row-Level Security implementation (FR-07).
 
-// Placeholder for Week 4 implementation
+pub mod converter;
+pub mod security;
+
+pub use converter::{ConversionError, ConvertedQuery, DataSourceConverter, QueryCondition};
+pub use security::{CurrentUser, SecurityEnforcer, SecurityPolicy};
