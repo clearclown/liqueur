@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@liqueur/protocol": "^0.1.0",
+    "@tanstack/react-table": "^8.21.3",
     "react": "^18.0.0",
     "recharts": "^2.15.4"
   },
