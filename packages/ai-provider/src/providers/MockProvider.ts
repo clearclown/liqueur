@@ -6,6 +6,7 @@ import type {
   CostEstimate,
   ProviderConfig,
 } from '../types';
+import { SchemaValidator } from '../validators/SchemaValidator';
 
 /**
  * Mock AI Provider for testing and development
@@ -96,69 +97,7 @@ export class MockProvider implements AIProvider {
   }
 
   validateResponse(response: unknown): ValidationResult {
-    // Type guard
-    if (!response || typeof response !== 'object') {
-      return {
-        valid: false,
-        errors: [
-          {
-            code: 'INVALID_RESPONSE_TYPE',
-            message: 'Response must be an object',
-          },
-        ],
-      };
-    }
-
-    const obj = response as Record<string, unknown>;
-
-    // Check required fields
-    const errors: ValidationResult['errors'] = [];
-
-    if (!obj.version) {
-      errors.push({
-        code: 'MISSING_VERSION',
-        message: 'Schema version is required',
-        path: 'version',
-      });
-    }
-
-    if (!obj.layout) {
-      errors.push({
-        code: 'MISSING_LAYOUT',
-        message: 'Schema layout is required',
-        path: 'layout',
-      });
-    }
-
-    if (!obj.components) {
-      errors.push({
-        code: 'MISSING_COMPONENTS',
-        message: 'Schema components are required',
-        path: 'components',
-      });
-    }
-
-    if (!obj.data_sources) {
-      errors.push({
-        code: 'MISSING_DATA_SOURCES',
-        message: 'Schema data_sources are required',
-        path: 'data_sources',
-      });
-    }
-
-    if (errors.length > 0) {
-      return {
-        valid: false,
-        errors,
-      };
-    }
-
-    // Basic validation passed
-    return {
-      valid: true,
-      errors: [],
-      schema: response as LiquidViewSchema,
-    };
+    return SchemaValidator.validateResponse(response);
   }
 
   estimateCost(prompt: string): CostEstimate {
