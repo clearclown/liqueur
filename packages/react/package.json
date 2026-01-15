@@ -1,0 +1,33 @@
+{
+  "name": "@liqueur/react",
+  "version": "0.1.0",
+  "description": "Liquid UI - React UIコンポーネントライブラリ",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@liqueur/protocol": "workspace:*",
+    "react": "^18.2.0",
+    "recharts": "^2.10.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "@types/react": "^18.2.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "jsdom": "^23.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

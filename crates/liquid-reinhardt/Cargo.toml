@@ -1,0 +1,17 @@
+[package]
+name = "liquid-reinhardt"
+version = "0.1.0"
+edition = "2021"
+description = "Liquid Reinhardt Adapter - reinhardt-web統合"
+license = "MIT"
+
+[dependencies]
+liquid-protocol = { path = "../liquid-protocol" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+# reinhardt-web = { path = "../../external/reinhardt-web" }  # submodule追加後に有効化
+
+[dev-dependencies]
+tokio = { workspace = true }

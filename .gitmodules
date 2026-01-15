@@ -1,0 +1,3 @@
+[submodule "external/reinhardt-web"]
+	path = external/reinhardt-web
+	url = https://github.com/kent8192/reinhardt-web.git
