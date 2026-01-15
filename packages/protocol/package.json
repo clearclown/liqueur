@@ -1,24 +1,39 @@
 {
   "name": "@liqueur/protocol",
   "version": "0.1.0",
-  "description": "Liquid Protocol - TypeScript型定義とバリデーター",
+  "description": "Liquid Protocol - Type definitions and validators for AI-driven dynamic UI generation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "docs": "typedoc src/index.ts --out ../../docs/api/typescript"
+    "lint": "eslint src tests --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
+  "keywords": [
+    "liquid",
+    "protocol",
+    "server-driven-ui",
+    "ai",
+    "typescript"
+  ],
+  "author": "Project Liquid Contributors",
+  "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@vitest/coverage-v8": "^2.0.0",
-    "typedoc": "^0.25.0",
-    "typescript": "^5.3.0",
-    "vitest": "^2.0.0"
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
   },
-  "engines": {
-    "node": ">=20.0.0"
-  }
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }
