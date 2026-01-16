@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/protocol" },
+    { "path": "./packages/react" },
+    { "path": "./packages/ai-provider" },
+    { "path": "./packages/artifact-store" }
+  ]
+}
