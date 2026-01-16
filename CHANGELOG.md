@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation Enhancement (Phase 55, 2025-01-16)
+
+#### Changed
+- **README.md**:
+  - Added "コード品質" section under "開発"
+  - Documented lint, format, and format:check commands
+  - Aligned with Phase 53 root scripts expansion
+
+#### Benefits
+- **Developer Experience**: Easy discovery of code quality commands
+- **Documentation Completeness**: All new commands properly documented
+- **Consistency**: Follows existing README structure and style
+
+#### Verification (Phase 55)
+- ✅ Documentation accurate and complete
+- ✅ Commands work as documented
+
+---
+
 ### Root Scripts Expansion (Phase 53, 2025-01-16)
 
 #### Added
