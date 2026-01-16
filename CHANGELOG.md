@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Package Scripts Unification (Phase 49, 2025-01-16)
+
+#### Changed
+- **packages/react/package.json**:
+  - Added `format` script: `prettier --write "src/**/*.{ts,tsx}" "tests/**/*.{ts,tsx}"`
+  - Added `prettier: ^3.1.0` to devDependencies
+
+- **packages/ai-provider/package.json**:
+  - Updated `test:watch`: `vitest` → `vitest watch` (explicit watch command)
+  - Reordered scripts: build, test, test:watch, test:coverage, typecheck, lint, format
+  - Added `format` script: `prettier --write "src/**/*.ts" "tests/**/*.ts"`
+  - Added `prettier: ^3.1.0` to devDependencies
+
+- **packages/artifact-store/package.json**:
+  - Updated `test:watch`: `vitest` → `vitest watch` (explicit watch command)
+  - Reordered scripts: build, test, test:watch, test:coverage, typecheck, lint, format
+  - Added `format` script: `prettier --write "src/**/*.ts" "tests/**/*.ts"`
+  - Added `prettier: ^3.1.0` to devDependencies
+
+#### Benefits
+- **Command Consistency**: All packages now have identical script command sets
+- **Script Order Consistency**: Standardized order improves readability
+- **Code Formatting**: All packages can now be formatted with `npm run format`
+- **Explicit Commands**: `test:watch` now explicitly uses `vitest watch` for clarity
+
+#### Verification (Phase 49)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ All builds successful: 4/4 packages
+- ✅ Dependencies installed successfully
+
+---
+
 ### Dependency Optimization (Phase 45, 2025-01-16)
 
 #### Changed
