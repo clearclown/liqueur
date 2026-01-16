@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Root Scripts Expansion (Phase 53, 2025-01-16)
+
+#### Added
+- **Root package.json** - Workspace-wide operation scripts:
+  - `lint` script: `npm run lint --workspaces`
+  - `format` script: `npm run format --workspaces`
+  - `format:check` script: `prettier --check "packages/*/src/**/*.{ts,tsx}" "packages/*/tests/**/*.{ts,tsx}"`
+  - `prettier: ^3.1.0` to devDependencies
+
+#### Changed
+- **All TypeScript Files** (54 files):
+  - Automatically formatted with Prettier
+  - Code style unified across all packages (ai-provider, artifact-store, protocol, react)
+
+#### Benefits
+- **Workspace-Wide Commands**: Single command for linting/formatting all packages
+- **Code Style Consistency**: All files follow Prettier standards
+- **Development Efficiency**: No need to cd into each package for formatting
+- **Root-Level Prettier**: Available for workspace-wide operations
+
+#### Verification (Phase 53)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors
+- ✅ All lint checks passing: 4/4 packages
+- ✅ Format check passing: All files use Prettier code style
+
+---
+
 ### Configuration Refinement (Phase 47-51, 2025-01-16)
 
 #### Changed
