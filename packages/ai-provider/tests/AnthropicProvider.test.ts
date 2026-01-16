@@ -2,12 +2,13 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { AnthropicProvider } from '../src/providers/AnthropicProvider';
 import type { DatabaseMetadata, ProviderConfig } from '../src/types';
 import {
+  createMockConfig,
   createMockMetadata,
   createValidSchema,
-  createInvalidSchemaMissingVersion,
-  createInvalidSchemaMissingLayout,
+  createInvalidSchema,
   createMultiTableMetadata,
-} from './testHelpers';
+  expectValidationSuccess,
+} from './testHelpersBaseAIProvider';
 
 describe('AnthropicProvider', () => {
   let provider: AnthropicProvider;
@@ -15,11 +16,10 @@ describe('AnthropicProvider', () => {
   let config: ProviderConfig;
 
   beforeEach(() => {
-    config = {
+    config = createMockConfig({
       apiKey: 'test-anthropic-key',
       model: 'claude-3-haiku-20240307',
-      timeout: 5000,
-    };
+    });
 
     provider = new AnthropicProvider(config);
     mockMetadata = createMockMetadata();
@@ -57,17 +57,12 @@ describe('AnthropicProvider', () => {
   describe('validateResponse', () => {
     it('should validate correct schema structure', () => {
       const validSchema = createValidSchema();
-
       const result = provider.validateResponse(validSchema);
-
-      expect(result.valid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-      expect(result.schema).toEqual(validSchema);
+      expectValidationSuccess(result, validSchema);
     });
 
     it('should reject invalid schema - missing version', () => {
-      const invalidSchema = createInvalidSchemaMissingVersion();
-
+      const invalidSchema = createInvalidSchema('version');
       const result = provider.validateResponse(invalidSchema);
 
       expect(result.valid).toBe(false);
@@ -76,8 +71,7 @@ describe('AnthropicProvider', () => {
     });
 
     it('should reject invalid schema - missing layout', () => {
-      const invalidSchema = createInvalidSchemaMissingLayout();
-
+      const invalidSchema = createInvalidSchema('layout');
       const result = provider.validateResponse(invalidSchema);
 
       expect(result.valid).toBe(false);

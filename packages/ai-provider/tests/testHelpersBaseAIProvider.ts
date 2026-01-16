@@ -45,6 +45,21 @@ export function createMockMetadata(
 }
 
 /**
+ * Creates a multi-table mock metadata for testing
+ * @param tableNames Array of table names to include
+ */
+export function createMultiTableMetadata(tableNames: string[]): DatabaseMetadata {
+  const baseTable = createMockMetadata().tables[0];
+
+  return {
+    tables: tableNames.map(name => ({
+      ...baseTable,
+      name,
+    })),
+  };
+}
+
+/**
  * Creates a valid LiquidView schema object
  */
 export function createValidSchema(overrides?: any) {
