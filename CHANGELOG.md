@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Package Metadata Unification (Phase 59, 2025-01-16)
+
+#### Added
+- **All 4 TypeScript packages** - npm registry metadata:
+  - `repository`: Git URL with `directory` field for monorepo packages
+  - `bugs`: GitHub issues tracker URL
+  - `homepage`: GitHub repository homepage URL
+
+#### Modified
+- **packages/protocol/package.json**: Added repository, bugs, homepage
+- **packages/react/package.json**: Added repository, bugs, homepage
+- **packages/ai-provider/package.json**: Added repository, bugs, homepage
+- **packages/artifact-store/package.json**: Added repository, bugs, homepage
+
+#### Benefits
+- **npm Registry Integration**: Source code and issue tracker links displayed on npm
+- **Developer Experience**: Easy navigation from npm to GitHub repository
+- **Consistency**: Uniform metadata structure across all packages
+- **Monorepo Support**: `directory` field correctly points to package location
+
+#### Verification (Phase 59)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors
+- ✅ All 4 packages have complete metadata
+
+---
+
 ### API Documentation Setup (Phase 57, 2025-01-16)
 
 #### Added
