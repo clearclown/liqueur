@@ -1,20 +1,17 @@
-import {
-  BaseOpenAIProvider,
-  type OpenAICompatibleConfig,
-} from './BaseOpenAIProvider';
+import { BaseOpenAIProvider, type OpenAICompatibleConfig } from "./BaseOpenAIProvider";
 
 /**
  * Local LLM Provider (LM Studio, Ollama, etc.)
  * OpenAI-compatible local endpoints
  */
 export class LocalLLMProvider extends BaseOpenAIProvider {
-  public readonly name = 'local';
+  public readonly name = "local";
 
   constructor(config: OpenAICompatibleConfig) {
     super({
       ...config,
-      baseURL: config.baseURL || 'http://localhost:1234/v1',
-      apiKey: 'not-needed', // Local LLM doesn't need API key
+      baseURL: config.baseURL || "http://localhost:1234/v1",
+      apiKey: "not-needed", // Local LLM doesn't need API key
     });
   }
 

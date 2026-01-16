@@ -1,4 +1,4 @@
-import type { Artifact, ArtifactVisibility, ListArtifactsQuery } from '../types';
+import type { Artifact, ArtifactVisibility, ListArtifactsQuery } from "../types";
 
 /**
  * Query helper functions for InMemoryArtifactStore
@@ -58,14 +58,14 @@ export function filterBySearch(artifacts: Artifact[], search?: string): Artifact
  */
 export function sortArtifacts(
   artifacts: Artifact[],
-  sortBy: 'createdAt' | 'updatedAt' | 'title' = 'createdAt',
-  sortOrder: 'asc' | 'desc' = 'desc'
+  sortBy: "createdAt" | "updatedAt" | "title" = "createdAt",
+  sortOrder: "asc" | "desc" = "desc"
 ): Artifact[] {
   return artifacts.sort((a, b) => {
     let aValue: any;
     let bValue: any;
 
-    if (sortBy === 'title') {
+    if (sortBy === "title") {
       aValue = a.title.toLowerCase();
       bValue = b.title.toLowerCase();
     } else {
@@ -73,7 +73,7 @@ export function sortArtifacts(
       bValue = b[sortBy].getTime();
     }
 
-    if (sortOrder === 'asc') {
+    if (sortOrder === "asc") {
       return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
     } else {
       return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;

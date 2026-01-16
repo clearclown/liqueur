@@ -1,5 +1,5 @@
-import React from 'react';
-import type { ChartComponent as ChartComponentType } from '@liqueur/protocol';
+import React from "react";
+import type { ChartComponent as ChartComponentType } from "@liqueur/protocol";
 import {
   BarChart,
   Bar,
@@ -14,8 +14,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
-import { ComponentWrapper } from './ComponentWrapper';
+} from "recharts";
+import { ComponentWrapper } from "./ComponentWrapper";
 
 export interface ChartComponentProps extends ChartComponentType {
   data?: unknown[];
@@ -25,7 +25,7 @@ export interface ChartComponentProps extends ChartComponentType {
   height?: number;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"];
 
 /**
  * ChartComponent - チャート表示コンポーネント（FR-08, FR-09）
@@ -53,9 +53,9 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
 
   const renderChart = () => {
     switch (variant) {
-      case 'bar':
+      case "bar":
         return (
-          <ResponsiveContainer width={width || '100%'} height={height}>
+          <ResponsiveContainer width={width || "100%"} height={height}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={xKey} />
@@ -69,9 +69,9 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
           </ResponsiveContainer>
         );
 
-      case 'line':
+      case "line":
         return (
-          <ResponsiveContainer width={width || '100%'} height={height}>
+          <ResponsiveContainer width={width || "100%"} height={height}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={xKey} />
@@ -90,11 +90,11 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
           </ResponsiveContainer>
         );
 
-      case 'pie': {
+      case "pie": {
         // Pieチャートは最初のyKeyのみ使用
         const pieDataKey = yKeys[0];
         return (
-          <ResponsiveContainer width={width || '100%'} height={height}>
+          <ResponsiveContainer width={width || "100%"} height={height}>
             <PieChart>
               <Pie
                 data={chartData}
@@ -117,22 +117,12 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
       }
 
       default:
-        return (
-          <div className="chart-unsupported">
-            Unsupported chart variant: {variant}
-          </div>
-        );
+        return <div className="chart-unsupported">Unsupported chart variant: {variant}</div>;
     }
   };
 
   return (
-    <ComponentWrapper
-      type="chart"
-      index={index}
-      title={title}
-      loading={loading}
-      hasData={hasData}
-    >
+    <ComponentWrapper type="chart" index={index} title={title} loading={loading} hasData={hasData}>
       {renderChart()}
     </ComponentWrapper>
   );

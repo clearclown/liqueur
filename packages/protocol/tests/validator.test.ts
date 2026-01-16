@@ -11,7 +11,7 @@ import {
   isGridLayout,
   isStackLayout,
   isChartComponent,
-  isTableComponent
+  isTableComponent,
 } from "../src/types/index.js";
 import { SchemaValidator } from "../src/validators/schema.js";
 import {
@@ -71,7 +71,7 @@ describe("SchemaValidator", () => {
     const schema = {
       layout: createGridLayout(2),
       components: [],
-      data_sources: {}
+      data_sources: {},
     };
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
@@ -83,7 +83,7 @@ describe("SchemaValidator", () => {
   it("should reject schema missing layout field", () => {
     const schema = {
       version: "1.0",
-      data_sources: {}
+      data_sources: {},
     };
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
@@ -96,7 +96,7 @@ describe("SchemaValidator", () => {
     const schema = {
       version: "1.0",
       layout: createGridLayout(2),
-      components: []
+      components: [],
     };
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
@@ -129,9 +129,9 @@ describe("SchemaValidator", () => {
         {
           type: "chart",
           variant: "invalid_variant" as any,
-          title: "Test Chart"
-        }
-      ]
+          title: "Test Chart",
+        },
+      ],
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_CHART_VARIANT);
@@ -142,7 +142,7 @@ describe("SchemaValidator", () => {
    */
   it("should reject table component with empty columns array", () => {
     const schema = createBaseSchema({
-      components: [createTableComponent([], { title: "Test Table" })]
+      components: [createTableComponent([], { title: "Test Table" })],
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.EMPTY_TABLE_COLUMNS);
@@ -156,9 +156,9 @@ describe("SchemaValidator", () => {
       components: [
         createChartComponent("bar", {
           data_source: "non_existent_ds",
-          title: "Test Chart"
-        })
-      ]
+          title: "Test Chart",
+        }),
+      ],
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.DANGLING_DATA_SOURCE_REF);
@@ -174,21 +174,19 @@ describe("SchemaValidator", () => {
           data_source: "sales_data",
           xAxis: "month",
           yAxis: "amount",
-          title: "Monthly Sales"
-        })
+          title: "Monthly Sales",
+        }),
       ],
       data_sources: {
         sales_data: createDataSource("sales", {
-          filters: [
-            { field: "status", op: "eq", value: "completed" }
-          ],
+          filters: [{ field: "status", op: "eq", value: "completed" }],
           aggregation: {
             type: "sum",
             field: "amount",
-            by: "month"
-          }
-        })
-      }
+            by: "month",
+          },
+        }),
+      },
     });
 
     validateAndExpectValid(validator, schema);
@@ -204,15 +202,15 @@ describe("SchemaValidator", () => {
         createTableComponent(["name", "price", "quantity"], {
           data_source: "products_data",
           sortable: true,
-          title: "Product List"
-        })
+          title: "Product List",
+        }),
       ],
       data_sources: {
         products_data: createDataSource("products", {
           sort: { field: "name", direction: "asc" },
-          limit: 50
-        })
-      }
+          limit: 50,
+        }),
+      },
     });
 
     validateAndExpectValid(validator, schema);
@@ -229,47 +227,45 @@ describe("SchemaValidator", () => {
           data_source: "monthly_revenue",
           xAxis: "month",
           yAxis: "revenue",
-          title: "Revenue Trend"
+          title: "Revenue Trend",
         }),
         createChartComponent("pie", {
           data_source: "category_breakdown",
-          title: "Sales by Category"
+          title: "Sales by Category",
         }),
         createTableComponent(["product", "sales", "profit"], {
           data_source: "top_products",
           sortable: true,
-          title: "Top Products"
-        })
+          title: "Top Products",
+        }),
       ],
       data_sources: {
         monthly_revenue: createDataSource("orders", {
-          filters: [
-            { field: "year", op: "eq", value: 2024 }
-          ],
+          filters: [{ field: "year", op: "eq", value: 2024 }],
           aggregation: {
             type: "sum",
             field: "amount",
-            by: "month"
+            by: "month",
           },
-          sort: { field: "month", direction: "asc" }
+          sort: { field: "month", direction: "asc" },
         }),
         category_breakdown: createDataSource("orders", {
           aggregation: {
             type: "sum",
             field: "amount",
-            by: "category"
-          }
+            by: "category",
+          },
         }),
         top_products: createDataSource("products", {
           aggregation: {
             type: "sum",
             field: "sales_amount",
-            by: "product_id"
+            by: "product_id",
           },
           sort: { field: "sales_amount", direction: "desc" },
-          limit: 10
-        })
-      }
+          limit: 10,
+        }),
+      },
     });
 
     validateAndExpectValid(validator, schema);
@@ -282,11 +278,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("users", {
-          filters: [
-            { field: "age", op: "invalid_op" as any, value: 30 }
-          ]
-        })
-      }
+          filters: [{ field: "age", op: "invalid_op" as any, value: 30 }],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_OP);
@@ -301,10 +295,10 @@ describe("SchemaValidator", () => {
         test_ds: createDataSource("sales", {
           aggregation: {
             type: "invalid_agg" as any,
-            field: "amount"
-          }
-        })
-      }
+            field: "amount",
+          },
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_AGGREGATION_TYPE);
@@ -317,9 +311,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: {
-          filters: [{ field: "id", op: "eq", value: 1 }]
-        } as any
-      }
+          filters: [{ field: "id", op: "eq", value: 1 }],
+        } as any,
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_RESOURCE);
@@ -333,8 +327,8 @@ describe("SchemaValidator", () => {
       layout: createStackLayout("horizontal"),
       components: [
         createChartComponent("bar", { title: "Chart 1" }),
-        createChartComponent("line", { title: "Chart 2" })
-      ]
+        createChartComponent("line", { title: "Chart 2" }),
+      ],
     });
 
     validateAndExpectValid(validator, schema);
@@ -355,10 +349,10 @@ describe("SchemaValidator", () => {
             { field: "price", op: "lt", value: 1000 },
             { field: "price", op: "lte", value: 1000 },
             { field: "category", op: "in", value: ["electronics", "books"] },
-            { field: "name", op: "contains", value: "laptop" }
-          ]
-        })
-      }
+            { field: "name", op: "contains", value: "laptop" },
+          ],
+        }),
+      },
     });
 
     validateAndExpectValid(validator, schema);
@@ -371,11 +365,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          filters: [
-            { field: "category", op: "in", value: "electronics" as any }
-          ]
-        })
-      }
+          filters: [{ field: "category", op: "in", value: "electronics" as any }],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_VALUE_TYPE);
@@ -388,11 +380,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          filters: [
-            { field: "id", op: "eq", value: [1, 2, 3] as any }
-          ]
-        })
-      }
+          filters: [{ field: "id", op: "eq", value: [1, 2, 3] as any }],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_VALUE_TYPE);
@@ -405,11 +395,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          filters: [
-            { op: "eq", value: 100 } as any
-          ]
-        })
-      }
+          filters: [{ op: "eq", value: 100 } as any],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
@@ -422,11 +410,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          filters: [
-            { field: "price", op: "gt" } as any
-          ]
-        })
-      }
+          filters: [{ field: "price", op: "gt" } as any],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
@@ -439,11 +425,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          filters: [
-            { field: "price", value: 100 } as any
-          ]
-        })
-      }
+          filters: [{ field: "price", value: 100 } as any],
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
@@ -457,10 +441,10 @@ describe("SchemaValidator", () => {
       data_sources: {
         test_ds: createDataSource("sales", {
           aggregation: {
-            field: "amount"
-          } as any
-        })
-      }
+            field: "amount",
+          } as any,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_AGGREGATION_FIELD);
@@ -474,10 +458,10 @@ describe("SchemaValidator", () => {
       data_sources: {
         test_ds: createDataSource("sales", {
           aggregation: {
-            type: "sum"
-          } as any
-        })
-      }
+            type: "sum",
+          } as any,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_AGGREGATION_FIELD);
@@ -490,9 +474,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          sort: { field: "price", direction: "invalid" as any }
-        })
-      }
+          sort: { field: "price", direction: "invalid" as any },
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_SORT_DIRECTION);
@@ -505,9 +489,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          sort: { direction: "asc" } as any
-        })
-      }
+          sort: { direction: "asc" } as any,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_SORT_FIELD);
@@ -520,9 +504,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          sort: { field: "price" } as any
-        })
-      }
+          sort: { field: "price" } as any,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_SORT_FIELD);
@@ -535,9 +519,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          limit: -10
-        })
-      }
+          limit: -10,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
@@ -550,9 +534,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          limit: 0
-        })
-      }
+          limit: 0,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
@@ -565,9 +549,9 @@ describe("SchemaValidator", () => {
     const schema = createBaseSchema({
       data_sources: {
         test_ds: createDataSource("products", {
-          limit: "10" as any
-        })
-      }
+          limit: "10" as any,
+        }),
+      },
     });
 
     validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
@@ -586,7 +570,7 @@ describe("Type Guards", () => {
       version: "1.0",
       layout: { type: "grid", columns: 1 },
       components: [],
-      data_sources: {}
+      data_sources: {},
     };
 
     expect(isLiquidViewSchema(schema)).toBe(true);

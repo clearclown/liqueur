@@ -6,7 +6,7 @@
 import {
   type ValidationResult,
   type ValidationError,
-  ValidationErrorCode
+  ValidationErrorCode,
 } from "../types/index.js";
 
 const SUPPORTED_VERSIONS = ["1.0"] as const;
@@ -30,7 +30,7 @@ export class SchemaValidator {
     if (typeof schema !== "object" || schema === null) {
       errors.push({
         code: ValidationErrorCode.INVALID_TYPE,
-        message: "Schema must be an object"
+        message: "Schema must be an object",
       });
       return { valid: false, errors };
     }
@@ -42,7 +42,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
         message: "Missing required field: version",
-        path: "version"
+        path: "version",
       });
     }
 
@@ -50,7 +50,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
         message: "Missing required field: layout",
-        path: "layout"
+        path: "layout",
       });
     }
 
@@ -58,7 +58,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
         message: "Missing required field: components (must be an array)",
-        path: "components"
+        path: "components",
       });
     }
 
@@ -66,7 +66,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_REQUIRED_FIELD,
         message: "Missing required field: data_sources",
-        path: "data_sources"
+        path: "data_sources",
       });
     }
 
@@ -102,7 +102,7 @@ export class SchemaValidator {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -114,7 +114,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.UNSUPPORTED_VERSION,
         message: `Unsupported protocol version: ${version}. Supported versions: ${SUPPORTED_VERSIONS.join(", ")}`,
-        path: "version"
+        path: "version",
       });
     }
   }
@@ -127,7 +127,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_LAYOUT_TYPE,
         message: `Invalid layout type: ${layout.type}. Valid types: ${VALID_LAYOUT_TYPES.join(", ")}`,
-        path: "layout.type"
+        path: "layout.type",
       });
       return;
     }
@@ -139,7 +139,7 @@ export class SchemaValidator {
           errors.push({
             code: ValidationErrorCode.INVALID_GRID_COLUMNS,
             message: `Grid columns must be >= 1, got: ${layout.columns}`,
-            path: "layout.columns"
+            path: "layout.columns",
           });
         }
       }
@@ -154,7 +154,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_COMPONENT_TYPE,
         message: `Invalid component type: ${component.type}. Valid types: ${VALID_COMPONENT_TYPES.join(", ")}`,
-        path: `${path}.type`
+        path: `${path}.type`,
       });
       return;
     }
@@ -165,7 +165,7 @@ export class SchemaValidator {
         errors.push({
           code: ValidationErrorCode.INVALID_CHART_VARIANT,
           message: `Invalid chart variant: ${component.variant}. Valid variants: ${VALID_CHART_VARIANTS.join(", ")}`,
-          path: `${path}.variant`
+          path: `${path}.variant`,
         });
       }
     }
@@ -176,7 +176,7 @@ export class SchemaValidator {
         errors.push({
           code: ValidationErrorCode.EMPTY_TABLE_COLUMNS,
           message: "Table columns array cannot be empty",
-          path: `${path}.columns`
+          path: `${path}.columns`,
         });
       }
     }
@@ -190,7 +190,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_TYPE,
         message: "data_sources must be an object",
-        path: "data_sources"
+        path: "data_sources",
       });
       return;
     }
@@ -209,7 +209,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_RESOURCE,
         message: "DataSource must have a resource field",
-        path: `${path}.resource`
+        path: `${path}.resource`,
       });
     }
 
@@ -245,7 +245,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_FILTER_FIELD,
         message: "Filter must have a field property",
-        path: `${path}.field`
+        path: `${path}.field`,
       });
     }
 
@@ -253,7 +253,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_FILTER_FIELD,
         message: "Filter must have an op property",
-        path: `${path}.op`
+        path: `${path}.op`,
       });
     }
 
@@ -261,7 +261,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_FILTER_FIELD,
         message: "Filter must have a value property",
-        path: `${path}.value`
+        path: `${path}.value`,
       });
     }
 
@@ -270,7 +270,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_FILTER_OP,
         message: `Invalid filter operator: ${filter.op}. Valid operators: ${VALID_FILTER_OPERATORS.join(", ")}`,
-        path: `${path}.op`
+        path: `${path}.op`,
       });
       return;
     }
@@ -285,7 +285,7 @@ export class SchemaValidator {
           errors.push({
             code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE,
             message: `Filter operator "in" requires an array value`,
-            path: `${path}.value`
+            path: `${path}.value`,
           });
         }
       } else {
@@ -294,7 +294,7 @@ export class SchemaValidator {
           errors.push({
             code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE,
             message: `Filter operator "${filter.op}" requires a scalar value (string | number | boolean)`,
-            path: `${path}.value`
+            path: `${path}.value`,
           });
         }
       }
@@ -310,7 +310,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_AGGREGATION_FIELD,
         message: "Aggregation must have a type field",
-        path: `${path}.type`
+        path: `${path}.type`,
       });
     }
 
@@ -319,7 +319,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_AGGREGATION_FIELD,
         message: "Aggregation must have a field property",
-        path: `${path}.field`
+        path: `${path}.field`,
       });
     }
 
@@ -328,7 +328,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_AGGREGATION_TYPE,
         message: `Invalid aggregation type: ${aggregation.type}. Valid types: ${VALID_AGGREGATION_TYPES.join(", ")}`,
-        path: `${path}.type`
+        path: `${path}.type`,
       });
     }
   }
@@ -342,7 +342,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_SORT_FIELD,
         message: "Sort must have a field property",
-        path: `${path}.field`
+        path: `${path}.field`,
       });
     }
 
@@ -351,7 +351,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.MISSING_SORT_FIELD,
         message: "Sort must have a direction property",
-        path: `${path}.direction`
+        path: `${path}.direction`,
       });
     }
 
@@ -360,7 +360,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_SORT_DIRECTION,
         message: `Invalid sort direction: ${sort.direction}. Valid values: ${VALID_SORT_DIRECTIONS.join(", ")}`,
-        path: `${path}.direction`
+        path: `${path}.direction`,
       });
     }
   }
@@ -374,7 +374,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_LIMIT,
         message: `Limit must be a number, got: ${typeof limit}`,
-        path
+        path,
       });
       return;
     }
@@ -384,7 +384,7 @@ export class SchemaValidator {
       errors.push({
         code: ValidationErrorCode.INVALID_LIMIT,
         message: `Limit must be a positive integer, got: ${limit}`,
-        path
+        path,
       });
     }
   }
@@ -392,7 +392,11 @@ export class SchemaValidator {
   /**
    * Validates that all data_source references in components exist
    */
-  private validateDataSourceReferences(components: any[], dataSources: any, errors: ValidationError[]): void {
+  private validateDataSourceReferences(
+    components: any[],
+    dataSources: any,
+    errors: ValidationError[]
+  ): void {
     if (!Array.isArray(components)) return;
 
     components.forEach((component: any, index: number) => {
@@ -401,7 +405,7 @@ export class SchemaValidator {
           errors.push({
             code: ValidationErrorCode.DANGLING_DATA_SOURCE_REF,
             message: `Component references non-existent data_source: ${component.data_source}`,
-            path: `components[${index}].data_source`
+            path: `components[${index}].data_source`,
           });
         }
       }

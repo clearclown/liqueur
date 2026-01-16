@@ -1,12 +1,7 @@
-import React from 'react';
-import type { TableComponent as TableComponentType } from '@liqueur/protocol';
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  type ColumnDef,
-} from '@tanstack/react-table';
-import { ComponentWrapper } from './ComponentWrapper';
+import React from "react";
+import type { TableComponent as TableComponentType } from "@liqueur/protocol";
+import { useReactTable, getCoreRowModel, flexRender, type ColumnDef } from "@tanstack/react-table";
+import { ComponentWrapper } from "./ComponentWrapper";
 
 export interface TableComponentProps extends TableComponentType {
   data?: unknown[];
@@ -37,7 +32,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
     cell: (info) => {
       const value = info.getValue();
       // 値がnull/undefinedの場合は空文字を返す
-      return value !== null && value !== undefined ? String(value) : '';
+      return value !== null && value !== undefined ? String(value) : "";
     },
   }));
 
@@ -49,13 +44,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
   });
 
   return (
-    <ComponentWrapper
-      type="table"
-      index={index}
-      title={title}
-      loading={loading}
-      hasData={hasData}
-    >
+    <ComponentWrapper type="table" index={index} title={title} loading={loading} hasData={hasData}>
       <table role="table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -74,9 +63,7 @@ export const TableComponent: React.FC<TableComponentProps> = ({
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
+                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
               ))}
             </tr>
           ))}

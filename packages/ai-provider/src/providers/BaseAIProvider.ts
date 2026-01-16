@@ -1,12 +1,12 @@
-import type { LiquidViewSchema } from '@liqueur/protocol';
+import type { LiquidViewSchema } from "@liqueur/protocol";
 import type {
   AIProvider,
   DatabaseMetadata,
   ValidationResult,
   CostEstimate,
   ProviderConfig,
-} from '../types';
-import { SchemaValidator } from '../validators/SchemaValidator';
+} from "../types";
+import { SchemaValidator } from "../validators/SchemaValidator";
 
 /**
  * Base class for AI providers with common validation and cost estimation logic
@@ -21,20 +21,17 @@ export abstract class BaseAIProvider implements AIProvider {
   }
 
   isConfigured(): boolean {
-    return !!this.config.apiKey && this.config.apiKey.trim() !== '';
+    return !!this.config.apiKey && this.config.apiKey.trim() !== "";
   }
 
-  async generateSchema(
-    prompt: string,
-    metadata: DatabaseMetadata
-  ): Promise<LiquidViewSchema> {
+  async generateSchema(prompt: string, metadata: DatabaseMetadata): Promise<LiquidViewSchema> {
     // Validation
-    if (!prompt || prompt.trim() === '') {
-      throw new Error('Prompt cannot be empty');
+    if (!prompt || prompt.trim() === "") {
+      throw new Error("Prompt cannot be empty");
     }
 
     if (!metadata.tables || metadata.tables.length === 0) {
-      throw new Error('Database metadata cannot be empty');
+      throw new Error("Database metadata cannot be empty");
     }
 
     // Build system prompt
@@ -54,7 +51,7 @@ export abstract class BaseAIProvider implements AIProvider {
     // Validate
     const validationResult = this.validateResponse(parsedSchema);
     if (!validationResult.valid) {
-      const errorMessages = validationResult.errors.map((e) => e.message).join(', ');
+      const errorMessages = validationResult.errors.map((e) => e.message).join(", ");
       throw new Error(`Invalid schema generated: ${errorMessages}`);
     }
 
@@ -77,12 +74,11 @@ export abstract class BaseAIProvider implements AIProvider {
     const costPerInputToken = this.getCostPerInputToken();
     const costPerOutputToken = this.getCostPerOutputToken();
 
-    const estimatedCost =
-      totalInputTokens * costPerInputToken + outputTokens * costPerOutputToken;
+    const estimatedCost = totalInputTokens * costPerInputToken + outputTokens * costPerOutputToken;
 
     return {
       estimatedCost,
-      currency: 'USD',
+      currency: "USD",
       model: this.config.model,
       inputTokens: totalInputTokens,
       outputTokens,

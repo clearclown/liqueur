@@ -3,9 +3,9 @@
  * TDD Red-Green-Refactor Cycle
  */
 
-import { renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { useLiquidView } from '../src/hooks/useLiquidView';
+import { renderHook } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { useLiquidView } from "../src/hooks/useLiquidView";
 import {
   createTestSchema,
   renderUseLiquidViewHook,
@@ -13,7 +13,7 @@ import {
   expectHookHasData,
   expectHookHasError,
   expectHookHasNoError,
-} from './testHelpersHooks';
+} from "./testHelpersHooks";
 
 // ResizeObserver mock (rechartsテストから継承)
 global.ResizeObserver = class ResizeObserver {
@@ -22,8 +22,8 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
-describe('useLiquidView - Basic Functionality', () => {
-  it('should return empty data when data_sources is empty', async () => {
+describe("useLiquidView - Basic Functionality", () => {
+  it("should return empty data when data_sources is empty", async () => {
     const schema = createTestSchema({});
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -33,7 +33,7 @@ describe('useLiquidView - Basic Functionality', () => {
     expectHookHasNoError(result);
   });
 
-  it('should set loading=false after data fetch completes', async () => {
+  it("should set loading=false after data fetch completes", async () => {
     const schema = createTestSchema({});
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -41,76 +41,72 @@ describe('useLiquidView - Basic Functionality', () => {
   });
 });
 
-describe('useLiquidView - Mock Data Generation', () => {
-  it('should generate mock data for known resources', async () => {
+describe("useLiquidView - Mock Data Generation", () => {
+  it("should generate mock data for known resources", async () => {
     const schema = createTestSchema({
-      components: [
-        { type: 'chart', variant: 'bar', data_source: 'ds_sales' }
-      ],
+      components: [{ type: "chart", variant: "bar", data_source: "ds_sales" }],
       data_sources: {
-        ds_sales: { resource: 'sales' }
+        ds_sales: { resource: "sales" },
       },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
     await waitForHookComplete(result);
 
-    expectHookHasData(result, 'ds_sales', ['month', 'amount']);
+    expectHookHasData(result, "ds_sales", ["month", "amount"]);
   });
 
   it('should generate users data for "users" resource', async () => {
     const schema = createTestSchema({
-      ds_users: { resource: 'users' }
+      ds_users: { resource: "users" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
     await waitForHookComplete(result);
 
-    expectHookHasData(result, 'ds_users', ['id', 'name', 'email']);
+    expectHookHasData(result, "ds_users", ["id", "name", "email"]);
   });
 
   it('should generate expenses data for "expenses" resource', async () => {
     const schema = createTestSchema({
-      ds_expenses: { resource: 'expenses' }
+      ds_expenses: { resource: "expenses" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
     await waitForHookComplete(result);
 
-    expectHookHasData(result, 'ds_expenses', ['date', 'category', 'amount']);
+    expectHookHasData(result, "ds_expenses", ["date", "category", "amount"]);
   });
 
-  it('should use partial matching for resource names', async () => {
+  it("should use partial matching for resource names", async () => {
     const schema = createTestSchema({
-      ds_monthly_sales: { resource: 'monthly_sales' }
+      ds_monthly_sales: { resource: "monthly_sales" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
     await waitForHookComplete(result);
 
-    expectHookHasData(result, 'ds_monthly_sales', ['month', 'amount']);
+    expectHookHasData(result, "ds_monthly_sales", ["month", "amount"]);
   });
 
-  it('should use default template for unknown resources', async () => {
+  it("should use default template for unknown resources", async () => {
     const schema = createTestSchema({
-      ds_unknown: { resource: 'unknown_resource' }
+      ds_unknown: { resource: "unknown_resource" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
     await waitForHookComplete(result);
 
-    expectHookHasData(result, 'ds_unknown');
+    expectHookHasData(result, "ds_unknown");
   });
 });
 
-describe('useLiquidView - Limit Application', () => {
-  it('should apply limit to mock data', async () => {
+describe("useLiquidView - Limit Application", () => {
+  it("should apply limit to mock data", async () => {
     const schema = createTestSchema({
-      components: [
-        { type: 'table', columns: ['month', 'amount'], data_source: 'ds_sales' }
-      ],
+      components: [{ type: "table", columns: ["month", "amount"], data_source: "ds_sales" }],
       data_sources: {
-        ds_sales: { resource: 'sales', limit: 3 }
+        ds_sales: { resource: "sales", limit: 3 },
       },
     });
     const { result } = renderUseLiquidViewHook(schema);
@@ -120,9 +116,9 @@ describe('useLiquidView - Limit Application', () => {
     expect(result.current.data.ds_sales).toHaveLength(3);
   });
 
-  it('should return full data when limit is undefined', async () => {
+  it("should return full data when limit is undefined", async () => {
     const schema = createTestSchema({
-      ds_users: { resource: 'users' }
+      ds_users: { resource: "users" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -131,9 +127,9 @@ describe('useLiquidView - Limit Application', () => {
     expect(result.current.data.ds_users.length).toBe(10); // Full users data
   });
 
-  it('should handle limit=0 correctly', async () => {
+  it("should handle limit=0 correctly", async () => {
     const schema = createTestSchema({
-      ds_sales: { resource: 'sales', limit: 0 }
+      ds_sales: { resource: "sales", limit: 0 },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -143,10 +139,10 @@ describe('useLiquidView - Limit Application', () => {
   });
 });
 
-describe('useLiquidView - Error Handling', () => {
-  it('should set error when resource name is empty', async () => {
+describe("useLiquidView - Error Handling", () => {
+  it("should set error when resource name is empty", async () => {
     const schema = createTestSchema({
-      ds_invalid: { resource: '' }
+      ds_invalid: { resource: "" },
     });
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -155,9 +151,9 @@ describe('useLiquidView - Error Handling', () => {
     expectHookHasError(result);
   });
 
-  it('should set loading=false when error occurs', async () => {
+  it("should set loading=false when error occurs", async () => {
     const schema = createTestSchema({
-      ds_invalid: { resource: '   ' } // Whitespace-only resource
+      ds_invalid: { resource: "   " }, // Whitespace-only resource
     });
     const { result } = renderUseLiquidViewHook(schema);
 
@@ -167,16 +163,15 @@ describe('useLiquidView - Error Handling', () => {
   });
 });
 
-describe('useLiquidView - Schema Reactivity', () => {
-  it('should refetch data when schema changes', async () => {
+describe("useLiquidView - Schema Reactivity", () => {
+  it("should refetch data when schema changes", async () => {
     const initialSchema = createTestSchema({
-      ds_sales: { resource: 'sales' }
+      ds_sales: { resource: "sales" },
     });
 
-    const { result, rerender } = renderHook(
-      ({ schema }) => useLiquidView({ schema }),
-      { initialProps: { schema: initialSchema } }
-    );
+    const { result, rerender } = renderHook(({ schema }) => useLiquidView({ schema }), {
+      initialProps: { schema: initialSchema },
+    });
 
     await waitForHookComplete(result);
     const firstData = result.current.data;
@@ -185,7 +180,7 @@ describe('useLiquidView - Schema Reactivity', () => {
 
     // スキーマ変更
     const newSchema = createTestSchema({
-      ds_users: { resource: 'users' }
+      ds_users: { resource: "users" },
     });
     rerender({ schema: newSchema });
 
@@ -196,16 +191,15 @@ describe('useLiquidView - Schema Reactivity', () => {
     expect(result.current.data.ds_sales).toBeUndefined();
   });
 
-  it('should clear previous data when schema changes', async () => {
+  it("should clear previous data when schema changes", async () => {
     const initialSchema = createTestSchema({
-      ds_sales: { resource: 'sales' },
-      ds_users: { resource: 'users' }
+      ds_sales: { resource: "sales" },
+      ds_users: { resource: "users" },
     });
 
-    const { result, rerender } = renderHook(
-      ({ schema }) => useLiquidView({ schema }),
-      { initialProps: { schema: initialSchema } }
-    );
+    const { result, rerender } = renderHook(({ schema }) => useLiquidView({ schema }), {
+      initialProps: { schema: initialSchema },
+    });
 
     await waitForHookComplete(result);
 

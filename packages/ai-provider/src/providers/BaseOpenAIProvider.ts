@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
-import type { ProviderConfig } from '../types';
-import { BaseAIProvider } from './BaseAIProvider';
+import OpenAI from "openai";
+import type { ProviderConfig } from "../types";
+import { BaseAIProvider } from "./BaseAIProvider";
 
 /**
  * Base configuration for OpenAI-compatible providers
@@ -22,7 +22,7 @@ export abstract class BaseOpenAIProvider extends BaseAIProvider {
     super(config);
     this.config = config;
     this.client = new OpenAI({
-      apiKey: config.apiKey || 'not-needed',
+      apiKey: config.apiKey || "not-needed",
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
       maxRetries: config.maxRetries || 3,
@@ -35,10 +35,10 @@ export abstract class BaseOpenAIProvider extends BaseAIProvider {
    */
   isConfigured(): boolean {
     // For local LLM, API key is not required
-    if (this.config.baseURL?.includes('localhost') || this.config.baseURL?.includes('127.0.0.1')) {
+    if (this.config.baseURL?.includes("localhost") || this.config.baseURL?.includes("127.0.0.1")) {
       return true;
     }
-    return !!this.config.apiKey && this.config.apiKey !== 'not-needed';
+    return !!this.config.apiKey && this.config.apiKey !== "not-needed";
   }
 
   /**
@@ -48,17 +48,17 @@ export abstract class BaseOpenAIProvider extends BaseAIProvider {
     const response = await this.client.chat.completions.create({
       model: this.config.model,
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt },
       ],
       temperature: 0.7,
       max_tokens: 4096,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('Empty response from AI provider');
+      throw new Error("Empty response from AI provider");
     }
 
     return content;

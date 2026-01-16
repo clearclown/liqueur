@@ -3,10 +3,10 @@
  * Reduces duplication in TableComponent.test.tsx
  */
 
-import React from 'react';
-import { render, screen, RenderResult } from '@testing-library/react';
-import { TableComponent } from '../src/components/TableComponent';
-import { expectLoadingState, expectNoDataState } from './testHelpersCommon';
+import React from "react";
+import { render, screen, RenderResult } from "@testing-library/react";
+import { TableComponent } from "../src/components/TableComponent";
+import { expectLoadingState, expectNoDataState } from "./testHelpersCommon";
 
 /**
  * Renders TableComponent with the given props
@@ -28,7 +28,7 @@ export function renderTableComponent(
  * Gets the table element by role
  */
 export function getTableByRole() {
-  return screen.getByRole('table');
+  return screen.getByRole("table");
 }
 
 /**
@@ -61,24 +61,24 @@ export function expectTableByTestId(index: number = 0) {
  */
 export function createTableData(
   rowCount: number = 3,
-  schema?: Record<string, 'string' | 'number'>
+  schema?: Record<string, "string" | "number">
 ): unknown[] {
-  const defaultSchema = { id: 'number', name: 'string', email: 'string' };
+  const defaultSchema = { id: "number", name: "string", email: "string" };
   const actualSchema = schema || defaultSchema;
 
-  const names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry'];
+  const names = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry"];
 
   return Array.from({ length: rowCount }, (_, i) => {
     const row: Record<string, unknown> = {};
 
     Object.entries(actualSchema).forEach(([key, type]) => {
-      if (key === 'id') {
+      if (key === "id") {
         row[key] = i + 1;
-      } else if (key === 'name') {
+      } else if (key === "name") {
         row[key] = names[i % names.length];
-      } else if (key === 'email' && type === 'string') {
+      } else if (key === "email" && type === "string") {
         row[key] = `${names[i % names.length].toLowerCase()}@example.com`;
-      } else if (type === 'number') {
+      } else if (type === "number") {
         row[key] = (i + 1) * 10;
       } else {
         row[key] = `${key}_${i + 1}`;
@@ -93,7 +93,7 @@ export function createTableData(
  * Expects table headers to match the given column names
  */
 export function expectTableHeaders(columnNames: string[]) {
-  const headers = screen.getAllByRole('columnheader');
+  const headers = screen.getAllByRole("columnheader");
 
   columnNames.forEach((columnName, index) => {
     expect(headers[index]).toHaveTextContent(columnName);

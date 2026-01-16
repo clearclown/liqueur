@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import type { LiquidViewSchema } from '@liqueur/protocol';
-import { generateMockData } from './mockDataGenerator';
+import { useState, useEffect } from "react";
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import { generateMockData } from "./mockDataGenerator";
 
 export interface UseLiquidViewParams {
   schema: LiquidViewSchema;
@@ -20,9 +20,7 @@ export interface UseLiquidViewResult {
  * Phase 1: モックデータ生成
  * Phase 2: 実API統合
  */
-export function useLiquidView({
-  schema,
-}: UseLiquidViewParams): UseLiquidViewResult {
+export function useLiquidView({ schema }: UseLiquidViewParams): UseLiquidViewResult {
   const [data, setData] = useState<Record<string, unknown[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
