@@ -42,6 +42,20 @@ liqueur/
 │   │   │   └── hooks/          # useLiquidView
 │   │   └── tests/
 │   │
+│   ├── ai-provider/            # @liqueur/ai-provider
+│   │   ├── src/
+│   │   │   ├── factory/        # ProviderFactory: 自動プロバイダー選択
+│   │   │   ├── providers/      # Anthropic, Gemini, OpenAI等の実装
+│   │   │   ├── types/          # AIプロバイダー抽象化型定義
+│   │   │   └── validators/     # プロバイダー設定バリデータ
+│   │   └── tests/
+│   │
+│   ├── artifact-store/         # @liqueur/artifact-store
+│   │   ├── src/
+│   │   │   ├── stores/         # FileStore等のストア実装
+│   │   │   └── types/          # Artifact永続化型定義
+│   │   └── tests/
+│   │
 │   └── playground/             # 開発用Next.jsアプリ
 │       └── app/
 │
