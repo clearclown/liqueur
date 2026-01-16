@@ -23,14 +23,14 @@
   "author": "Project Liquid Contributors",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.10.0",
+    "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
-    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/coverage-v8": "^3.0.3",
     "eslint": "^8.55.0",
     "prettier": "^3.1.0",
-    "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.3"
   },
   "files": [
     "dist",
