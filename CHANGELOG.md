@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Package Scripts Unification (Phase 65, 2025-01-16)
+
+#### Changed
+- **packages/ai-provider/package.json** - `docs` script:
+  - Changed from `typedoc --out docs` to `typedoc src/index.ts --out docs`
+  - Now matches format used by protocol, react, and artifact-store packages
+
+#### Benefits
+- **Consistency**: All 4 packages now use identical docs script format
+- **Explicit Entry Point**: Entry point (src/index.ts) is explicitly specified in command
+- **Maintainability**: Uniform script structure makes cross-package changes easier
+- **Documentation Quality**: Explicit entry point ensures consistent documentation generation
+
+#### Context
+All packages already had the following unified script set:
+- `build`, `test`, `test:watch`, `test:coverage`, `typecheck`, `lint`, `format`, `docs`
+
+Phase 65 completes the unification by standardizing the docs script content.
+
+#### Verification (Phase 65)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors
+- ✅ Lint: All packages pass ESLint checks
+- ✅ docs generation: ai-provider successfully generates HTML documentation
+
+---
+
 ### Workspace Dependencies Unification (Phase 63, 2025-01-16)
 
 #### Changed
