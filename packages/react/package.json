@@ -38,6 +38,15 @@
   "peerDependencies": {
     "react": "^18.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ablaze/liqueur.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/ablaze/liqueur/issues"
+  },
+  "homepage": "https://github.com/ablaze/liqueur#readme",
   "keywords": [
     "liquid",
     "react",
