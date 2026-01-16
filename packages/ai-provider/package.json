@@ -65,5 +65,8 @@
   "files": [
     "dist",
     "README.md"
-  ]
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }
