@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### API Documentation Setup (Phase 57, 2025-01-16)
+
+#### Added
+- **TypeDoc** (Phase 57):
+  - `typedoc: ^0.27.5` to root devDependencies
+  - `docs` script to all 4 TypeScript packages: `typedoc src/index.ts --out docs`
+  - `docs/` to .gitignore (generated documentation excluded from Git)
+
+#### Benefits
+- **API Documentation**: Automated generation for all TypeScript packages
+- **Workspace-Wide Command**: `npm run docs` generates docs for all packages
+- **Version Control**: Generated docs excluded from Git (docs/ in .gitignore)
+- **Latest Features**: TypeDoc v0.27+ with modern documentation features
+
+#### Verification (Phase 57)
+- ✅ All packages generate docs successfully (protocol, react, ai-provider, artifact-store)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors
+- ✅ HTML documentation created in packages/*/docs/
+
+---
+
 ### Documentation Enhancement (Phase 55, 2025-01-16)
 
 #### Changed
