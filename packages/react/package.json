@@ -18,7 +18,8 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
+    "docs": "typedoc src/index.ts --out docs"
   },
   "dependencies": {
     "@liqueur/protocol": "^0.1.0",
