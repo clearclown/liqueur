@@ -6,7 +6,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import type { DatabaseMetadata } from "@liqueur/protocol";
+import type { DatabaseMetadata } from "@liqueur/ai-provider";
 
 /**
  * GenerateForm Props

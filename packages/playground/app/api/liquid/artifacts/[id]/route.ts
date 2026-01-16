@@ -36,9 +36,10 @@ interface UpdateArtifactRequest {
  * 指定されたIDのArtifactを取得
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<{ artifact: Artifact } | ErrorResponse>> {
+  const params = await context.params;
   try {
     const artifact = await artifactStore.get(params.id);
 
@@ -79,8 +80,9 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<{ artifact: Artifact } | ErrorResponse>> {
+  const params = await context.params;
   try {
     // リクエストボディのパース
     const parseResult = await parseRequestBody<UpdateArtifactRequest>(request);
@@ -109,7 +111,7 @@ export async function PUT(
           "INVALID_SCHEMA",
           `Schema validation failed: ${firstError.message}`,
           400,
-          `Field: ${firstError.field}, Code: ${firstError.code}`
+          `Path: ${firstError.path}, Code: ${firstError.code}`
         );
       }
     }
@@ -161,9 +163,10 @@ export async function PUT(
  * Artifactを削除
  */
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<{ success: boolean } | ErrorResponse>> {
+  const params = await context.params;
   try {
     await artifactStore.delete(params.id);
 

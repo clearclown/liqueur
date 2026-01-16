@@ -4,6 +4,6 @@
  * JSON Schema-based protocol for AI-driven dynamic UI generation
  */
 
-export * from "./types/index.js";
-export * from "./validators/schema.js";
-export * from "./constants.js";
+export * from "./types/index";
+export * from "./validators/schema";
+export * from "./constants";

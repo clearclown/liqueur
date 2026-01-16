@@ -6,7 +6,8 @@
 "use client";
 
 import React, { useState } from "react";
-import type { LiquidViewSchema, DatabaseMetadata } from "@liqueur/protocol";
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import type { DatabaseMetadata } from "@liqueur/ai-provider";
 import { LiquidRenderer } from "@liqueur/react";
 
 /**

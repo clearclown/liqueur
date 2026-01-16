@@ -3,7 +3,8 @@
  * Shared test data for API tests
  */
 
-import type { LiquidViewSchema, DatabaseMetadata } from "@liqueur/protocol";
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import type { DatabaseMetadata } from "@liqueur/ai-provider";
 
 /**
  * Mock LiquidViewSchema for testing
@@ -18,18 +19,11 @@ export const mockSchema: LiquidViewSchema = {
   components: [
     {
       type: "chart",
-      id: "chart1",
       data_source: "ds1",
       variant: "bar",
       title: "Expenses by Category",
-      x_field: "category",
-      y_field: "amount",
-      grid_area: {
-        column: 1,
-        row: 1,
-        column_span: 6,
-        row_span: 4,
-      },
+      xAxis: "category",
+      yAxis: "amount",
     },
   ],
   data_sources: {

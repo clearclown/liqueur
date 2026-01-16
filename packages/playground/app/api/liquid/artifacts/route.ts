@@ -35,7 +35,7 @@ interface CreateArtifactRequest {
  * GET /api/liquid/artifacts
  * 全Artifactのリストを取得
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   try {
     const result = await artifactStore.list();
 
@@ -78,7 +78,7 @@ export async function POST(
     const body = parseResult.data;
 
     // 必須フィールドのバリデーション
-    const validationResult = validateRequiredFields(body, ["name", "schema"]);
+    const validationResult = validateRequiredFields(body as unknown as Record<string, unknown>, ["name", "schema"]);
     if (!validationResult.valid) {
       return validationResult.response;
     }
@@ -101,7 +101,7 @@ export async function POST(
         "INVALID_SCHEMA",
         `Schema validation failed: ${firstError.message}`,
         400,
-        `Field: ${firstError.field}, Code: ${firstError.code}`
+        `Path: ${firstError.path}, Code: ${firstError.code}`
       );
     }
 

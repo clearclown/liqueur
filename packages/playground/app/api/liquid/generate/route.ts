@@ -6,9 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import type { LiquidViewSchema, DatabaseMetadata } from "@liqueur/protocol";
-import { ArtifactGenerator } from "@liqueur/ai-provider/src/services/ArtifactGenerator";
-import { createProviderFromEnv } from "@liqueur/ai-provider/src/factory/createProviderFromEnv";
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import type { DatabaseMetadata } from "@liqueur/ai-provider";
+import { ArtifactGenerator, createProviderFromEnv } from "@liqueur/ai-provider";
 import { parseRequestBody, createErrorResponse, validateRequiredFields } from "@/lib/apiHelpers";
 import type { ErrorResponse } from "@/lib/types/api";
 
@@ -48,7 +48,7 @@ export async function POST(
     const body = parseResult.data;
 
     // 必須フィールドのバリデーション
-    const validationResult = validateRequiredFields(body, ["prompt", "metadata"]);
+    const validationResult = validateRequiredFields(body as unknown as Record<string, unknown>, ["prompt", "metadata"]);
     if (!validationResult.valid) {
       return validationResult.response;
     }
@@ -78,7 +78,7 @@ export async function POST(
       metadata: {
         generatedAt: new Date().toISOString(),
         provider: provider.name,
-        estimatedCost: result.estimatedCost,
+        estimatedCost: result.estimatedCost ?? 0,
       },
     };
 

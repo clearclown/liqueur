@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import GenerateForm from "../components/GenerateForm";
-import type { DatabaseMetadata } from "@liqueur/protocol";
+import type { DatabaseMetadata } from "@liqueur/ai-provider";
 
 /**
  * Test Data: Database Metadata

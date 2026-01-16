@@ -7,7 +7,7 @@ import {
   type ValidationResult,
   type ValidationError,
   ValidationErrorCode,
-} from "../types/index.js";
+} from "../types/index";
 
 const SUPPORTED_VERSIONS = ["1.0"] as const;
 const VALID_LAYOUT_TYPES = ["grid", "stack"] as const;

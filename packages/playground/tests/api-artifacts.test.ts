@@ -176,7 +176,7 @@ describe("GET /api/liquid/artifacts/:id", () => {
         `http://localhost:3000/api/liquid/artifacts/${artifactId}`,
         "GET"
       );
-      const response = await GetById(getRequest, { params: { id: artifactId } });
+      const response = await GetById(getRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -192,7 +192,7 @@ describe("GET /api/liquid/artifacts/:id", () => {
         "GET"
       );
 
-      const response = await GetById(request, { params: { id: "nonexistent" } });
+      const response = await GetById(request, { params: Promise.resolve({ id: "nonexistent" }) });
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -229,7 +229,7 @@ describe("PUT /api/liquid/artifacts/:id", () => {
           name: "Updated Name",
         }
       );
-      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const response = await PUT(updateRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -265,7 +265,7 @@ describe("PUT /api/liquid/artifacts/:id", () => {
           schema: newSchema,
         }
       );
-      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const response = await PUT(updateRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -281,7 +281,7 @@ describe("PUT /api/liquid/artifacts/:id", () => {
         }
       );
 
-      const response = await PUT(request, { params: { id: "nonexistent" } });
+      const response = await PUT(request, { params: Promise.resolve({ id: "nonexistent" }) });
       const data = await response.json();
 
       expect(response.status).toBe(404);
@@ -311,7 +311,7 @@ describe("PUT /api/liquid/artifacts/:id", () => {
           name: "   ",
         }
       );
-      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const response = await PUT(updateRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -341,7 +341,7 @@ describe("PUT /api/liquid/artifacts/:id", () => {
           schema: { invalid: "schema" },
         }
       );
-      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const response = await PUT(updateRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -372,7 +372,7 @@ describe("DELETE /api/liquid/artifacts/:id", () => {
         `http://localhost:3000/api/liquid/artifacts/${artifactId}`,
         "DELETE"
       );
-      const response = await DELETE(deleteRequest, { params: { id: artifactId } });
+      const response = await DELETE(deleteRequest, { params: Promise.resolve({ id: artifactId }) });
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -383,7 +383,7 @@ describe("DELETE /api/liquid/artifacts/:id", () => {
         `http://localhost:3000/api/liquid/artifacts/${artifactId}`,
         "GET"
       );
-      const getResponse = await GetById(getRequest, { params: { id: artifactId } });
+      const getResponse = await GetById(getRequest, { params: Promise.resolve({ id: artifactId }) });
       expect(getResponse.status).toBe(404);
     });
 
@@ -393,7 +393,7 @@ describe("DELETE /api/liquid/artifacts/:id", () => {
         "DELETE"
       );
 
-      const response = await DELETE(request, { params: { id: "nonexistent" } });
+      const response = await DELETE(request, { params: Promise.resolve({ id: "nonexistent" }) });
       const data = await response.json();
 
       expect(response.status).toBe(404);

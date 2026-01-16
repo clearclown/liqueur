@@ -52,18 +52,18 @@ export function createErrorResponse(
 /**
  * Validate required fields in request body
  */
-export function validateRequiredFields<T extends Record<string, unknown>>(
-  body: T,
-  fields: Array<keyof T>
+export function validateRequiredFields(
+  body: Record<string, unknown>,
+  fields: string[]
 ): { valid: true } | { valid: false; response: NextResponse<ErrorResponse> } {
   for (const field of fields) {
     if (!body[field]) {
-      const fieldName = String(field).toUpperCase();
+      const fieldName = field.toUpperCase();
       return {
         valid: false,
         response: createErrorResponse(
           `MISSING_${fieldName}` as ApiErrorCode,
-          `Request must include '${String(field)}' field`,
+          `Request must include '${field}' field`,
           400
         ),
       };
