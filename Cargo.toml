@@ -11,7 +11,7 @@ edition = "2021"
 rust-version = "1.70"
 authors = ["Project Liquid Contributors"]
 license = "MIT"
-repository = "https://github.com/clearclown/liqueur"
+repository = "https://github.com/ablaze/liqueur"
 
 [workspace.dependencies]
 # Serialization
