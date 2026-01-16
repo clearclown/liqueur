@@ -9,6 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./src/services/ArtifactGenerator": {
+      "types": "./dist/services/ArtifactGenerator.d.ts",
+      "import": "./dist/services/ArtifactGenerator.js"
+    },
+    "./src/factory/createProviderFromEnv": {
+      "types": "./dist/factory/createProviderFromEnv.d.ts",
+      "import": "./dist/factory/createProviderFromEnv.js"
     }
   },
   "scripts": {

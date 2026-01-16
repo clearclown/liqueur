@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./src/stores/InMemoryArtifactStore": {
+      "types": "./dist/stores/InMemoryArtifactStore.d.ts",
+      "import": "./dist/stores/InMemoryArtifactStore.js"
     }
   },
   "scripts": {
