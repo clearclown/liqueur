@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { GeminiProvider } from '../src/providers/GeminiProvider';
 import type { DatabaseMetadata, ProviderConfig } from '../src/types';
 import {
+  createMockConfig,
   createMockMetadata,
   createValidSchema,
-  createInvalidSchemaMissingVersion,
-} from './testHelpers';
+  createInvalidSchema,
+  expectValidationSuccess,
+} from './testHelpersBaseAIProvider';
 
 describe('GeminiProvider', () => {
   let provider: GeminiProvider;
@@ -13,11 +15,10 @@ describe('GeminiProvider', () => {
   let config: ProviderConfig;
 
   beforeEach(() => {
-    config = {
+    config = createMockConfig({
       apiKey: 'test-gemini-key',
       model: 'gemini-1.5-flash',
-      timeout: 5000,
-    };
+    });
 
     provider = new GeminiProvider(config);
     mockMetadata = createMockMetadata();
@@ -55,17 +56,12 @@ describe('GeminiProvider', () => {
   describe('validateResponse', () => {
     it('should validate correct schema structure', () => {
       const validSchema = createValidSchema();
-
       const result = provider.validateResponse(validSchema);
-
-      expect(result.valid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-      expect(result.schema).toEqual(validSchema);
+      expectValidationSuccess(result, validSchema);
     });
 
     it('should reject invalid schema - missing version', () => {
-      const invalidSchema = createInvalidSchemaMissingVersion();
-
+      const invalidSchema = createInvalidSchema('version');
       const result = provider.validateResponse(invalidSchema);
 
       expect(result.valid).toBe(false);
