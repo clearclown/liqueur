@@ -39,7 +39,7 @@
   "author": "Project Liquid Contributors",
   "license": "MIT",
   "dependencies": {
-    "@liqueur/protocol": "^0.1.0"
+    "@liqueur/protocol": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

@@ -16,7 +16,7 @@ async function fetchDataFromAPI(dataSource: DataSource): Promise<unknown[]> {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
 
-  const result = await response.json();
+  const result = await response.json() as { data: unknown[] };
   return result.data;
 }
 
