@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { DataSource } from '@liqueur/protocol';
+import { VALID_FILTER_OPERATORS, VALID_AGGREGATION_TYPES } from '@liqueur/protocol';
+import { parseRequestBody, createErrorResponse } from '@/lib/apiHelpers';
+import type { ErrorResponse } from '@/lib/types/api';
 
 // Response types
 interface QueryResponse {
@@ -7,14 +10,6 @@ interface QueryResponse {
   metadata: {
     totalCount: number;
     executionTime: number;
-  };
-}
-
-interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
   };
 }
 
@@ -37,11 +32,7 @@ const MOCK_DATA: Record<string, unknown[]> = {
   ],
 };
 
-// Valid filter operators
-const VALID_FILTER_OPS = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'contains'];
-
-// Valid aggregation types
-const VALID_AGGREGATION_TYPES = ['count', 'sum', 'avg', 'min', 'max'];
+// Constants imported from @liqueur/protocol
 
 /**
  * Validate DataSource schema
@@ -60,7 +51,7 @@ function validateDataSource(dataSource: DataSource): string | null {
   // Validate filters
   if (dataSource.filters) {
     for (const filter of dataSource.filters) {
-      if (!VALID_FILTER_OPS.includes(filter.op)) {
+      if (!VALID_FILTER_OPERATORS.includes(filter.op)) {
         return `Invalid filter operator: ${filter.op}`;
       }
     }

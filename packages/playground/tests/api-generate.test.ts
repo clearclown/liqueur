@@ -6,56 +6,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { POST } from "../app/api/liquid/generate/route";
 import { NextRequest } from "next/server";
-import type { DatabaseMetadata } from "@liqueur/protocol";
-
-/**
- * Test Data: Database Metadata
- */
-const mockMetadata: DatabaseMetadata = {
-  tables: [
-    {
-      name: "expenses",
-      description: "Expense transactions",
-      columns: [
-        { name: "id", type: "integer", nullable: false, isPrimaryKey: true, isForeignKey: false },
-        { name: "user_id", type: "integer", nullable: false, isPrimaryKey: false, isForeignKey: true },
-        { name: "category", type: "text", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "amount", type: "decimal", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "date", type: "date", nullable: false, isPrimaryKey: false, isForeignKey: false },
-      ],
-    },
-    {
-      name: "sales",
-      description: "Sales records",
-      columns: [
-        { name: "id", type: "integer", nullable: false, isPrimaryKey: true, isForeignKey: false },
-        { name: "product", type: "text", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "quantity", type: "integer", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "revenue", type: "decimal", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "date", type: "date", nullable: false, isPrimaryKey: false, isForeignKey: false },
-      ],
-    },
-  ],
-};
-
-/**
- * Helper: Create mock NextRequest
- */
-function createMockRequest(body: unknown): NextRequest {
-  const request = new NextRequest("http://localhost:3000/api/liquid/generate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return request;
-}
+import { POST } from "../app/api/liquid/generate/route";
+import { createMockRequest } from "./helpers/testHelpers";
+import { mockMetadata } from "./fixtures/mockSchemas";
 
 describe("POST /api/liquid/generate", () => {
   describe("TC-GEN-001: Basic Schema Generation", () => {
     it("should generate valid LiquidViewSchema from simple prompt", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me my expenses",
         metadata: mockMetadata,
       });
@@ -72,7 +31,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should generate chart component for visualization request", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me monthly sales as a bar chart",
         metadata: mockMetadata,
       });
@@ -90,7 +49,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should generate table component for list request", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me a table of all expenses",
         metadata: mockMetadata,
       });
@@ -110,7 +69,7 @@ describe("POST /api/liquid/generate", () => {
 
   describe("TC-GEN-002: Filter Generation", () => {
     it("should generate filters based on prompt constraints", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me expenses excluding travel category",
         metadata: mockMetadata,
       });
@@ -127,7 +86,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should use correct resource based on prompt context", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me sales by product",
         metadata: mockMetadata,
       });
@@ -146,7 +105,7 @@ describe("POST /api/liquid/generate", () => {
 
   describe("TC-GEN-003: Validation & Error Handling", () => {
     it("should reject request without prompt", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         metadata: mockMetadata,
       });
 
@@ -159,7 +118,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should reject request without metadata", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me expenses",
       });
 
@@ -172,7 +131,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should reject empty prompt", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "   ",
         metadata: mockMetadata,
       });
@@ -204,7 +163,7 @@ describe("POST /api/liquid/generate", () => {
 
   describe("TC-GEN-004: Response Format", () => {
     it("should include generation metadata in response", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me expenses",
         metadata: mockMetadata,
       });
@@ -220,7 +179,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should return valid JSON-serializable schema", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me expenses",
         metadata: mockMetadata,
       });
@@ -237,7 +196,7 @@ describe("POST /api/liquid/generate", () => {
 
   describe("TC-GEN-005: Provider Selection", () => {
     it("should use MockProvider by default in test environment", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me expenses",
         metadata: mockMetadata,
       });
@@ -252,7 +211,7 @@ describe("POST /api/liquid/generate", () => {
 
   describe("TC-GEN-006: Complex Prompts", () => {
     it("should handle multi-component requests", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me a chart of monthly expenses and a table of recent transactions",
         metadata: mockMetadata,
       });
@@ -266,7 +225,7 @@ describe("POST /api/liquid/generate", () => {
     });
 
     it("should handle aggregation requests", async () => {
-      const request = createMockRequest({
+      const request = createMockRequest("http://localhost:3000/api/liquid/generate", "POST", {
         prompt: "Show me total sales by month",
         metadata: mockMetadata,
       });

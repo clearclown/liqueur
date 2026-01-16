@@ -8,44 +8,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { GET, POST } from "../app/api/liquid/artifacts/route";
 import { GET as GetById, PUT, DELETE } from "../app/api/liquid/artifacts/[id]/route";
-import { NextRequest } from "next/server";
-import type { LiquidViewSchema } from "@liqueur/protocol";
-
-/**
- * Test Data: Sample Schema
- */
-const mockSchema: LiquidViewSchema = {
-  version: "1.0",
-  layout: { type: "grid", columns: 2, gap: 16 },
-  components: [
-    {
-      type: "chart",
-      variant: "bar",
-      title: "Monthly Expenses",
-      data_source: "ds_expenses",
-      x_axis: "month",
-      y_axis: "amount",
-    },
-  ],
-  data_sources: {
-    ds_expenses: {
-      resource: "expenses",
-      aggregation: { type: "sum", field: "amount", by: "month" },
-    },
-  },
-};
-
-/**
- * Helper: Create mock NextRequest
- */
-function createMockRequest(url: string, method: string, body?: unknown): NextRequest {
-  const request = new NextRequest(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  return request;
-}
+import { createMockRequest } from "./helpers/testHelpers";
+import { mockSchema } from "./fixtures/mockSchemas";
 
 describe("POST /api/liquid/artifacts", () => {
   describe("TC-ART-001: Create Artifact", () => {
@@ -253,6 +217,9 @@ describe("PUT /api/liquid/artifacts/:id", () => {
       const createResponse = await POST(createRequest);
       const createData = await createResponse.json();
       const artifactId = createData.artifact.id;
+
+      // タイムスタンプが異なることを保証するため、わずかに遅延
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // 更新
       const updateRequest = createMockRequest(

@@ -8,16 +8,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 import { artifactStore } from "@/lib/artifactStore";
+import { parseRequestBody, createErrorResponse } from "@/lib/apiHelpers";
+import type { ErrorResponse } from "@/lib/types/api";
 
 /**
- * Error response type
+ * Artifact type
  */
-interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
+interface Artifact {
+  id: string;
+  name: string;
+  schema: LiquidViewSchema;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Update request type
+ */
+interface UpdateArtifactRequest {
+  name?: string;
+  schema?: LiquidViewSchema;
 }
 
 /**
@@ -27,19 +37,15 @@ interface ErrorResponse {
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse<{ artifact: Artifact } | ErrorResponse>> {
   try {
     const artifact = await artifactStore.get(params.id);
 
     if (!artifact) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "ARTIFACT_NOT_FOUND",
-            message: `Artifact with id "${params.id}" not found`,
-          },
-        },
-        { status: 404 }
+      return createErrorResponse(
+        "ARTIFACT_NOT_FOUND",
+        `Artifact with id "${params.id}" not found`,
+        404
       );
     }
 
@@ -57,16 +63,11 @@ export async function GET(
     );
   } catch (error) {
     console.error("Get Artifact Error:", error);
-
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to get artifact",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to get artifact",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }
@@ -78,80 +79,53 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse<{ artifact: Artifact } | ErrorResponse>> {
   try {
     // リクエストボディのパース
-    let body: any;
-    try {
-      body = await request.json();
-    } catch (error) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "INVALID_JSON",
-            message: "Request body must be valid JSON",
-            details: error instanceof Error ? error.message : String(error),
-          },
-        },
-        { status: 400 }
-      );
+    const parseResult = await parseRequestBody<UpdateArtifactRequest>(request);
+    if (!parseResult.success) {
+      return parseResult.response;
     }
+    const body = parseResult.data;
 
     // 既存のArtifactを取得
     const existingArtifact = await artifactStore.get(params.id);
     if (!existingArtifact) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "ARTIFACT_NOT_FOUND",
-            message: `Artifact with id "${params.id}" not found`,
-          },
-        },
-        { status: 404 }
+      return createErrorResponse(
+        "ARTIFACT_NOT_FOUND",
+        `Artifact with id "${params.id}" not found`,
+        404
       );
     }
 
-    // 更新内容の準備
-    const updates: { title?: string; schema?: LiquidViewSchema } = {};
+    // スキーマ検証（提供された場合）
+    if (body.schema) {
+      if (!body.schema.version || !body.schema.layout || !body.schema.components || !body.schema.data_sources) {
+        return createErrorResponse(
+          "INVALID_SCHEMA",
+          "Schema must include version, layout, components, and data_sources",
+          400
+        );
+      }
+    }
 
+    // 更新内容を構築
+    const updates: { title?: string; schema?: LiquidViewSchema } = {};
     if (body.name !== undefined) {
       if (typeof body.name !== "string" || body.name.trim() === "") {
-        return NextResponse.json<ErrorResponse>(
-          {
-            error: {
-              code: "EMPTY_NAME",
-              message: "Name cannot be empty or whitespace only",
-            },
-          },
-          { status: 400 }
+        return createErrorResponse(
+          "EMPTY_NAME",
+          "Name cannot be empty or whitespace only",
+          400
         );
       }
       updates.title = body.name;
     }
-
     if (body.schema !== undefined) {
-      // スキーマの基本構造チェック
-      const schema = body.schema;
-      if (
-        !schema.version ||
-        !schema.layout ||
-        !schema.components ||
-        !schema.data_sources
-      ) {
-        return NextResponse.json<ErrorResponse>(
-          {
-            error: {
-              code: "INVALID_SCHEMA",
-              message: "Schema must have version, layout, components, and data_sources fields",
-            },
-          },
-          { status: 400 }
-        );
-      }
-      updates.schema = schema;
+      updates.schema = body.schema;
     }
 
-    // 更新実行
+    // Artifactを更新
     const updatedArtifact = await artifactStore.update(params.id, updates);
 
     return NextResponse.json(
@@ -168,16 +142,11 @@ export async function PUT(
     );
   } catch (error) {
     console.error("Update Artifact Error:", error);
-
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to update artifact",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to update artifact",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }
@@ -189,7 +158,7 @@ export async function PUT(
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+): Promise<NextResponse<{ success: boolean } | ErrorResponse>> {
   try {
     await artifactStore.delete(params.id);
 
@@ -202,28 +171,19 @@ export async function DELETE(
   } catch (error) {
     console.error("Delete Artifact Error:", error);
 
-    // "Artifact not found" エラーの場合は404を返す
     if (error instanceof Error && error.message === "Artifact not found") {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "ARTIFACT_NOT_FOUND",
-            message: `Artifact with id "${params.id}" not found`,
-          },
-        },
-        { status: 404 }
+      return createErrorResponse(
+        "ARTIFACT_NOT_FOUND",
+        `Artifact with id "${params.id}" not found`,
+        404
       );
     }
 
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to delete artifact",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to delete artifact",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }

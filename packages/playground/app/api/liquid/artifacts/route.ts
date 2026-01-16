@@ -7,6 +7,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 import { artifactStore } from "@/lib/artifactStore";
+import { parseRequestBody, createErrorResponse, validateRequiredFields } from "@/lib/apiHelpers";
+import type { ErrorResponse } from "@/lib/types/api";
 
 /**
  * Artifact type
@@ -20,21 +22,18 @@ interface Artifact {
 }
 
 /**
- * Error response type
+ * Create request type
  */
-interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
+interface CreateArtifactRequest {
+  name: string;
+  schema: LiquidViewSchema;
 }
 
 /**
  * GET /api/liquid/artifacts
  * 全Artifactのリストを取得
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const result = await artifactStore.list();
 
@@ -52,16 +51,11 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error("List Artifacts Error:", error);
-
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to list artifacts",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to list artifacts",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }
@@ -70,89 +64,48 @@ export async function GET(request: NextRequest) {
  * POST /api/liquid/artifacts
  * 新しいArtifactを作成
  */
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<{ artifact: Artifact } | ErrorResponse>> {
   try {
     // リクエストボディのパース
-    let body: any;
-    try {
-      body = await request.json();
-    } catch (error) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "INVALID_JSON",
-            message: "Request body must be valid JSON",
-            details: error instanceof Error ? error.message : String(error),
-          },
-        },
-        { status: 400 }
-      );
+    const parseResult = await parseRequestBody<CreateArtifactRequest>(request);
+    if (!parseResult.success) {
+      return parseResult.response;
+    }
+    const body = parseResult.data;
+
+    // 必須フィールドのバリデーション
+    const validationResult = validateRequiredFields(body, ["name", "schema"]);
+    if (!validationResult.valid) {
+      return validationResult.response;
     }
 
-    // バリデーション: name
-    if (!body.name) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "MISSING_NAME",
-            message: "Request must include 'name' field",
-          },
-        },
-        { status: 400 }
-      );
-    }
-
+    // 名前の空白文字列チェック
     if (typeof body.name !== "string" || body.name.trim() === "") {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "EMPTY_NAME",
-            message: "Name cannot be empty or whitespace only",
-          },
-        },
-        { status: 400 }
+      return createErrorResponse(
+        "EMPTY_NAME",
+        "Name cannot be empty or whitespace only",
+        400
       );
     }
 
-    // バリデーション: schema
-    if (!body.schema) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "MISSING_SCHEMA",
-            message: "Request must include 'schema' field",
-          },
-        },
-        { status: 400 }
+    // スキーマ基本検証
+    if (!body.schema.version || !body.schema.layout || !body.schema.components || !body.schema.data_sources) {
+      return createErrorResponse(
+        "INVALID_SCHEMA",
+        "Schema must include version, layout, components, and data_sources",
+        400
       );
     }
 
-    // スキーマの基本構造チェック
-    const schema = body.schema;
-    if (
-      !schema.version ||
-      !schema.layout ||
-      !schema.components ||
-      !schema.data_sources
-    ) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "INVALID_SCHEMA",
-            message: "Schema must have version, layout, components, and data_sources fields",
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    // Artifactを保存
+    // Artifactの作成
     const artifact = await artifactStore.create(
       {
         title: body.name,
-        schema: schema,
+        schema: body.schema,
       },
-      "test-user" // TODO: 本番では実際のユーザーIDを使用
+      "test-user"
     );
 
     return NextResponse.json(
@@ -169,16 +122,11 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Create Artifact Error:", error);
-
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to create artifact",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to create artifact",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }
