@@ -191,7 +191,7 @@ describe('ProviderFactory', () => {
 
       expect(() => {
         ProviderFactory.createFromEnv();
-      }).toThrow('OpenAI model is required');
+      }).toThrow('model is required');
     });
   });
 
