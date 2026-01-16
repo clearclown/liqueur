@@ -6,6 +6,7 @@
 import React from 'react';
 import { render, screen, RenderResult } from '@testing-library/react';
 import { ChartComponent } from '../src/components/ChartComponent';
+import { expectLoadingState, expectNoDataState } from './testHelpersCommon';
 
 /**
  * Renders ChartComponent with the given props
@@ -75,16 +76,5 @@ export function createChartData(variant: 'bar' | 'line' | 'pie', count: number =
   }
 }
 
-/**
- * Expects loading indicator to be visible
- */
-export function expectLoadingState() {
-  expect(screen.getByText(/loading/i)).toBeInTheDocument();
-}
-
-/**
- * Expects "no data" message to be visible
- */
-export function expectNoDataState() {
-  expect(screen.getByText(/no data/i)).toBeInTheDocument();
-}
+// Re-export common helpers for backward compatibility
+export { expectLoadingState, expectNoDataState };

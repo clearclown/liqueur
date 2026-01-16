@@ -6,6 +6,7 @@
 import React from 'react';
 import { render, screen, RenderResult } from '@testing-library/react';
 import { TableComponent } from '../src/components/TableComponent';
+import { expectLoadingState, expectNoDataState } from './testHelpersCommon';
 
 /**
  * Renders TableComponent with the given props
@@ -101,16 +102,5 @@ export function expectTableHeaders(columnNames: string[]) {
   return headers;
 }
 
-/**
- * Expects loading indicator to be visible
- */
-export function expectLoadingState() {
-  expect(screen.getByText(/loading/i)).toBeInTheDocument();
-}
-
-/**
- * Expects "no data" message to be visible
- */
-export function expectNoDataState() {
-  expect(screen.getByText(/no data/i)).toBeInTheDocument();
-}
+// Re-export common helpers for backward compatibility
+export { expectLoadingState, expectNoDataState };
