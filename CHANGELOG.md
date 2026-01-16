@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### TypeScript Configuration Unification (Phase 68, 2025-01-16)
+
+#### Changed
+- **packages/protocol/tsconfig.json**:
+  - Added `declarationMap: true` for source map support
+- **packages/react/tsconfig.json**:
+  - Added `composite: true` to enable project references
+  - Added `declarationMap: true` for source map support
+  - Added `references: [{ "path": "../protocol" }]` for proper dependency tracking
+
+#### Benefits
+- **IDE Support**: Better jump-to-definition and intellisense across packages
+- **Build Performance**: TypeScript can incrementally build dependent packages with `tsc --build`
+- **Source Maps**: Declaration maps enable precise navigation to original TypeScript source
+- **Type Safety**: Proper project references ensure correct type resolution across packages
+- **Consistency**: All 4 packages now use identical TypeScript configuration pattern
+
+#### Technical Details
+- `composite: true`: Enables TypeScript's project references feature for monorepo builds
+- `declarationMap: true`: Generates .d.ts.map files alongside .d.ts declaration files
+- Project references: Allow TypeScript to understand inter-package dependencies and build order
+- This configuration is essential for efficient monorepo development with multiple TypeScript packages
+
+#### All Packages Now Have
+- `composite: true` (enables project references)
+- `declarationMap: true` (source maps for declarations)
+- `references: [...]` (where applicable - packages depending on @liqueur/protocol)
+
+#### Verification (Phase 68)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors with `tsc --build`
+- ✅ Lint: All packages pass ESLint checks
+- ✅ Project references: Properly configured for protocol → react/ai-provider/artifact-store
+
+---
+
 ### Package Scripts Unification (Phase 65, 2025-01-16)
 
 #### Changed
