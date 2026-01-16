@@ -42,13 +42,12 @@ CSS Gridベースのレイアウト。
 ```typescript
 interface GridLayout {
   type: "grid";
-  props: {
-    columns: number;    // カラム数（1以上）
-    gap?: number;       // グリッド間隔（ピクセル、デフォルト: 16）
-  };
-  children: Component[];
+  columns: number;    // カラム数（1以上）
+  gap?: number;       // グリッド間隔（ピクセル、デフォルト: 16）
 }
 ```
+
+**注意**: `components` は `LiquidViewSchema` のトップレベルフィールドであり、`layout.children` ではありません。
 
 ### StackLayout
 
@@ -57,11 +56,8 @@ Flexboxベースのレイアウト。
 ```typescript
 interface StackLayout {
   type: "stack";
-  props: {
-    direction: "horizontal" | "vertical";
-    spacing?: number;  // アイテム間隔（ピクセル、デフォルト: 8）
-  };
-  children: Component[];
+  direction: "horizontal" | "vertical";
+  spacing?: number;  // アイテム間隔（ピクセル、デフォルト: 8）
 }
 ```
 
@@ -193,23 +189,24 @@ interface Sort {
   "version": "1.0",
   "layout": {
     "type": "grid",
-    "props": { "columns": 2, "gap": 24 },
-    "children": [
-      {
-        "type": "chart",
-        "variant": "bar",
-        "title": "Monthly Sales",
-        "data_source": "ds_sales"
-      },
-      {
-        "type": "table",
-        "title": "Top Products",
-        "columns": ["product_name", "total_sales"],
-        "data_source": "ds_products",
-        "sortable": true
-      }
-    ]
+    "columns": 2,
+    "gap": 24
   },
+  "components": [
+    {
+      "type": "chart",
+      "variant": "bar",
+      "title": "Monthly Sales",
+      "data_source": "ds_sales"
+    },
+    {
+      "type": "table",
+      "title": "Top Products",
+      "columns": ["product_name", "total_sales"],
+      "data_source": "ds_products",
+      "sortable": true
+    }
+  ],
   "data_sources": {
     "ds_sales": {
       "resource": "sales",

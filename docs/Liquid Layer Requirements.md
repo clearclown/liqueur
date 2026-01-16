@@ -56,27 +56,27 @@
 
 ### **Liquid View Schema**
 
-{  
-  "version": "1.0",  
-  "layout": {  
-    "type": "grid",  
-    "props": { "columns": 2 },  
-    "children": \[  
-      {  
-        "type": "chart",  
-        "variant": "bar",  
-        "title": "Monthly Expenses",  
-        "data\_source": "ds\_expenses\_monthly"  
-      }  
-    \]  
-  },  
-  "data\_sources": {  
-    "ds\_expenses\_monthly": {  
-      "resource": "expenses",  
-      "aggregation": { "type": "sum", "field": "amount", "by": "month" },  
-      "filters": \[  
-        { "field": "category", "op": "neq", "value": "travel" }  
-      \]  
-    }  
-  }  
+{
+  "version": "1.0",
+  "layout": {
+    "type": "grid",
+    "columns": 2
+  },
+  "components": \[
+    {
+      "type": "chart",
+      "variant": "bar",
+      "title": "Monthly Expenses",
+      "data\_source": "ds\_expenses\_monthly"
+    }
+  \],
+  "data\_sources": {
+    "ds\_expenses\_monthly": {
+      "resource": "expenses",
+      "aggregation": { "type": "sum", "field": "amount", "by": "month" },
+      "filters": \[
+        { "field": "category", "op": "neq", "value": "travel" }
+      \]
+    }
+  }
 }  

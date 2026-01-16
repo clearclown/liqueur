@@ -42,7 +42,8 @@ describe("SchemaValidator", () => {
   it("should reject invalid layout type", () => {
     const schema = {
       version: "1.0",
-      layout: { type: "invalid_type", props: {}, children: [] },
+      layout: { type: "invalid_type" },
+      components: [],
       data_sources: {}
     };
 
@@ -220,17 +221,17 @@ validator.rs: 97.2% coverage ✅
 
 ```typescript
 it("should validate minimum columns", () => {
-  const schema = { layout: { props: { columns: 1 } } };
+  const schema = { layout: { type: "grid", columns: 1 } };
   expect(validator.validate(schema).valid).toBe(true);
 });
 
 it("should reject zero columns", () => {
-  const schema = { layout: { props: { columns: 0 } } };
+  const schema = { layout: { type: "grid", columns: 0 } };
   expect(validator.validate(schema).valid).toBe(false);
 });
 
 it("should reject negative columns", () => {
-  const schema = { layout: { props: { columns: -1 } } };
+  const schema = { layout: { type: "grid", columns: -1 } };
   expect(validator.validate(schema).valid).toBe(false);
 });
 ```
@@ -238,13 +239,13 @@ it("should reject negative columns", () => {
 ### パターン2: 配列テスト
 
 ```typescript
-it("should validate empty children array", () => {
-  const schema = { layout: { children: [] } };
+it("should validate empty components array", () => {
+  const schema = { components: [] };
   expect(validator.validate(schema).valid).toBe(true);
 });
 
-it("should validate multiple children", () => {
-  const schema = { layout: { children: [component1, component2] } };
+it("should validate multiple components", () => {
+  const schema = { components: [component1, component2] };
   expect(validator.validate(schema).valid).toBe(true);
 });
 ```
@@ -253,7 +254,7 @@ it("should validate multiple children", () => {
 
 ```typescript
 it("should handle missing optional field", () => {
-  const schema = { layout: { props: { columns: 2 } } };  // gapなし
+  const schema = { layout: { type: "grid", columns: 2 } };  // gapなし
   expect(validator.validate(schema).valid).toBe(true);
 });
 
