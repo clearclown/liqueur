@@ -7,6 +7,14 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { useLiquidView } from '../src/hooks/useLiquidView';
 import type { LiquidViewSchema } from '@liqueur/protocol';
+import {
+  createTestSchema,
+  renderUseLiquidViewHook,
+  waitForHookComplete,
+  expectHookHasData,
+  expectHookHasError,
+  expectHookHasNoError,
+} from './testHelpersHooks';
 
 // ResizeObserver mock (rechartsテストから継承)
 global.ResizeObserver = class ResizeObserver {
@@ -17,189 +25,120 @@ global.ResizeObserver = class ResizeObserver {
 
 describe('useLiquidView - Basic Functionality', () => {
   it('should return empty data when data_sources is empty', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {},
-    } as LiquidViewSchema;
+    const schema = createTestSchema({});
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
-
-    // 初期状態を確認（loading=trueはuseEffectが即座に実行されるため確認困難）
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data).toEqual({});
-    expect(result.current.error).toBeNull();
+    expectHookHasNoError(result);
   });
 
   it('should set loading=false after data fetch completes', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {},
-    } as LiquidViewSchema;
+    const schema = createTestSchema({});
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
   });
 });
 
 describe('useLiquidView - Mock Data Generation', () => {
   it('should generate mock data for known resources', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
+    const schema = createTestSchema({
       components: [
         { type: 'chart', variant: 'bar', data_source: 'ds_sales' }
       ],
       data_sources: {
         ds_sales: { resource: 'sales' }
       },
-    } as LiquidViewSchema;
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data.ds_sales).toBeDefined();
-    expect(result.current.data.ds_sales.length).toBeGreaterThan(0);
-    expect(result.current.data.ds_sales[0]).toHaveProperty('month');
-    expect(result.current.data.ds_sales[0]).toHaveProperty('amount');
+    expectHookHasData(result, 'ds_sales', ['month', 'amount']);
   });
 
   it('should generate users data for "users" resource', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_users: { resource: 'users' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_users: { resource: 'users' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data.ds_users).toBeDefined();
-    expect(result.current.data.ds_users.length).toBeGreaterThan(0);
-    expect(result.current.data.ds_users[0]).toHaveProperty('id');
-    expect(result.current.data.ds_users[0]).toHaveProperty('name');
-    expect(result.current.data.ds_users[0]).toHaveProperty('email');
+    expectHookHasData(result, 'ds_users', ['id', 'name', 'email']);
   });
 
   it('should generate expenses data for "expenses" resource', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_expenses: { resource: 'expenses' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_expenses: { resource: 'expenses' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data.ds_expenses).toBeDefined();
-    expect(result.current.data.ds_expenses.length).toBeGreaterThan(0);
-    expect(result.current.data.ds_expenses[0]).toHaveProperty('date');
-    expect(result.current.data.ds_expenses[0]).toHaveProperty('category');
-    expect(result.current.data.ds_expenses[0]).toHaveProperty('amount');
+    expectHookHasData(result, 'ds_expenses', ['date', 'category', 'amount']);
   });
 
   it('should use partial matching for resource names', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_monthly_sales: { resource: 'monthly_sales' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_monthly_sales: { resource: 'monthly_sales' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data.ds_monthly_sales).toBeDefined();
-    expect(result.current.data.ds_monthly_sales[0]).toHaveProperty('month');
-    expect(result.current.data.ds_monthly_sales[0]).toHaveProperty('amount');
+    expectHookHasData(result, 'ds_monthly_sales', ['month', 'amount']);
   });
 
   it('should use default template for unknown resources', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_unknown: { resource: 'unknown_resource' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_unknown: { resource: 'unknown_resource' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data.ds_unknown).toBeDefined();
-    expect(result.current.data.ds_unknown.length).toBeGreaterThan(0);
+    expectHookHasData(result, 'ds_unknown');
   });
 });
 
 describe('useLiquidView - Limit Application', () => {
   it('should apply limit to mock data', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
+    const schema = createTestSchema({
       components: [
         { type: 'table', columns: ['month', 'amount'], data_source: 'ds_sales' }
       ],
       data_sources: {
         ds_sales: { resource: 'sales', limit: 3 }
       },
-    } as LiquidViewSchema;
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data.ds_sales).toHaveLength(3);
   });
 
   it('should return full data when limit is undefined', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_users: { resource: 'users' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_users: { resource: 'users' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data.ds_users.length).toBe(10); // Full users data
   });
 
   it('should handle limit=0 correctly', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_sales: { resource: 'sales', limit: 0 }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_sales: { resource: 'sales', limit: 0 }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data.ds_sales).toHaveLength(0);
   });
@@ -207,73 +146,51 @@ describe('useLiquidView - Limit Application', () => {
 
 describe('useLiquidView - Error Handling', () => {
   it('should set error when resource name is empty', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_invalid: { resource: '' }
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_invalid: { resource: '' }
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.error).not.toBeNull();
-    expect(result.current.data).toEqual({});
+    expectHookHasError(result);
   });
 
   it('should set loading=false when error occurs', async () => {
-    const schema: LiquidViewSchema = {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
-      components: [],
-      data_sources: {
-        ds_invalid: { resource: '   ' } // Whitespace-only resource
-      },
-    } as LiquidViewSchema;
+    const schema = createTestSchema({
+      ds_invalid: { resource: '   ' } // Whitespace-only resource
+    });
+    const { result } = renderUseLiquidViewHook(schema);
 
-    const { result } = renderHook(() => useLiquidView({ schema }));
+    await waitForHookComplete(result);
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.error).not.toBeNull();
+    expectHookHasError(result);
   });
 });
 
 describe('useLiquidView - Schema Reactivity', () => {
   it('should refetch data when schema changes', async () => {
+    const initialSchema = createTestSchema({
+      ds_sales: { resource: 'sales' }
+    });
+
     const { result, rerender } = renderHook(
       ({ schema }) => useLiquidView({ schema }),
-      {
-        initialProps: {
-          schema: {
-            version: '1.0' as const,
-            layout: { type: 'grid' as const, columns: 1 },
-            components: [],
-            data_sources: { ds_sales: { resource: 'sales' } },
-          } as LiquidViewSchema,
-        },
-      }
+      { initialProps: { schema: initialSchema } }
     );
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
     const firstData = result.current.data;
 
     expect(firstData.ds_sales).toBeDefined();
 
     // スキーマ変更
-    rerender({
-      schema: {
-        version: '1.0' as const,
-        layout: { type: 'grid' as const, columns: 1 },
-        components: [],
-        data_sources: { ds_users: { resource: 'users' } },
-      } as LiquidViewSchema,
+    const newSchema = createTestSchema({
+      ds_users: { resource: 'users' }
     });
+    rerender({ schema: newSchema });
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data).not.toEqual(firstData);
     expect(result.current.data.ds_users).toBeDefined();
@@ -281,36 +198,26 @@ describe('useLiquidView - Schema Reactivity', () => {
   });
 
   it('should clear previous data when schema changes', async () => {
+    const initialSchema = createTestSchema({
+      ds_sales: { resource: 'sales' },
+      ds_users: { resource: 'users' }
+    });
+
     const { result, rerender } = renderHook(
       ({ schema }) => useLiquidView({ schema }),
-      {
-        initialProps: {
-          schema: {
-            version: '1.0' as const,
-            layout: { type: 'grid' as const, columns: 1 },
-            components: [],
-            data_sources: { ds_sales: { resource: 'sales' }, ds_users: { resource: 'users' } },
-          } as LiquidViewSchema,
-        },
-      }
+      { initialProps: { schema: initialSchema } }
     );
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data.ds_sales).toBeDefined();
     expect(result.current.data.ds_users).toBeDefined();
 
     // スキーマを空に変更
-    rerender({
-      schema: {
-        version: '1.0' as const,
-        layout: { type: 'grid' as const, columns: 1 },
-        components: [],
-        data_sources: {},
-      } as LiquidViewSchema,
-    });
+    const emptySchema = createTestSchema({});
+    rerender({ schema: emptySchema });
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitForHookComplete(result);
 
     expect(result.current.data).toEqual({});
   });
