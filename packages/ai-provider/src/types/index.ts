@@ -9,8 +9,9 @@ export interface DatabaseMetadata {
 
 export interface TableMetadata {
   name: string;
+  description?: string;
   columns: ColumnMetadata[];
-  rowCount: number;
+  rowCount?: number;
   sampleData?: unknown[];
 }
 
