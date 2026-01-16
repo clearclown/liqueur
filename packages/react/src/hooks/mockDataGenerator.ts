@@ -41,6 +41,8 @@ const MOCK_TEMPLATES: Record<string, () => unknown[]> = {
     { date: "2024-03-15", category: "Travel", amount: 250.0, merchant: "Hotel F" },
     { date: "2024-04-05", category: "Office", amount: 150.0, merchant: "Supplier G" },
     { date: "2024-04-20", category: "Food", amount: 55.25, merchant: "Restaurant H" },
+    { date: "2024-05-10", category: "Travel", amount: 180.0, merchant: "Train I" },
+    { date: "2024-05-25", category: "Office", amount: 95.0, merchant: "Supplier J" },
   ],
 
   // ジェネリックフォールバック
@@ -91,7 +93,7 @@ export function generateMockData(dataSource: DataSource): unknown[] {
  * limitを適用（Phase 1で唯一のDataSource処理）
  */
 function applyLimit(data: unknown[], limit?: number): unknown[] {
-  if (limit !== undefined && limit >= 0) {
+  if (limit !== undefined && limit > 0) {
     return data.slice(0, limit);
   }
   return data;

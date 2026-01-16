@@ -13,9 +13,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest run --pool=forks",
+    "test:watch": "vitest watch --pool=forks --maxWorkers=1",
+    "test:coverage": "vitest run --pool=forks --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
