@@ -239,7 +239,7 @@ Phase 2ではAI統合（Claude API + Vercel AI SDK）を予定しています。
 
 ## Contributing
 
-コントリビューションを歓迎します！詳細は [CONTRIBUTING.md](docs/development/contributing.md) をご覧ください。
+コントリビューションを歓迎します！詳細は [CONTRIBUTING.md](CONTRIBUTING.md) をご覧ください。
 
 ### 開発ルール
 
