@@ -17,7 +17,8 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src tests --ext .ts,.tsx"
+    "lint": "eslint src tests --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@liqueur/protocol": "^0.1.0",
@@ -30,6 +31,7 @@
     "@testing-library/react": "^14.0.0",
     "@types/react": "^18.2.0",
     "jsdom": "^23.0.0",
+    "prettier": "^3.1.0",
     "react-dom": "^18.3.1"
   },
   "peerDependencies": {

@@ -13,11 +13,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src tests --ext .ts"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "keywords": [
     "ai",
@@ -38,7 +39,8 @@
     "@anthropic-ai/sdk": "^0.32.1",
     "@google/generative-ai": "^0.21.0",
     "@types/node": "^22.10.5",
-    "openai": "^4.77.3"
+    "openai": "^4.77.3",
+    "prettier": "^3.1.0"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
