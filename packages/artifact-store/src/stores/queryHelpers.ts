@@ -1,4 +1,4 @@
-import type { Artifact, ListArtifactsQuery } from '../types';
+import type { Artifact, ArtifactVisibility, ListArtifactsQuery } from '../types';
 
 /**
  * Query helper functions for InMemoryArtifactStore
@@ -30,7 +30,7 @@ export function filterByTags(artifacts: Artifact[], tags?: string[]): Artifact[]
  */
 export function filterByVisibility(
   artifacts: Artifact[],
-  visibility?: 'public' | 'private'
+  visibility?: ArtifactVisibility
 ): Artifact[] {
   if (!visibility) {
     return artifacts;
