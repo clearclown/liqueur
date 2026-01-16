@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AnthropicProvider } from '../src/providers/AnthropicProvider';
 import type { DatabaseMetadata, ProviderConfig } from '../src/types';
+import {
+  createMockMetadata,
+  createValidSchema,
+  createInvalidSchemaMissingVersion,
+  createInvalidSchemaMissingLayout,
+  createMultiTableMetadata,
+} from './testHelpers';
 
 describe('AnthropicProvider', () => {
   let provider: AnthropicProvider;
@@ -15,38 +22,7 @@ describe('AnthropicProvider', () => {
     };
 
     provider = new AnthropicProvider(config);
-
-    mockMetadata = {
-      tables: [
-        {
-          name: 'sales',
-          columns: [
-            {
-              name: 'id',
-              type: 'integer',
-              nullable: false,
-              isPrimaryKey: true,
-              isForeignKey: false,
-            },
-            {
-              name: 'month',
-              type: 'text',
-              nullable: false,
-              isPrimaryKey: false,
-              isForeignKey: false,
-            },
-            {
-              name: 'amount',
-              type: 'numeric',
-              nullable: false,
-              isPrimaryKey: false,
-              isForeignKey: false,
-            },
-          ],
-          rowCount: 12,
-        },
-      ],
-    };
+    mockMetadata = createMockMetadata();
   });
 
   describe('constructor', () => {
@@ -80,22 +56,7 @@ describe('AnthropicProvider', () => {
 
   describe('validateResponse', () => {
     it('should validate correct schema structure', () => {
-      const validSchema = {
-        version: '1.0',
-        layout: { type: 'grid', columns: 1 },
-        components: [
-          {
-            type: 'chart',
-            variant: 'bar',
-            data_source: 'ds_sales',
-          },
-        ],
-        data_sources: {
-          ds_sales: {
-            resource: 'sales',
-          },
-        },
-      };
+      const validSchema = createValidSchema();
 
       const result = provider.validateResponse(validSchema);
 
@@ -105,11 +66,7 @@ describe('AnthropicProvider', () => {
     });
 
     it('should reject invalid schema - missing version', () => {
-      const invalidSchema = {
-        layout: { type: 'grid', columns: 1 },
-        components: [],
-        data_sources: {},
-      };
+      const invalidSchema = createInvalidSchemaMissingVersion();
 
       const result = provider.validateResponse(invalidSchema);
 
@@ -119,11 +76,7 @@ describe('AnthropicProvider', () => {
     });
 
     it('should reject invalid schema - missing layout', () => {
-      const invalidSchema = {
-        version: '1.0',
-        components: [],
-        data_sources: {},
-      };
+      const invalidSchema = createInvalidSchemaMissingLayout();
 
       const result = provider.validateResponse(invalidSchema);
 
@@ -199,13 +152,7 @@ describe('AnthropicProvider', () => {
     });
 
     it('should include all table names in prompt', () => {
-      const multiTableMetadata: DatabaseMetadata = {
-        tables: [
-          { ...mockMetadata.tables[0], name: 'sales' },
-          { ...mockMetadata.tables[0], name: 'users' },
-          { ...mockMetadata.tables[0], name: 'products' },
-        ],
-      };
+      const multiTableMetadata = createMultiTableMetadata(['sales', 'users', 'products']);
 
       const systemPrompt = (provider as any).buildSystemPrompt(multiTableMetadata);
 

@@ -4,36 +4,14 @@ import { DeepSeekProvider } from '../src/providers/DeepSeekProvider';
 import { GLMProvider } from '../src/providers/GLMProvider';
 import { LocalLLMProvider } from '../src/providers/LocalLLMProvider';
 import type { DatabaseMetadata, OpenAICompatibleConfig } from '../src';
+import { createMockMetadata } from './testHelpers';
 
 describe('OpenAI-Compatible Providers', () => {
   let mockMetadata: DatabaseMetadata;
   let baseConfig: OpenAICompatibleConfig;
 
   beforeEach(() => {
-    mockMetadata = {
-      tables: [
-        {
-          name: 'sales',
-          columns: [
-            {
-              name: 'id',
-              type: 'integer',
-              nullable: false,
-              isPrimaryKey: true,
-              isForeignKey: false,
-            },
-            {
-              name: 'amount',
-              type: 'numeric',
-              nullable: false,
-              isPrimaryKey: false,
-              isForeignKey: false,
-            },
-          ],
-          rowCount: 100,
-        },
-      ],
-    };
+    mockMetadata = createMockMetadata();
 
     baseConfig = {
       apiKey: 'test-api-key',
