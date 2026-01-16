@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# Rust
+target/
+Cargo.lock
+
+# Generated files
+*.log
+*.min.js
+*.min.css
+
+# MCP Server
+.serena/
+
+# Claude Code
+.claude/
