@@ -26,6 +26,9 @@ export abstract class BaseOpenAIProvider extends BaseAIProvider {
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
       maxRetries: config.maxRetries || 3,
+      // Allow running in Node.js test environments (Vitest)
+      // This is safe because we're running server-side
+      dangerouslyAllowBrowser: true,
     });
   }
 
