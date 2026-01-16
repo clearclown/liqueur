@@ -159,6 +159,8 @@ liqueur/
 ├── packages/                    # TypeScript/JavaScript packages
 │   ├── protocol/               # @liqueur/protocol - コアプロトコル定義
 │   ├── react/                  # @liqueur/react - UIコンポーネント
+│   ├── ai-provider/            # @liqueur/ai-provider - AIプロバイダー抽象化
+│   ├── artifact-store/         # @liqueur/artifact-store - Artifact永続化
 │   └── playground/             # 開発用Next.jsアプリ
 │
 ├── crates/                     # Rust crates
@@ -222,19 +224,33 @@ cargo check --workspace
 - [API Reference](docs/api/) - TypeScript/Rust API
 - [CLAUDE.md](CLAUDE.md) - Claude Code開発ガイド
 
-## Phase 1ロードマップ
+## Phase 1 完了 ✅
 
-現在、Phase 1（Protocol策定と基本実装）を進行中です：
+**Phase 1（Protocol策定と基本実装）は2025-01-15に完了しました：**
 
 - [x] プロジェクト構造セットアップ
-- [x] CI/CD パイプライン構築
-- [ ] liquid-protocol (TypeScript) - 型定義とバリデーター
-- [ ] liquid-protocol (Rust) - Serde構造体とバリデーター
-- [ ] @liqueur/react - UIコンポーネントライブラリ
-- [ ] liquid-reinhardt - reinhardt-webアダプター
-- [ ] Playgroundアプリでの動作デモ
+- [x] CI/CD パイプライン構築（95%カバレッジ強制）
+- [x] liquid-protocol (TypeScript) - 型定義とバリデーター（44テスト、96.76%カバレッジ）
+- [x] liquid-protocol (Rust) - Serde構造体とバリデーター（95.7%カバレッジ）
+- [x] @liqueur/react - UIコンポーネントライブラリ（54テスト、98.68%カバレッジ）
+- [x] liquid-reinhardt - reinhardt-webアダプター（100%カバレッジ）
+- [x] Playgroundアプリでの動作デモ
 
-Phase 2ではAI統合（Claude API + Vercel AI SDK）を予定しています。
+**追加パッケージ（進行中）：**
+- [x] @liqueur/ai-provider - AIプロバイダー抽象化（Anthropic、Gemini、OpenAI対応）
+- [x] @liqueur/artifact-store - Artifact永続化レイヤー
+
+詳細は [CHANGELOG.md](CHANGELOG.md) を参照してください。
+
+## Phase 2 ロードマップ
+
+Phase 2では以下を予定しています：
+
+- AI統合（Claude API + Vercel AI SDK）
+- 実データフェッチング（useLiquidView hook）
+- reinhardt-webとの完全統合
+- Artifact永続化機能
+- エンドツーエンドデモアプリケーション
 
 ## Contributing
 
