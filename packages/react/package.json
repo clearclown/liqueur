@@ -40,5 +40,6 @@
   "files": [
     "dist",
     "README.md"
-  ]
+  ],
+  "license": "MIT"
 }
