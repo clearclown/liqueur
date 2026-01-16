@@ -6,9 +6,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
+import { SchemaValidator } from "@liqueur/protocol";
 import { artifactStore } from "@/lib/artifactStore";
 import { parseRequestBody, createErrorResponse, validateRequiredFields } from "@/lib/apiHelpers";
 import type { ErrorResponse } from "@/lib/types/api";
+import { getCurrentUser } from "@/lib/auth/context";
 
 /**
  * Artifact type
@@ -90,22 +92,27 @@ export async function POST(
       );
     }
 
-    // スキーマ基本検証
-    if (!body.schema.version || !body.schema.layout || !body.schema.components || !body.schema.data_sources) {
+    // スキーマ厳密検証 (SchemaValidator使用)
+    const schemaValidator = new SchemaValidator();
+    const schemaValidation = schemaValidator.validate(body.schema);
+    if (!schemaValidation.valid) {
+      const firstError = schemaValidation.errors[0];
       return createErrorResponse(
         "INVALID_SCHEMA",
-        "Schema must include version, layout, components, and data_sources",
-        400
+        `Schema validation failed: ${firstError.message}`,
+        400,
+        `Field: ${firstError.field}, Code: ${firstError.code}`
       );
     }
 
     // Artifactの作成
+    const userId = getCurrentUser(request);
     const artifact = await artifactStore.create(
       {
         title: body.name,
         schema: body.schema,
       },
-      "test-user"
+      userId
     );
 
     return NextResponse.json(

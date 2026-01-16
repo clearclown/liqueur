@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
+import { SchemaValidator } from "@liqueur/protocol";
 import { artifactStore } from "@/lib/artifactStore";
 import { parseRequestBody, createErrorResponse } from "@/lib/apiHelpers";
 import type { ErrorResponse } from "@/lib/types/api";
@@ -98,13 +99,17 @@ export async function PUT(
       );
     }
 
-    // スキーマ検証（提供された場合）
+    // スキーマ厳密検証（提供された場合）
     if (body.schema) {
-      if (!body.schema.version || !body.schema.layout || !body.schema.components || !body.schema.data_sources) {
+      const schemaValidator = new SchemaValidator();
+      const schemaValidation = schemaValidator.validate(body.schema);
+      if (!schemaValidation.valid) {
+        const firstError = schemaValidation.errors[0];
         return createErrorResponse(
           "INVALID_SCHEMA",
-          "Schema must include version, layout, components, and data_sources",
-          400
+          `Schema validation failed: ${firstError.message}`,
+          400,
+          `Field: ${firstError.field}, Code: ${firstError.code}`
         );
       }
     }

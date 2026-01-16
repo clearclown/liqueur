@@ -288,6 +288,66 @@ describe("PUT /api/liquid/artifacts/:id", () => {
       expect(data.error).toBeDefined();
       expect(data.error.code).toBe("ARTIFACT_NOT_FOUND");
     });
+
+    it("should reject empty name update", async () => {
+      // まず作成
+      const createRequest = createMockRequest(
+        "http://localhost:3000/api/liquid/artifacts",
+        "POST",
+        {
+          name: "Original Name",
+          schema: mockSchema,
+        }
+      );
+      const createResponse = await POST(createRequest);
+      const createData = await createResponse.json();
+      const artifactId = createData.artifact.id;
+
+      // 空の名前で更新を試みる
+      const updateRequest = createMockRequest(
+        `http://localhost:3000/api/liquid/artifacts/${artifactId}`,
+        "PUT",
+        {
+          name: "   ",
+        }
+      );
+      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBeDefined();
+      expect(data.error.code).toBe("EMPTY_NAME");
+    });
+
+    it("should reject invalid schema update", async () => {
+      // まず作成
+      const createRequest = createMockRequest(
+        "http://localhost:3000/api/liquid/artifacts",
+        "POST",
+        {
+          name: "Test Dashboard",
+          schema: mockSchema,
+        }
+      );
+      const createResponse = await POST(createRequest);
+      const createData = await createResponse.json();
+      const artifactId = createData.artifact.id;
+
+      // 無効なスキーマで更新を試みる
+      const updateRequest = createMockRequest(
+        `http://localhost:3000/api/liquid/artifacts/${artifactId}`,
+        "PUT",
+        {
+          schema: { invalid: "schema" },
+        }
+      );
+      const response = await PUT(updateRequest, { params: { id: artifactId } });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBeDefined();
+      expect(data.error.code).toBe("INVALID_SCHEMA");
+    });
   });
 });
 
