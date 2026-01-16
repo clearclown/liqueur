@@ -15,6 +15,16 @@ import {
   isTableComponent
 } from "../src/types/index.js";
 import { SchemaValidator } from "../src/validators/schema.js";
+import {
+  createBaseSchema,
+  createGridLayout,
+  createStackLayout,
+  createChartComponent,
+  createTableComponent,
+  createDataSource,
+  validateAndExpectValid,
+  validateAndExpectError,
+} from "./testHelpers.js";
 
 describe("SchemaValidator", () => {
   const validator = new SchemaValidator();
@@ -23,70 +33,36 @@ describe("SchemaValidator", () => {
    * Test 1: ✅ Valid minimal schema
    */
   it("should validate a minimal valid schema", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "grid", columns: 2 },
-      components: [],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ layout: createGridLayout(2) });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 2: ❌ Unsupported version
    */
   it("should reject unsupported protocol version", () => {
-    const schema = {
-      version: "2.0",
-      layout: { type: "grid", columns: 2 },
-      components: [],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ version: "2.0", layout: createGridLayout(2) });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.UNSUPPORTED_VERSION })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.UNSUPPORTED_VERSION);
   });
 
   /**
    * Test 3: ❌ Invalid layout type
    */
   it("should reject invalid layout type", () => {
-    const schema = {
-      version: "1.0",
-      layout: { type: "invalid_layout" },
-      components: [],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ layout: { type: "invalid_layout" } });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_LAYOUT_TYPE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LAYOUT_TYPE);
   });
 
   /**
    * Test 4: ❌ Invalid component type
    */
   it("should reject invalid component type", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [{ type: "invalid_component" }],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ components: [{ type: "invalid_component" }] });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_COMPONENT_TYPE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_COMPONENT_TYPE);
   });
 
   /**
@@ -94,16 +70,12 @@ describe("SchemaValidator", () => {
    */
   it("should reject schema missing version field", () => {
     const schema = {
-      layout: { type: "grid", columns: 2 },
+      layout: createGridLayout(2),
       components: [],
       data_sources: {}
     };
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_REQUIRED_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
   });
 
   /**
@@ -115,11 +87,7 @@ describe("SchemaValidator", () => {
       data_sources: {}
     };
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_REQUIRED_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
   });
 
   /**
@@ -128,75 +96,46 @@ describe("SchemaValidator", () => {
   it("should reject schema missing data_sources field", () => {
     const schema = {
       version: "1.0",
-      layout: { type: "grid", columns: 2 },
+      layout: createGridLayout(2),
       components: []
     };
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_REQUIRED_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_REQUIRED_FIELD);
   });
 
   /**
    * Test 8: ❌ Invalid grid columns (zero)
    */
   it("should reject grid layout with zero columns", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 0 },
-      components: [],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ layout: createGridLayout(0) });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_GRID_COLUMNS })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_GRID_COLUMNS);
   });
 
   /**
    * Test 9: ❌ Invalid grid columns (negative)
    */
   it("should reject grid layout with negative columns", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: -1 },
-      components: [],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({ layout: createGridLayout(-1) });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_GRID_COLUMNS })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_GRID_COLUMNS);
   });
 
   /**
    * Test 10: ❌ Invalid chart variant
    */
   it("should reject chart component with invalid variant", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
+    const schema = createBaseSchema({
       components: [
         {
           type: "chart",
-          variant: "invalid_variant",
+          variant: "invalid_variant" as any,
           title: "Test Chart"
         }
-      ],
-      data_sources: {}
-    };
+      ]
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_CHART_VARIANT })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_CHART_VARIANT);
   });
 
   /**
