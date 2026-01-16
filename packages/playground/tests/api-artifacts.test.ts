@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { GET, POST } from "../src/app/api/liquid/artifacts/route";
-import { GET as GetById, PUT, DELETE } from "../src/app/api/liquid/artifacts/[id]/route";
+import { GET, POST } from "../app/api/liquid/artifacts/route";
+import { GET as GetById, PUT, DELETE } from "../app/api/liquid/artifacts/[id]/route";
 import { NextRequest } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 

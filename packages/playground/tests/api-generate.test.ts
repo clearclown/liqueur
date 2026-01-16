@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { POST } from "../src/app/api/liquid/generate/route";
+import { POST } from "../app/api/liquid/generate/route";
 import { NextRequest } from "next/server";
 import type { DatabaseMetadata } from "@liqueur/protocol";
 

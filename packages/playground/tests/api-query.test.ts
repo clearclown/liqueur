@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from '../src/app/api/liquid/query/route';
+import { POST } from '../app/api/liquid/query/route';
 import type { NextRequest } from 'next/server';
 
 describe('/api/liquid/query - TC-VAL Test Cases', () => {

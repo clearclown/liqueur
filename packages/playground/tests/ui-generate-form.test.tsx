@@ -9,7 +9,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import GenerateForm from "../src/components/GenerateForm";
+import GenerateForm from "../components/GenerateForm";
 import type { DatabaseMetadata } from "@liqueur/protocol";
 
 /**

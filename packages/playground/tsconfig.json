@@ -20,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./*"],
       "@liqueur/protocol": ["../protocol/src"],
       "@liqueur/react": ["../react/src"]
     }

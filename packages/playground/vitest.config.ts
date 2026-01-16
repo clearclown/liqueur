@@ -26,7 +26,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './'),
       '@liqueur/protocol': path.resolve(__dirname, '../protocol/src'),
       '@liqueur/react': path.resolve(__dirname, '../react/src'),
     },
