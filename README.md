@@ -1,7 +1,6 @@
 # Project Liquid
 
-[![TypeScript Tests](https://github.com/ablaze/liqueur/actions/workflows/test-ts.yml/badge.svg)](https://github.com/ablaze/liqueur/actions/workflows/test-ts.yml)
-[![Rust Tests](https://github.com/ablaze/liqueur/actions/workflows/test-rust.yml/badge.svg)](https://github.com/ablaze/liqueur/actions/workflows/test-rust.yml)
+[![Quality Gate](https://github.com/ablaze/liqueur/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/ablaze/liqueur/actions/workflows/quality-gate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## 概要
