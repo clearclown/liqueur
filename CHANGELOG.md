@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Package README Repository URL Fix (Phase 61, 2025-01-16)
+
+#### Fixed
+- **All 4 TypeScript packages** - Repository URL in Contributing section:
+  - packages/protocol/README.md:99
+  - packages/react/README.md:193
+  - packages/ai-provider/README.md:249
+  - packages/artifact-store/README.md:262
+  - Replaced placeholder `your-org` with actual `ablaze` organization name
+
+#### Benefits
+- **Correct Links**: Contributors can now navigate to actual repository
+- **Documentation Accuracy**: All package READMEs point to correct GitHub URL
+- **Consistency**: Uniform repository URLs across all packages
+
+#### Verification (Phase 61)
+- ✅ All 4 package READMEs updated correctly
+- ✅ URLs now point to: https://github.com/ablaze/liqueur
+
+---
+
 ### Package Metadata Unification (Phase 59, 2025-01-16)
 
 #### Added
