@@ -4,7 +4,7 @@ import { DeepSeekProvider } from '../src/providers/DeepSeekProvider';
 import { GLMProvider } from '../src/providers/GLMProvider';
 import { LocalLLMProvider } from '../src/providers/LocalLLMProvider';
 import type { DatabaseMetadata, OpenAICompatibleConfig } from '../src';
-import { createMockMetadata } from './testHelpers';
+import { createMockMetadata } from './testHelpersBaseAIProvider';
 
 describe('OpenAI-Compatible Providers', () => {
   let mockMetadata: DatabaseMetadata;
