@@ -6,7 +6,6 @@
 import { describe, it, expect } from "vitest";
 import {
   type LiquidViewSchema,
-  type ValidationResult,
   ValidationErrorCode,
   isLiquidViewSchema,
   isGridLayout,

@@ -3,10 +3,9 @@
  * TDD Red-Green-Refactor Cycle
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { useLiquidView } from '../src/hooks/useLiquidView';
-import type { LiquidViewSchema } from '@liqueur/protocol';
 import {
   createTestSchema,
   renderUseLiquidViewHook,
