@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "docs": "typedoc --out docs"
+    "docs": "typedoc src/index.ts --out docs"
   },
   "repository": {
     "type": "git",
