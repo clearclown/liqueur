@@ -6,6 +6,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table';
+import { ComponentWrapper } from './ComponentWrapper';
 
 export interface TableComponentProps extends TableComponentType {
   data?: unknown[];
@@ -26,34 +27,8 @@ export const TableComponent: React.FC<TableComponentProps> = ({
   index,
   loading = false,
 }) => {
-  // FR-09: Loading state
-  if (loading) {
-    return (
-      <div
-        data-testid={`liquid-component-table-${index}`}
-        className="liquid-table-component"
-      >
-        {title && <h3>{title}</h3>}
-        <div className="table-loading">Loading...</div>
-      </div>
-    );
-  }
-
-  // Empty data handling
-  if (!data || data.length === 0) {
-    return (
-      <div
-        data-testid={`liquid-component-table-${index}`}
-        className="liquid-table-component"
-      >
-        {title && <h3>{title}</h3>}
-        <div className="table-no-data">No data available</div>
-      </div>
-    );
-  }
-
-  // データを型安全な配列としてキャスト
-  const tableData = data as Array<Record<string, unknown>>;
+  const tableData = (data || []) as Array<Record<string, unknown>>;
+  const hasData = tableData.length > 0;
 
   // カラム定義を動的生成
   const columnDefs: ColumnDef<Record<string, unknown>>[] = columns.map((col) => ({
@@ -74,11 +49,13 @@ export const TableComponent: React.FC<TableComponentProps> = ({
   });
 
   return (
-    <div
-      data-testid={`liquid-component-table-${index}`}
-      className="liquid-table-component"
+    <ComponentWrapper
+      type="table"
+      index={index}
+      title={title}
+      loading={loading}
+      hasData={hasData}
     >
-      {title && <h3>{title}</h3>}
       <table role="table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -105,6 +82,6 @@ export const TableComponent: React.FC<TableComponentProps> = ({
           ))}
         </tbody>
       </table>
-    </div>
+    </ComponentWrapper>
   );
 };

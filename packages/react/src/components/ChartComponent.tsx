@@ -15,6 +15,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { ComponentWrapper } from './ComponentWrapper';
 
 export interface ChartComponentProps extends ChartComponentType {
   data?: unknown[];
@@ -41,36 +42,11 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
   width,
   height = 400,
 }) => {
-  // FR-09: Loading state
-  if (loading) {
-    return (
-      <div
-        data-testid={`liquid-component-chart-${index}`}
-        className="liquid-chart-component"
-      >
-        {title && <h3>{title}</h3>}
-        <div className="chart-loading">Loading...</div>
-      </div>
-    );
-  }
-
-  // Empty data handling
-  if (!data || data.length === 0) {
-    return (
-      <div
-        data-testid={`liquid-component-chart-${index}`}
-        className="liquid-chart-component"
-      >
-        {title && <h3>{title}</h3>}
-        <div className="chart-no-data">No data available</div>
-      </div>
-    );
-  }
-
-  const chartData = data as Array<Record<string, unknown>>;
+  const chartData = (data || []) as Array<Record<string, unknown>>;
+  const hasData = chartData.length > 0;
 
   // データから最初のキーを取得（XAxis/PieChart用）
-  const firstDataPoint = chartData[0];
+  const firstDataPoint = hasData ? chartData[0] : {};
   const keys = Object.keys(firstDataPoint);
   const xKey = keys[0]; // 最初のキー（name, date, categoryなど）
   const yKeys = keys.slice(1); // 残りのキー（value, amount など）
@@ -149,12 +125,14 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
   };
 
   return (
-    <div
-      data-testid={`liquid-component-chart-${index}`}
-      className="liquid-chart-component"
+    <ComponentWrapper
+      type="chart"
+      index={index}
+      title={title}
+      loading={loading}
+      hasData={hasData}
     >
-      {title && <h3>{title}</h3>}
       {renderChart()}
-    </div>
+    </ComponentWrapper>
   );
 };
