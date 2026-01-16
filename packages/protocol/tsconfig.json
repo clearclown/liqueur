@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
+    "declarationMap": true,
     "types": ["node", "vitest/globals"]
   },
   "include": ["src/**/*"],
