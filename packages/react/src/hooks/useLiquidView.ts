@@ -1,9 +1,29 @@
 import { useState, useEffect } from "react";
-import type { LiquidViewSchema } from "@liqueur/protocol";
+import type { LiquidViewSchema, DataSource } from "@liqueur/protocol";
 import { generateMockData } from "./mockDataGenerator";
+
+/**
+ * Fetch data from the backend API
+ */
+async function fetchDataFromAPI(dataSource: DataSource): Promise<unknown[]> {
+  const response = await fetch('/api/liquid/query', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dataSource }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  return result.data;
+}
 
 export interface UseLiquidViewParams {
   schema: LiquidViewSchema;
+  /** Use mock data instead of real API (default: true for Phase 1) */
+  useMockData?: boolean;
 }
 
 export interface UseLiquidViewResult {
@@ -20,7 +40,7 @@ export interface UseLiquidViewResult {
  * Phase 1: モックデータ生成
  * Phase 2: 実API統合
  */
-export function useLiquidView({ schema }: UseLiquidViewParams): UseLiquidViewResult {
+export function useLiquidView({ schema, useMockData = true }: UseLiquidViewParams): UseLiquidViewResult {
   const [data, setData] = useState<Record<string, unknown[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -37,10 +57,14 @@ export function useLiquidView({ schema }: UseLiquidViewParams): UseLiquidViewRes
           return;
         }
 
-        // 各data_sourceのモックデータ生成
+        // 各data_sourceのデータ取得（モック or 実API）
         const fetchedData: Record<string, unknown[]> = {};
         for (const [name, dataSource] of Object.entries(schema.data_sources)) {
-          fetchedData[name] = generateMockData(dataSource);
+          if (useMockData) {
+            fetchedData[name] = generateMockData(dataSource);
+          } else {
+            fetchedData[name] = await fetchDataFromAPI(dataSource);
+          }
         }
 
         setData(fetchedData);
@@ -53,7 +77,7 @@ export function useLiquidView({ schema }: UseLiquidViewParams): UseLiquidViewRes
     };
 
     fetchData();
-  }, [schema]);
+  }, [schema, useMockData]);
 
   return { data, loading, error };
 }
