@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema, DatabaseMetadata } from "@liqueur/protocol";
 import { ArtifactGenerator } from "@liqueur/ai-provider/src/services/ArtifactGenerator";
 import { createProviderFromEnv } from "@liqueur/ai-provider/src/factory/createProviderFromEnv";
+import { parseRequestBody, createErrorResponse, validateRequiredFields } from "@/lib/apiHelpers";
+import type { ErrorResponse } from "@/lib/types/api";
 
 /**
  * Request body type
@@ -31,74 +33,32 @@ interface GenerateResponse {
 }
 
 /**
- * Error response type
- */
-interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
-}
-
-/**
  * POST /api/liquid/generate
  * AI生成エンドポイント
  */
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<GenerateResponse | ErrorResponse>> {
   try {
     // リクエストボディのパース
-    let body: Partial<GenerateRequest>;
-    try {
-      body = await request.json();
-    } catch (error) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "INVALID_JSON",
-            message: "Request body must be valid JSON",
-            details: error instanceof Error ? error.message : String(error),
-          },
-        },
-        { status: 400 }
-      );
+    const parseResult = await parseRequestBody<GenerateRequest>(request);
+    if (!parseResult.success) {
+      return parseResult.response;
+    }
+    const body = parseResult.data;
+
+    // 必須フィールドのバリデーション
+    const validationResult = validateRequiredFields(body, ["prompt", "metadata"]);
+    if (!validationResult.valid) {
+      return validationResult.response;
     }
 
-    // バリデーション: prompt
-    if (!body.prompt) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "MISSING_PROMPT",
-            message: "Request must include 'prompt' field",
-          },
-        },
-        { status: 400 }
-      );
-    }
-
+    // prompt検証
     if (typeof body.prompt !== "string" || body.prompt.trim() === "") {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "EMPTY_PROMPT",
-            message: "Prompt cannot be empty or whitespace only",
-          },
-        },
-        { status: 400 }
-      );
-    }
-
-    // バリデーション: metadata
-    if (!body.metadata) {
-      return NextResponse.json<ErrorResponse>(
-        {
-          error: {
-            code: "MISSING_METADATA",
-            message: "Request must include 'metadata' field with database schema",
-          },
-        },
-        { status: 400 }
+      return createErrorResponse(
+        "EMPTY_PROMPT",
+        "Prompt cannot be empty or whitespace only",
+        400
       );
     }
 
@@ -127,15 +87,11 @@ export async function POST(request: NextRequest) {
     // 内部エラー
     console.error("AI Generation Error:", error);
 
-    return NextResponse.json<ErrorResponse>(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "An error occurred during schema generation",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "An error occurred during schema generation",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }
