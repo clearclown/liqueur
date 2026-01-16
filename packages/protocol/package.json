@@ -2,8 +2,15 @@
   "name": "@liqueur/protocol",
   "version": "0.1.0",
   "description": "Liquid Protocol - Type definitions and validators for AI-driven dynamic UI generation",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -35,5 +42,8 @@
   "files": [
     "dist",
     "README.md"
-  ]
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

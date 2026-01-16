@@ -1,9 +1,16 @@
 {
   "name": "@liqueur/react",
   "version": "0.1.0",
-  "description": "Liquid UI - React UIコンポーネントライブラリ",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Liquid UI - React component library for rendering LiquidView schemas",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -34,6 +41,16 @@
   "peerDependencies": {
     "react": "^18.0.0"
   },
+  "keywords": [
+    "liquid",
+    "react",
+    "ui-components",
+    "server-driven-ui",
+    "liquidview",
+    "chart",
+    "table"
+  ],
+  "author": "Project Liquid Contributors",
   "engines": {
     "node": ">=20.0.0"
   },
