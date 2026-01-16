@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "description": "AI駆動の動的UI生成を安全に実装するプロトコル・SDKスイート",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ablaze/liqueur.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ablaze/liqueur/issues"
+  },
+  "homepage": "https://github.com/ablaze/liqueur#readme",
   "workspaces": [
     "packages/*"
   ],
@@ -13,10 +21,20 @@
     "typecheck": "tsc --build",
     "docs": "npm run docs --workspaces"
   },
+  "keywords": [
+    "liquid",
+    "server-driven-ui",
+    "ai",
+    "dynamic-ui",
+    "protocol",
+    "rust",
+    "typescript"
+  ],
+  "author": "Project Liquid Contributors",
   "devDependencies": {
-    "@vitest/coverage-v8": "^2.0.0",
-    "typescript": "^5.3.0",
-    "vitest": "^2.0.0"
+    "@vitest/coverage-v8": "^3.0.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.3"
   },
   "engines": {
     "node": ">=20.0.0"
