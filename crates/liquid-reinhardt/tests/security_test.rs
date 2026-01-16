@@ -3,9 +3,46 @@ use liquid_reinhardt::converter::{ConvertedQuery, QueryCondition};
 
 /// FR-07: Row-Level Security Tests (TDD Red Phase)
 
+// ============================================================================
+// Test Helper Functions
+// ============================================================================
+
+/// Creates a CurrentUser with the given ID and permission strings
+fn create_user(id: u64, permissions: &[&str]) -> CurrentUser {
+    CurrentUser::new(
+        id,
+        permissions.iter().map(|s| s.to_string()).collect(),
+    )
+}
+
+/// Creates a default SecurityEnforcer
+fn create_enforcer() -> SecurityEnforcer {
+    SecurityEnforcer::new()
+}
+
+/// Creates a ConvertedQuery for the given resource
+fn create_query(resource: &str) -> ConvertedQuery {
+    ConvertedQuery::new(resource.to_string())
+}
+
+/// Asserts that a QueryCondition is an Eq condition with the expected field and value
+fn assert_eq_condition(condition: &QueryCondition, expected_field: &str, expected_value: &str) {
+    match condition {
+        QueryCondition::Eq { field, value } => {
+            assert_eq!(field, expected_field);
+            assert_eq!(value, expected_value);
+        }
+        _ => panic!("Expected Eq condition for {}", expected_field),
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
 #[test]
 fn test_current_user_creation() {
-    let user = CurrentUser::new(123, vec!["read".to_string(), "write".to_string()]);
+    let user = create_user(123, &["read", "write"]);
 
     assert_eq!(user.id(), 123);
     assert_eq!(user.permissions().len(), 2);
@@ -16,10 +53,10 @@ fn test_current_user_creation() {
 
 #[test]
 fn test_enforce_default_policy_adds_user_id_filter() {
-    let user = CurrentUser::new(42, vec![]);
-    let enforcer = SecurityEnforcer::new();
+    let user = create_user(42, &[]);
+    let enforcer = create_enforcer();
 
-    let mut query = ConvertedQuery::new("users".to_string());
+    let mut query = create_query("users");
 
     let result = enforcer.enforce(&mut query, &user);
     assert!(result.is_ok());
@@ -28,21 +65,15 @@ fn test_enforce_default_policy_adds_user_id_filter() {
     let conditions = query.conditions();
     assert_eq!(conditions.len(), 1);
 
-    match &conditions[0] {
-        QueryCondition::Eq { field, value } => {
-            assert_eq!(field, "user_id");
-            assert_eq!(value, "42");
-        }
-        _ => panic!("Expected Eq condition for user_id"),
-    }
+    assert_eq_condition(&conditions[0], "user_id", "42");
 }
 
 #[test]
 fn test_enforce_preserves_existing_filters() {
-    let user = CurrentUser::new(100, vec![]);
-    let enforcer = SecurityEnforcer::new();
+    let user = create_user(100, &[]);
+    let enforcer = create_enforcer();
 
-    let mut query = ConvertedQuery::new("expenses".to_string());
+    let mut query = create_query("expenses");
     query.add_condition(QueryCondition::Eq {
         field: "category".to_string(),
         value: "food".to_string(),
@@ -56,28 +87,16 @@ fn test_enforce_preserves_existing_filters() {
     assert_eq!(conditions.len(), 2);
 
     // 最初の条件は既存のまま
-    match &conditions[0] {
-        QueryCondition::Eq { field, value } => {
-            assert_eq!(field, "category");
-            assert_eq!(value, "food");
-        }
-        _ => panic!("Expected category filter"),
-    }
+    assert_eq_condition(&conditions[0], "category", "food");
 
     // 2番目の条件はRLS
-    match &conditions[1] {
-        QueryCondition::Eq { field, value } => {
-            assert_eq!(field, "user_id");
-            assert_eq!(value, "100");
-        }
-        _ => panic!("Expected user_id filter"),
-    }
+    assert_eq_condition(&conditions[1], "user_id", "100");
 }
 
 #[test]
 fn test_custom_policy_for_resource() {
-    let user = CurrentUser::new(50, vec!["admin".to_string()]);
-    let mut enforcer = SecurityEnforcer::new();
+    let user = create_user(50, &["admin"]);
+    let mut enforcer = create_enforcer();
 
     // カスタムポリシー: adminユーザーは全レコードにアクセス可能
     let policy = SecurityPolicy::new("admin_full_access", |user, _query| {
@@ -86,7 +105,7 @@ fn test_custom_policy_for_resource() {
 
     enforcer.add_policy_for_resource("users", policy);
 
-    let mut query = ConvertedQuery::new("users".to_string());
+    let mut query = create_query("users");
     let result = enforcer.enforce(&mut query, &user);
 
     assert!(result.is_ok());
@@ -97,8 +116,8 @@ fn test_custom_policy_for_resource() {
 
 #[test]
 fn test_custom_policy_denies_access() {
-    let user = CurrentUser::new(50, vec![]);  // adminなし
-    let mut enforcer = SecurityEnforcer::new();
+    let user = create_user(50, &[]);  // adminなし
+    let mut enforcer = create_enforcer();
 
     // カスタムポリシー: adminのみアクセス可能
     let policy = SecurityPolicy::new("admin_only", |user, _query| {
@@ -107,7 +126,7 @@ fn test_custom_policy_denies_access() {
 
     enforcer.add_policy_for_resource("sensitive_data", policy);
 
-    let mut query = ConvertedQuery::new("sensitive_data".to_string());
+    let mut query = create_query("sensitive_data");
     let result = enforcer.enforce(&mut query, &user);
 
     // アクセス拒否
@@ -118,15 +137,15 @@ fn test_custom_policy_denies_access() {
 
 #[test]
 fn test_policy_with_custom_field() {
-    let user = CurrentUser::new(200, vec![]);
-    let mut enforcer = SecurityEnforcer::new();
+    let user = create_user(200, &[]);
+    let mut enforcer = create_enforcer();
 
     // カスタムポリシー: owner_idフィールドでフィルタ
     let policy = SecurityPolicy::custom_field("owner_id");
 
     enforcer.add_policy_for_resource("projects", policy);
 
-    let mut query = ConvertedQuery::new("projects".to_string());
+    let mut query = create_query("projects");
     let result = enforcer.enforce(&mut query, &user);
 
     assert!(result.is_ok());
@@ -134,24 +153,18 @@ fn test_policy_with_custom_field() {
     let conditions = query.conditions();
     assert_eq!(conditions.len(), 1);
 
-    match &conditions[0] {
-        QueryCondition::Eq { field, value } => {
-            assert_eq!(field, "owner_id");
-            assert_eq!(value, "200");
-        }
-        _ => panic!("Expected owner_id filter"),
-    }
+    assert_eq_condition(&conditions[0], "owner_id", "200");
 }
 
 #[test]
 fn test_enforce_multiple_resources() {
-    let user = CurrentUser::new(10, vec![]);
-    let enforcer = SecurityEnforcer::new();
+    let user = create_user(10, &[]);
+    let enforcer = create_enforcer();
 
     let resources = vec!["users", "expenses", "orders"];
 
     for resource in resources {
-        let mut query = ConvertedQuery::new(resource.to_string());
+        let mut query = create_query(resource);
         let result = enforcer.enforce(&mut query, &user);
 
         assert!(result.is_ok());
@@ -167,7 +180,7 @@ fn test_security_enforcer_default() {
 
 #[test]
 fn test_current_user_no_permissions() {
-    let user = CurrentUser::new(1, vec![]);
+    let user = create_user(1, &[]);
 
     assert_eq!(user.permissions().len(), 0);
     assert!(!user.has_permission("any"));
@@ -176,10 +189,10 @@ fn test_current_user_no_permissions() {
 #[test]
 fn test_enforce_idempotency() {
     // 同じクエリに2回enforceしても結果が変わらない
-    let user = CurrentUser::new(99, vec![]);
-    let enforcer = SecurityEnforcer::new();
+    let user = create_user(99, &[]);
+    let enforcer = create_enforcer();
 
-    let mut query = ConvertedQuery::new("data".to_string());
+    let mut query = create_query("data");
 
     // 1回目
     enforcer.enforce(&mut query, &user).unwrap();
