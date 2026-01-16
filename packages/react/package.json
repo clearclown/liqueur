@@ -8,7 +8,8 @@
     "build": "tsc",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests --ext .ts,.tsx"
   },
   "dependencies": {
     "@liqueur/protocol": "^0.1.0",

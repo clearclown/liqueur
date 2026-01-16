@@ -7,11 +7,11 @@ import type { DatabaseMetadata, OpenAICompatibleConfig } from '../src';
 import { createMockMetadata } from './testHelpersBaseAIProvider';
 
 describe('OpenAI-Compatible Providers', () => {
-  let mockMetadata: DatabaseMetadata;
+  let _mockMetadata: DatabaseMetadata;
   let baseConfig: OpenAICompatibleConfig;
 
   beforeEach(() => {
-    mockMetadata = createMockMetadata();
+    _mockMetadata = createMockMetadata();
 
     baseConfig = {
       apiKey: 'test-api-key',

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MockProvider } from '../src/providers/MockProvider';
-import type { DatabaseMetadata, ProviderConfig } from '../src/types';
+import type { DatabaseMetadata } from '../src/types';
 import {
   createMockConfig,
   createMockMetadata,

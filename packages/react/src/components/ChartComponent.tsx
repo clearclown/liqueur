@@ -90,7 +90,7 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
           </ResponsiveContainer>
         );
 
-      case 'pie':
+      case 'pie': {
         // Pieチャートは最初のyKeyのみ使用
         const pieDataKey = yKeys[0];
         return (
@@ -114,6 +114,7 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
             </PieChart>
           </ResponsiveContainer>
         );
+      }
 
       default:
         return (
