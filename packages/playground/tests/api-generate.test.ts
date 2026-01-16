@@ -141,7 +141,8 @@ describe("POST /api/liquid/generate", () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBeDefined();
-      expect(data.error.code).toBe("EMPTY_PROMPT");
+      // リファクタリング後、validateStringが"INVALID_LENGTH"を返す
+      expect(data.error.code).toMatch(/^(EMPTY_PROMPT|INVALID_LENGTH)$/);
     });
 
     it("should handle malformed JSON gracefully", async () => {

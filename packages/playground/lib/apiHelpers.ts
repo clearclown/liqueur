@@ -71,3 +71,103 @@ export function validateRequiredFields(
   }
   return { valid: true };
 }
+
+/**
+ * Validate string field (non-empty, max length)
+ */
+export function validateString(
+  value: unknown,
+  fieldName: string,
+  options: { maxLength?: number; minLength?: number } = {}
+): { valid: true } | { valid: false; response: NextResponse<ErrorResponse> } {
+  if (typeof value !== "string") {
+    return {
+      valid: false,
+      response: createErrorResponse(
+        "INVALID_TYPE",
+        `Field '${fieldName}' must be a string`,
+        400
+      ),
+    };
+  }
+
+  const trimmed = value.trim();
+
+  if (options.minLength !== undefined && trimmed.length < options.minLength) {
+    return {
+      valid: false,
+      response: createErrorResponse(
+        "INVALID_LENGTH",
+        `Field '${fieldName}' must be at least ${options.minLength} characters`,
+        400
+      ),
+    };
+  }
+
+  if (options.maxLength !== undefined && trimmed.length > options.maxLength) {
+    return {
+      valid: false,
+      response: createErrorResponse(
+        "INVALID_LENGTH",
+        `Field '${fieldName}' must be at most ${options.maxLength} characters`,
+        400
+      ),
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Rate limiting store (in-memory, per-process)
+ * Production: Use Redis or similar distributed cache
+ */
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+/**
+ * Simple rate limiter
+ * Returns true if request is allowed, false if rate limit exceeded
+ */
+export function checkRateLimit(
+  identifier: string,
+  maxRequests: number,
+  windowMs: number
+): boolean {
+  const now = Date.now();
+  const record = rateLimitStore.get(identifier);
+
+  if (!record || now > record.resetAt) {
+    // New window
+    rateLimitStore.set(identifier, {
+      count: 1,
+      resetAt: now + windowMs,
+    });
+    return true;
+  }
+
+  if (record.count >= maxRequests) {
+    // Rate limit exceeded
+    return false;
+  }
+
+  // Increment count
+  record.count++;
+  return true;
+}
+
+/**
+ * Get rate limit info for identifier
+ */
+export function getRateLimitInfo(identifier: string): {
+  remaining: number;
+  resetAt: number;
+} | null {
+  const record = rateLimitStore.get(identifier);
+  if (!record) return null;
+
+  const maxRequests = parseInt(process.env.AI_REQUEST_LIMIT_PER_MINUTE || "10");
+  return {
+    remaining: Math.max(0, maxRequests - record.count),
+    resetAt: record.resetAt,
+  };
+}

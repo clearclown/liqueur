@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { DatabaseMetadata } from "@liqueur/ai-provider";
 import type { ErrorResponse } from "@/lib/types/api";
+import { checkRateLimit, createErrorResponse } from "@/lib/apiHelpers";
 
 /**
  * Response body type
@@ -155,35 +156,82 @@ function getMockMetadata(): DatabaseMetadata {
 }
 
 /**
+ * Metadata cache (in-memory)
+ * Production: Use Redis with TTL
+ */
+let metadataCache: { data: DatabaseMetadata; generatedAt: string } | null = null;
+let cacheExpiry = 0;
+
+/**
  * GET /api/liquid/metadata
  * Database schema metadata取得
  */
 export async function GET(
-  _request: NextRequest
+  request: NextRequest
 ): Promise<NextResponse<MetadataResponse | ErrorResponse>> {
   try {
+    // Rate limiting (lighter than generate API)
+    const clientIp = request.headers.get("x-forwarded-for") || "unknown";
+    const rateLimitPerMinute = 30; // Metadata is cheaper
+
+    if (!checkRateLimit(`metadata:${clientIp}`, rateLimitPerMinute, 60 * 1000)) {
+      return createErrorResponse(
+        "RATE_LIMIT_EXCEEDED",
+        "Too many metadata requests. Please try again later.",
+        429
+      );
+    }
+
+    // Check cache (default: 1 hour TTL)
+    const cacheTTL = parseInt(process.env.METADATA_CACHE_TTL || "3600") * 1000;
+    const now = Date.now();
+
+    if (metadataCache && now < cacheExpiry) {
+      // Return cached metadata
+      return NextResponse.json(
+        {
+          metadata: metadataCache.data,
+          generatedAt: metadataCache.generatedAt,
+        },
+        {
+          status: 200,
+          headers: {
+            "X-Cache": "HIT",
+            "X-Cache-Expires-At": new Date(cacheExpiry).toISOString(),
+          },
+        }
+      );
+    }
+
     // Get database metadata
     // TODO: Implement actual database introspection
     const metadata = getMockMetadata();
+    const generatedAt = new Date().toISOString();
+
+    // Update cache
+    metadataCache = { data: metadata, generatedAt };
+    cacheExpiry = now + cacheTTL;
 
     const response: MetadataResponse = {
       metadata,
-      generatedAt: new Date().toISOString(),
+      generatedAt,
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, {
+      status: 200,
+      headers: {
+        "X-Cache": "MISS",
+        "Cache-Control": `private, max-age=${cacheTTL / 1000}`,
+      },
+    });
   } catch (error) {
     console.error("Metadata Generation Error:", error);
 
-    return NextResponse.json(
-      {
-        error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to generate database metadata",
-          details: error instanceof Error ? error.message : String(error),
-        },
-      },
-      { status: 500 }
+    return createErrorResponse(
+      "INTERNAL_ERROR",
+      "Failed to generate database metadata",
+      500,
+      error instanceof Error ? error.message : String(error)
     );
   }
 }

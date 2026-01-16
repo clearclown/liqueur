@@ -9,7 +9,14 @@ import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 import type { DatabaseMetadata } from "@liqueur/ai-provider";
 import { ArtifactGenerator, createProviderFromEnv } from "@liqueur/ai-provider";
-import { parseRequestBody, createErrorResponse, validateRequiredFields } from "@/lib/apiHelpers";
+import {
+  parseRequestBody,
+  createErrorResponse,
+  validateRequiredFields,
+  validateString,
+  checkRateLimit,
+  getRateLimitInfo,
+} from "@/lib/apiHelpers";
 import type { ErrorResponse } from "@/lib/types/api";
 
 /**
@@ -40,6 +47,35 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<GenerateResponse | ErrorResponse>> {
   try {
+    // Rate limiting (per IP address)
+    const clientIp = request.headers.get("x-forwarded-for") || "unknown";
+    const rateLimitPerMinute = parseInt(process.env.AI_REQUEST_LIMIT_PER_MINUTE || "10");
+
+    if (!checkRateLimit(clientIp, rateLimitPerMinute, 60 * 1000)) {
+      const rateLimitInfo = getRateLimitInfo(clientIp);
+      return NextResponse.json(
+        {
+          error: {
+            code: "RATE_LIMIT_EXCEEDED",
+            message: "Too many requests. Please try again later.",
+            details: rateLimitInfo
+              ? `Rate limit: ${rateLimitPerMinute}/min. Resets at ${new Date(rateLimitInfo.resetAt).toISOString()}`
+              : undefined,
+          },
+        },
+        {
+          status: 429,
+          headers: rateLimitInfo
+            ? {
+                "X-RateLimit-Limit": rateLimitPerMinute.toString(),
+                "X-RateLimit-Remaining": rateLimitInfo.remaining.toString(),
+                "X-RateLimit-Reset": rateLimitInfo.resetAt.toString(),
+              }
+            : {},
+        }
+      );
+    }
+
     // リクエストボディのパース
     const parseResult = await parseRequestBody<GenerateRequest>(request);
     if (!parseResult.success) {
@@ -53,13 +89,13 @@ export async function POST(
       return validationResult.response;
     }
 
-    // prompt検証
-    if (typeof body.prompt !== "string" || body.prompt.trim() === "") {
-      return createErrorResponse(
-        "EMPTY_PROMPT",
-        "Prompt cannot be empty or whitespace only",
-        400
-      );
+    // prompt厳密検証（長さ制限: 1-5000文字）
+    const promptValidation = validateString(body.prompt, "prompt", {
+      minLength: 1,
+      maxLength: 5000,
+    });
+    if (!promptValidation.valid) {
+      return promptValidation.response;
     }
 
     // AIプロバイダーの初期化
