@@ -13,11 +13,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src tests --ext .ts"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "keywords": [
     "artifact",
@@ -31,7 +32,8 @@
     "@liqueur/protocol": "file:../protocol"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5"
+    "@types/node": "^22.10.5",
+    "prettier": "^3.1.0"
   },
   "files": [
     "dist",
