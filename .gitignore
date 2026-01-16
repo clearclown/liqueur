@@ -53,3 +53,7 @@ yarn-error.log*
 # Minified files
 *.min.js
 *.min.css
+
+# Playwright
+playwright-report/
+test-results/

@@ -24,3 +24,37 @@ export { GeminiProvider } from "./providers/GeminiProvider";
 
 // Factory
 export { ProviderFactory } from "./factory/ProviderFactory";
+export { createProviderFromEnv } from "./factory/createProviderFromEnv";
+
+// Configuration
+export {
+  getProviderFromEnv,
+  getDeepSeekConfig,
+  getAnthropicConfig,
+  getGeminiConfig,
+  getOpenAIConfig,
+  getGLMConfig,
+  getLocalLLMConfig,
+  getCostTrackingConfig,
+  getRateLimitConfig,
+  getAIConfig,
+  SUPPORTED_PROVIDERS,
+} from "./config/envConfig";
+export type {
+  CostTrackingConfig,
+  RateLimitConfig,
+  AIConfig,
+} from "./config/envConfig";
+
+// Services
+export { ArtifactGenerator } from "./services/ArtifactGenerator";
+export type {
+  GenerateArtifactRequest,
+  GenerateArtifactResult,
+} from "./services/ArtifactGenerator";
+
+// Prompts
+export {
+  createDashboardPrompt,
+  createSimpleDashboardPrompt,
+} from "./prompts/dashboardPrompt";
