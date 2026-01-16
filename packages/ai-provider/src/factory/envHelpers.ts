@@ -1,5 +1,5 @@
-import type { ProviderConfig } from '../types';
-import type { OpenAICompatibleConfig } from '../providers/BaseOpenAIProvider';
+import type { ProviderConfig } from "../types";
+import type { OpenAICompatibleConfig } from "../providers/BaseOpenAIProvider";
 
 /**
  * Environment variable parsing helpers for ProviderFactory
@@ -33,7 +33,7 @@ export function getOpenAICompatibleConfig(
 
   return {
     apiKey,
-    model: model || 'default-model',
+    model: model || "default-model",
     baseURL,
   };
 }
@@ -45,10 +45,7 @@ export function getOpenAICompatibleConfig(
  * @returns ProviderConfig
  * @throws Error if required variables are missing
  */
-export function getBasicProviderConfig(
-  apiKeyEnvVar: string,
-  modelEnvVar: string
-): ProviderConfig {
+export function getBasicProviderConfig(apiKeyEnvVar: string, modelEnvVar: string): ProviderConfig {
   const apiKey = process.env[apiKeyEnvVar];
   const model = process.env[modelEnvVar];
 
@@ -70,8 +67,8 @@ export function getBasicProviderConfig(
  * @returns OpenAICompatibleConfig with default values
  */
 export function getLocalLLMConfig(): OpenAICompatibleConfig {
-  const model = process.env.LOCAL_LLM_MODEL || 'local-model';
-  const baseURL = process.env.LOCAL_LLM_BASE_URL || 'http://localhost:1234/v1';
+  const model = process.env.LOCAL_LLM_MODEL || "local-model";
+  const baseURL = process.env.LOCAL_LLM_BASE_URL || "http://localhost:1234/v1";
 
   return {
     model,

@@ -1,18 +1,18 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { ProviderConfig } from '../types';
-import { BaseAIProvider } from './BaseAIProvider';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { ProviderConfig } from "../types";
+import { BaseAIProvider } from "./BaseAIProvider";
 
 /**
  * Google Gemini Provider (Gemini 1.5 Flash, Gemini 1.5 Pro, etc.)
  * Official Google Generative AI API
  */
 export class GeminiProvider extends BaseAIProvider {
-  public readonly name = 'gemini';
+  public readonly name = "gemini";
   private client: GoogleGenerativeAI;
 
   constructor(config: ProviderConfig) {
     super(config);
-    this.client = new GoogleGenerativeAI(config.apiKey || '');
+    this.client = new GoogleGenerativeAI(config.apiKey || "");
   }
 
   /**
@@ -24,14 +24,11 @@ export class GeminiProvider extends BaseAIProvider {
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 4096,
-        responseMimeType: 'application/json',
+        responseMimeType: "application/json",
       },
     });
 
-    const result = await model.generateContent([
-      { text: systemPrompt },
-      { text: prompt },
-    ]);
+    const result = await model.generateContent([{ text: systemPrompt }, { text: prompt }]);
 
     const response = result.response;
     return response.text();
@@ -43,15 +40,15 @@ export class GeminiProvider extends BaseAIProvider {
    */
   protected getCostPerInputToken(): number {
     // Gemini 2.0 Flash Experimental - Free
-    if (this.config.model.includes('gemini-2.0-flash-exp')) {
+    if (this.config.model.includes("gemini-2.0-flash-exp")) {
       return 0;
     }
     // Gemini 1.5 Flash
-    if (this.config.model.includes('gemini-1.5-flash')) {
+    if (this.config.model.includes("gemini-1.5-flash")) {
       return 0.075 / 1_000_000; // $0.075 per MTok (≤128k tokens)
     }
     // Gemini 1.5 Pro
-    if (this.config.model.includes('gemini-1.5-pro')) {
+    if (this.config.model.includes("gemini-1.5-pro")) {
       return 1.25 / 1_000_000; // $1.25 per MTok (≤128k tokens)
     }
     // Default to Flash pricing
@@ -63,18 +60,18 @@ export class GeminiProvider extends BaseAIProvider {
    */
   protected getCostPerOutputToken(): number {
     // Gemini 2.0 Flash Experimental - Free
-    if (this.config.model.includes('gemini-2.0-flash-exp')) {
+    if (this.config.model.includes("gemini-2.0-flash-exp")) {
       return 0;
     }
     // Gemini 1.5 Flash
-    if (this.config.model.includes('gemini-1.5-flash')) {
-      return 0.30 / 1_000_000; // $0.30 per MTok
+    if (this.config.model.includes("gemini-1.5-flash")) {
+      return 0.3 / 1_000_000; // $0.30 per MTok
     }
     // Gemini 1.5 Pro
-    if (this.config.model.includes('gemini-1.5-pro')) {
+    if (this.config.model.includes("gemini-1.5-pro")) {
       return 5.0 / 1_000_000; // $5.00 per MTok
     }
     // Default to Flash pricing
-    return 0.30 / 1_000_000;
+    return 0.3 / 1_000_000;
   }
 }

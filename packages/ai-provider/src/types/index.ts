@@ -1,4 +1,4 @@
-import type { LiquidViewSchema } from '@liqueur/protocol';
+import type { LiquidViewSchema } from "@liqueur/protocol";
 
 /**
  * Database metadata for AI context
@@ -76,10 +76,7 @@ export interface AIProvider {
    * @returns Promise resolving to LiquidViewSchema
    * @throws Error if generation fails or schema is invalid
    */
-  generateSchema(
-    prompt: string,
-    metadata: DatabaseMetadata
-  ): Promise<LiquidViewSchema>;
+  generateSchema(prompt: string, metadata: DatabaseMetadata): Promise<LiquidViewSchema>;
 
   /**
    * Validate AI response and parse to schema
@@ -110,4 +107,11 @@ export type AIProviderFactory = (config: ProviderConfig) => AIProvider;
 /**
  * Provider types supported
  */
-export type ProviderType = 'anthropic' | 'gemini' | 'openai' | 'deepseek' | 'glm' | 'local' | 'mock';
+export type ProviderType =
+  | "anthropic"
+  | "gemini"
+  | "openai"
+  | "deepseek"
+  | "glm"
+  | "local"
+  | "mock";

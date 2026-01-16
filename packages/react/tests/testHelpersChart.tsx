@@ -3,10 +3,10 @@
  * Reduces duplication in ChartComponent.test.tsx
  */
 
-import React from 'react';
-import { render, screen, RenderResult } from '@testing-library/react';
-import { ChartComponent } from '../src/components/ChartComponent';
-import { expectLoadingState, expectNoDataState } from './testHelpersCommon';
+import React from "react";
+import { render, screen, RenderResult } from "@testing-library/react";
+import { ChartComponent } from "../src/components/ChartComponent";
+import { expectLoadingState, expectNoDataState } from "./testHelpersCommon";
 
 /**
  * Renders ChartComponent with the given props
@@ -17,7 +17,7 @@ export function renderChartComponent(
   return render(
     <ChartComponent
       type="chart"
-      variant={props.variant || 'bar'}
+      variant={props.variant || "bar"}
       index={props.index ?? 0}
       {...props}
     />
@@ -45,7 +45,7 @@ export function expectChartRendered(index: number = 0) {
  */
 export function expectChartHasSvg(index: number = 0) {
   const chartContainer = getChartContainer(index);
-  const svgElements = chartContainer.querySelectorAll('svg');
+  const svgElements = chartContainer.querySelectorAll("svg");
   expect(svgElements.length).toBeGreaterThan(0);
   return chartContainer;
 }
@@ -53,23 +53,23 @@ export function expectChartHasSvg(index: number = 0) {
 /**
  * Creates test data for different chart variants
  */
-export function createChartData(variant: 'bar' | 'line' | 'pie', count: number = 3): unknown[] {
+export function createChartData(variant: "bar" | "line" | "pie", count: number = 3): unknown[] {
   switch (variant) {
-    case 'bar':
+    case "bar":
       return Array.from({ length: count }, (_, i) => ({
-        name: ['Jan', 'Feb', 'Mar', 'Apr', 'May'][i] || `Month ${i + 1}`,
+        name: ["Jan", "Feb", "Mar", "Apr", "May"][i] || `Month ${i + 1}`,
         value: (i + 1) * 50 + Math.floor(Math.random() * 50),
       }));
-    case 'line':
+    case "line":
       return Array.from({ length: count }, (_, i) => ({
         date: `2024-0${i + 1}`,
         amount: (i + 1) * 250 + Math.floor(Math.random() * 100),
       }));
-    case 'pie':
+    case "pie":
       return [
-        { category: 'Food', value: 300 },
-        { category: 'Travel', value: 200 },
-        { category: 'Entertainment', value: 100 },
+        { category: "Food", value: 300 },
+        { category: "Travel", value: 200 },
+        { category: "Entertainment", value: 100 },
       ].slice(0, count);
     default:
       return [];

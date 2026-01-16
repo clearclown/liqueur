@@ -1,9 +1,9 @@
-import React from 'react';
-import type { LiquidViewSchema } from '@liqueur/protocol';
-import { GridLayout } from '../layouts/GridLayout';
-import { StackLayout } from '../layouts/StackLayout';
-import { ChartComponent } from './ChartComponent';
-import { TableComponent } from './TableComponent';
+import React from "react";
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import { GridLayout } from "../layouts/GridLayout";
+import { StackLayout } from "../layouts/StackLayout";
+import { ChartComponent } from "./ChartComponent";
+import { TableComponent } from "./TableComponent";
 
 export interface LiquidRendererProps {
   schema: LiquidViewSchema;
@@ -11,7 +11,7 @@ export interface LiquidRendererProps {
   data?: Record<string, unknown[]>;
 }
 
-const SUPPORTED_VERSIONS = ['1.0'];
+const SUPPORTED_VERSIONS = ["1.0"];
 
 /**
  * LiquidRenderer - JSON SchemaをReactコンポーネントに変換
@@ -41,28 +41,14 @@ export const LiquidRenderer: React.FC<LiquidRendererProps> = ({
   }
 
   // レイアウトに応じたコンポーネントレンダリング
-  const renderComponent = (component: typeof schema.components[number], index: number) => {
+  const renderComponent = (component: (typeof schema.components)[number], index: number) => {
     const componentData = component.data_source ? data[component.data_source] : undefined;
 
     switch (component.type) {
-      case 'chart':
-        return (
-          <ChartComponent
-            key={index}
-            {...component}
-            data={componentData}
-            index={index}
-          />
-        );
-      case 'table':
-        return (
-          <TableComponent
-            key={index}
-            {...component}
-            data={componentData}
-            index={index}
-          />
-        );
+      case "chart":
+        return <ChartComponent key={index} {...component} data={componentData} index={index} />;
+      case "table":
+        return <TableComponent key={index} {...component} data={componentData} index={index} />;
       default:
         return null;
     }
@@ -70,13 +56,13 @@ export const LiquidRenderer: React.FC<LiquidRendererProps> = ({
 
   // レイアウトレンダリング
   switch (schema.layout.type) {
-    case 'grid':
+    case "grid":
       return (
         <GridLayout {...schema.layout}>
           {schema.components.map((component, index) => renderComponent(component, index))}
         </GridLayout>
       );
-    case 'stack':
+    case "stack":
       return (
         <StackLayout {...schema.layout}>
           {schema.components.map((component, index) => renderComponent(component, index))}

@@ -3,8 +3,8 @@
  * Shared utilities for React component tests to reduce duplication
  */
 
-import { screen } from '@testing-library/react';
-import { expect } from 'vitest';
+import { screen } from "@testing-library/react";
+import { expect } from "vitest";
 
 /**
  * Expects loading indicator to be visible

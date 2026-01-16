@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 export interface ComponentWrapperProps {
   /** Component type for testid and className */
-  type: 'chart' | 'table';
+  type: "chart" | "table";
   /** Component index */
   index: number;
   /** Optional title */

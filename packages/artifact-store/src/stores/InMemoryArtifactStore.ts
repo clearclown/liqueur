@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from "crypto";
 import type {
   Artifact,
   ArtifactStore,
@@ -6,8 +6,8 @@ import type {
   UpdateArtifactInput,
   ListArtifactsQuery,
   ListArtifactsResponse,
-} from '../types';
-import { applyQuery } from './queryHelpers';
+} from "../types";
+import { applyQuery } from "./queryHelpers";
 
 /**
  * In-memory implementation of ArtifactStore
@@ -18,8 +18,8 @@ export class InMemoryArtifactStore implements ArtifactStore {
 
   async create(input: CreateArtifactInput, userId: string): Promise<Artifact> {
     // Validation
-    if (!input.title || input.title.trim() === '') {
-      throw new Error('Title cannot be empty');
+    if (!input.title || input.title.trim() === "") {
+      throw new Error("Title cannot be empty");
     }
 
     const now = new Date();
@@ -34,7 +34,7 @@ export class InMemoryArtifactStore implements ArtifactStore {
       createdAt: now,
       updatedAt: now,
       tags: input.tags || [],
-      visibility: input.visibility || 'private',
+      visibility: input.visibility || "private",
     };
 
     this.artifacts.set(artifact.id, artifact);
@@ -56,7 +56,7 @@ export class InMemoryArtifactStore implements ArtifactStore {
     const artifact = this.artifacts.get(id);
 
     if (!artifact) {
-      throw new Error('Artifact not found');
+      throw new Error("Artifact not found");
     }
 
     const updated: Artifact = {
@@ -79,7 +79,7 @@ export class InMemoryArtifactStore implements ArtifactStore {
     const artifact = this.artifacts.get(id);
 
     if (!artifact) {
-      throw new Error('Artifact not found');
+      throw new Error("Artifact not found");
     }
 
     this.artifacts.delete(id);

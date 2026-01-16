@@ -1,5 +1,5 @@
-import type { LiquidViewSchema } from '@liqueur/protocol';
-import type { ValidationResult } from '../types';
+import type { LiquidViewSchema } from "@liqueur/protocol";
+import type { ValidationResult } from "../types";
 
 /**
  * SchemaValidator - Shared validation logic for AI provider responses
@@ -24,13 +24,13 @@ export class SchemaValidator {
    */
   static validateResponse(response: unknown): ValidationResult {
     // Type guard
-    if (!response || typeof response !== 'object') {
+    if (!response || typeof response !== "object") {
       return {
         valid: false,
         errors: [
           {
-            code: 'INVALID_RESPONSE_TYPE',
-            message: 'Response must be an object',
+            code: "INVALID_RESPONSE_TYPE",
+            message: "Response must be an object",
           },
         ],
       };
@@ -39,37 +39,37 @@ export class SchemaValidator {
     const obj = response as Record<string, unknown>;
 
     // Check required fields
-    const errors: ValidationResult['errors'] = [];
+    const errors: ValidationResult["errors"] = [];
 
     if (!obj.version) {
       errors.push({
-        code: 'MISSING_VERSION',
-        message: 'Schema version is required',
-        path: 'version',
+        code: "MISSING_VERSION",
+        message: "Schema version is required",
+        path: "version",
       });
     }
 
     if (!obj.layout) {
       errors.push({
-        code: 'MISSING_LAYOUT',
-        message: 'Schema layout is required',
-        path: 'layout',
+        code: "MISSING_LAYOUT",
+        message: "Schema layout is required",
+        path: "layout",
       });
     }
 
     if (!obj.components) {
       errors.push({
-        code: 'MISSING_COMPONENTS',
-        message: 'Schema components are required',
-        path: 'components',
+        code: "MISSING_COMPONENTS",
+        message: "Schema components are required",
+        path: "components",
       });
     }
 
     if (!obj.data_sources) {
       errors.push({
-        code: 'MISSING_DATA_SOURCES',
-        message: 'Schema data_sources are required',
-        path: 'data_sources',
+        code: "MISSING_DATA_SOURCES",
+        message: "Schema data_sources are required",
+        path: "data_sources",
       });
     }
 

@@ -3,10 +3,10 @@
  * Reduces duplication in useLiquidView.test.ts
  */
 
-import { renderHook, waitFor, RenderHookResult } from '@testing-library/react';
-import { expect } from 'vitest';
-import { useLiquidView, UseLiquidViewResult } from '../src/hooks/useLiquidView';
-import type { LiquidViewSchema, DataSource } from '@liqueur/protocol';
+import { renderHook, waitFor, RenderHookResult } from "@testing-library/react";
+import { expect } from "vitest";
+import { useLiquidView, UseLiquidViewResult } from "../src/hooks/useLiquidView";
+import type { LiquidViewSchema, DataSource } from "@liqueur/protocol";
 
 /**
  * Creates a minimal test schema with defaults
@@ -16,23 +16,24 @@ export function createTestSchema(
   dataSourcesOrOverrides: Record<string, DataSource> | Partial<LiquidViewSchema>
 ): LiquidViewSchema {
   // Check if it's a data_sources object or full schema overrides
-  const isDataSources = dataSourcesOrOverrides &&
-    Object.values(dataSourcesOrOverrides).some(val =>
-      typeof val === 'object' && 'resource' in val
+  const isDataSources =
+    dataSourcesOrOverrides &&
+    Object.values(dataSourcesOrOverrides).some(
+      (val) => typeof val === "object" && "resource" in val
     );
 
   if (isDataSources) {
     return {
-      version: '1.0',
-      layout: { type: 'grid', columns: 1 },
+      version: "1.0",
+      layout: { type: "grid", columns: 1 },
       components: [],
       data_sources: dataSourcesOrOverrides as Record<string, DataSource>,
     } as LiquidViewSchema;
   }
 
   return {
-    version: '1.0',
-    layout: { type: 'grid', columns: 1 },
+    version: "1.0",
+    layout: { type: "grid", columns: 1 },
     components: [],
     data_sources: {},
     ...dataSourcesOrOverrides,
@@ -50,7 +51,7 @@ export function renderUseLiquidViewHook(schema: LiquidViewSchema) {
  * Waits for the hook to complete loading
  */
 export async function waitForHookComplete(
-  result: RenderHookResult<UseLiquidViewResult, unknown>['result']
+  result: RenderHookResult<UseLiquidViewResult, unknown>["result"]
 ) {
   await waitFor(() => expect(result.current.loading).toBe(false));
 }
@@ -60,7 +61,7 @@ export async function waitForHookComplete(
  * Optionally checks for expected properties in the first data item
  */
 export function expectHookHasData(
-  result: RenderHookResult<UseLiquidViewResult, unknown>['result'],
+  result: RenderHookResult<UseLiquidViewResult, unknown>["result"],
   dsName: string,
   expectedProps?: string[]
 ) {
@@ -69,7 +70,7 @@ export function expectHookHasData(
 
   if (expectedProps) {
     const firstItem = result.current.data[dsName][0];
-    expectedProps.forEach(prop => {
+    expectedProps.forEach((prop) => {
       expect(firstItem).toHaveProperty(prop);
     });
   }
@@ -79,7 +80,7 @@ export function expectHookHasData(
  * Expects the hook result to have an error
  */
 export function expectHookHasError(
-  result: RenderHookResult<UseLiquidViewResult, unknown>['result']
+  result: RenderHookResult<UseLiquidViewResult, unknown>["result"]
 ) {
   expect(result.current.error).not.toBeNull();
   expect(result.current.data).toEqual({});
@@ -89,7 +90,7 @@ export function expectHookHasError(
  * Expects the hook result to have no error
  */
 export function expectHookHasNoError(
-  result: RenderHookResult<UseLiquidViewResult, unknown>['result']
+  result: RenderHookResult<UseLiquidViewResult, unknown>["result"]
 ) {
   expect(result.current.error).toBeNull();
 }

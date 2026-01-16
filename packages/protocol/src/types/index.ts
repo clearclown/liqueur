@@ -125,13 +125,13 @@ export interface Filter {
  * Filter operators
  */
 export type FilterOperator =
-  | "eq"       // Equal
-  | "neq"      // Not equal
-  | "gt"       // Greater than
-  | "gte"      // Greater than or equal
-  | "lt"       // Less than
-  | "lte"      // Less than or equal
-  | "in"       // In array
+  | "eq" // Equal
+  | "neq" // Not equal
+  | "gt" // Greater than
+  | "gte" // Greater than or equal
+  | "lt" // Less than
+  | "lte" // Less than or equal
+  | "in" // In array
   | "contains"; // Partial match
 
 /**
@@ -210,7 +210,7 @@ export enum ValidationErrorCode {
   MISSING_AGGREGATION_FIELD = "MISSING_AGGREGATION_FIELD",
   INVALID_SORT_DIRECTION = "INVALID_SORT_DIRECTION",
   MISSING_SORT_FIELD = "MISSING_SORT_FIELD",
-  INVALID_LIMIT = "INVALID_LIMIT"
+  INVALID_LIMIT = "INVALID_LIMIT",
 }
 
 /**

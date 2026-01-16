@@ -7,7 +7,7 @@ export type {
   ListArtifactsQuery,
   ListArtifactsResponse,
   ArtifactStore,
-} from './types';
+} from "./types";
 
 // Stores
-export { InMemoryArtifactStore } from './stores/InMemoryArtifactStore';
+export { InMemoryArtifactStore } from "./stores/InMemoryArtifactStore";

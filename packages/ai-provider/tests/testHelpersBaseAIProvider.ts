@@ -3,17 +3,17 @@
  * Reduces duplication in BaseAIProvider.test.ts
  */
 
-import { expect } from 'vitest';
-import { BaseAIProvider } from '../src/providers/BaseAIProvider';
-import type { DatabaseMetadata, ProviderConfig, ValidationResult } from '../src/types';
+import { expect } from "vitest";
+import { BaseAIProvider } from "../src/providers/BaseAIProvider";
+import type { DatabaseMetadata, ProviderConfig, ValidationResult } from "../src/types";
 
 /**
  * Creates a mock AI provider configuration
  */
 export function createMockConfig(overrides?: Partial<ProviderConfig>): ProviderConfig {
   return {
-    apiKey: 'test-api-key',
-    model: 'test-model',
+    apiKey: "test-api-key",
+    model: "test-model",
     timeout: 5000,
     ...overrides,
   };
@@ -26,11 +26,11 @@ export function createMockMetadata(
   tables?: Array<{ name: string; columns?: any[]; rowCount?: number }>
 ): DatabaseMetadata {
   const defaultTable = {
-    name: 'sales',
+    name: "sales",
     columns: [
       {
-        name: 'id',
-        type: 'integer',
+        name: "id",
+        type: "integer",
         nullable: false,
         isPrimaryKey: true,
         isForeignKey: false,
@@ -52,7 +52,7 @@ export function createMultiTableMetadata(tableNames: string[]): DatabaseMetadata
   const baseTable = createMockMetadata().tables[0];
 
   return {
-    tables: tableNames.map(name => ({
+    tables: tableNames.map((name) => ({
       ...baseTable,
       name,
     })),
@@ -64,8 +64,8 @@ export function createMultiTableMetadata(tableNames: string[]): DatabaseMetadata
  */
 export function createValidSchema(overrides?: any) {
   return {
-    version: '1.0',
-    layout: { type: 'grid', columns: 1 },
+    version: "1.0",
+    layout: { type: "grid", columns: 1 },
     components: [],
     data_sources: {},
     ...overrides,
@@ -75,10 +75,12 @@ export function createValidSchema(overrides?: any) {
 /**
  * Creates an invalid schema missing a specific field
  */
-export function createInvalidSchema(missingField: 'version' | 'layout' | 'components' | 'data_sources') {
+export function createInvalidSchema(
+  missingField: "version" | "layout" | "components" | "data_sources"
+) {
   const base: any = {
-    version: '1.0',
-    layout: { type: 'grid', columns: 1 },
+    version: "1.0",
+    layout: { type: "grid", columns: 1 },
     components: [],
     data_sources: {},
   };
@@ -98,7 +100,7 @@ export async function expectGenerateSchemaSuccess(
   const schema = await provider.generateSchema(prompt, metadata);
 
   expect(schema).toBeDefined();
-  expect(schema.version).toBe('1.0');
+  expect(schema.version).toBe("1.0");
   expect(schema.layout).toBeDefined();
   expect(schema.components).toBeDefined();
   expect(schema.data_sources).toBeDefined();
@@ -137,9 +139,7 @@ export function expectValidationSuccess(result: ValidationResult, expectedSchema
  */
 export function expectValidationError(result: ValidationResult, errorCode: string) {
   expect(result.valid).toBe(false);
-  expect(result.errors).toContainEqual(
-    expect.objectContaining({ code: errorCode })
-  );
+  expect(result.errors).toContainEqual(expect.objectContaining({ code: errorCode }));
 
   return result;
 }
@@ -149,7 +149,7 @@ export function expectValidationError(result: ValidationResult, errorCode: strin
  */
 export function expectValidCostEstimate(estimate: any) {
   expect(estimate.estimatedCost).toBeGreaterThan(0);
-  expect(estimate.currency).toBe('USD');
+  expect(estimate.currency).toBe("USD");
   expect(estimate.model).toBeDefined();
   expect(estimate.inputTokens).toBeGreaterThan(0);
   expect(estimate.outputTokens).toBe(1000);
@@ -162,37 +162,37 @@ export function expectValidCostEstimate(estimate: any) {
  */
 const PROVIDER_ENV_MAP: Record<string, Record<string, string | undefined>> = {
   mock: {
-    AI_PROVIDER: 'mock',
+    AI_PROVIDER: "mock",
   },
   openai: {
-    AI_PROVIDER: 'openai',
-    OPENAI_API_KEY: 'test-openai-key',
-    OPENAI_MODEL: 'gpt-4o-mini',
+    AI_PROVIDER: "openai",
+    OPENAI_API_KEY: "test-openai-key",
+    OPENAI_MODEL: "gpt-4o-mini",
   },
   deepseek: {
-    AI_PROVIDER: 'deepseek',
-    DEEPSEEK_API_KEY: 'test-deepseek-key',
-    DEEPSEEK_MODEL: 'deepseek-chat',
+    AI_PROVIDER: "deepseek",
+    DEEPSEEK_API_KEY: "test-deepseek-key",
+    DEEPSEEK_MODEL: "deepseek-chat",
   },
   glm: {
-    AI_PROVIDER: 'glm',
-    GLM_API_KEY: 'test-glm-key',
-    GLM_MODEL: 'glm-4.7',
+    AI_PROVIDER: "glm",
+    GLM_API_KEY: "test-glm-key",
+    GLM_MODEL: "glm-4.7",
   },
   local: {
-    AI_PROVIDER: 'local',
-    LOCAL_LLM_BASE_URL: 'http://localhost:1234/v1',
-    LOCAL_LLM_MODEL: 'local-model',
+    AI_PROVIDER: "local",
+    LOCAL_LLM_BASE_URL: "http://localhost:1234/v1",
+    LOCAL_LLM_MODEL: "local-model",
   },
   anthropic: {
-    AI_PROVIDER: 'anthropic',
-    ANTHROPIC_API_KEY: 'test-anthropic-key',
-    ANTHROPIC_MODEL: 'claude-3-haiku-20240307',
+    AI_PROVIDER: "anthropic",
+    ANTHROPIC_API_KEY: "test-anthropic-key",
+    ANTHROPIC_MODEL: "claude-3-haiku-20240307",
   },
   gemini: {
-    AI_PROVIDER: 'gemini',
-    GOOGLE_API_KEY: 'test-gemini-key',
-    GEMINI_MODEL: 'gemini-1.5-flash',
+    AI_PROVIDER: "gemini",
+    GOOGLE_API_KEY: "test-gemini-key",
+    GEMINI_MODEL: "gemini-1.5-flash",
   },
 };
 

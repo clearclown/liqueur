@@ -1,7 +1,7 @@
-import React from 'react';
-import type { StackLayout as StackLayoutType } from '@liqueur/protocol';
+import React from "react";
+import type { StackLayout as StackLayoutType } from "@liqueur/protocol";
 
-export interface StackLayoutComponentProps extends Omit<StackLayoutType, 'type'> {
+export interface StackLayoutComponentProps extends Omit<StackLayoutType, "type"> {
   children: React.ReactNode;
 }
 
@@ -9,13 +9,13 @@ export interface StackLayoutComponentProps extends Omit<StackLayoutType, 'type'>
  * StackLayout - スタックレイアウトコンポーネント
  */
 export const StackLayout: React.FC<StackLayoutComponentProps> = ({
-  direction = 'vertical',
+  direction = "vertical",
   gap = 0,
   children,
 }) => {
   const style: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: direction === 'vertical' ? 'column' : 'row',
+    display: "flex",
+    flexDirection: direction === "vertical" ? "column" : "row",
     gap: `${gap}px`,
   };
 
