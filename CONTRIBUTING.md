@@ -147,7 +147,7 @@ cargo clippy --workspace --all-features -- -D warnings
 3. **🔵 Refactor**: コード改善
 4. **✅ Coverage**: カバレッジ95%以上確認
 
-詳細は [TDD Guide](tdd-guide.md) を参照してください。
+詳細は [TDD Guide](docs/development/tdd-guide.md) を参照してください。
 
 ### カバレッジ要件
 
