@@ -246,7 +246,7 @@ npm run typecheck
 
 ## Contributing
 
-See the main [repository](https://github.com/your-org/liqueur) for contribution guidelines.
+See the main [repository](https://github.com/ablaze/liqueur) for contribution guidelines.
 
 ## License
 
