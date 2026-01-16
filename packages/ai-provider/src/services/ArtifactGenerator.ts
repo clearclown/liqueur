@@ -82,7 +82,7 @@ export class ArtifactGenerator {
   /**
    * AI応答からJSONを抽出
    */
-  private extractJSON(text: string): LiquidViewSchema {
+  private _extractJSON(text: string): LiquidViewSchema {
     // マークダウンコードブロックを削除
     let cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "");
 
@@ -115,7 +115,7 @@ export class ArtifactGenerator {
    * トークン数からコストを推定
    * （DeepSeekの料金: $0.27/1M input tokens, $1.10/1M output tokens）
    */
-  private estimateCost(totalTokens: number): number {
+  private _estimateCost(totalTokens: number): number {
     // 簡易的な推定（入力:出力 = 3:1 と仮定）
     const inputTokens = totalTokens * 0.75;
     const outputTokens = totalTokens * 0.25;

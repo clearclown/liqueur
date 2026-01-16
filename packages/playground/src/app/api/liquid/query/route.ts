@@ -102,7 +102,7 @@ function applyFilters(data: unknown[], filters: DataSource['filters']): unknown[
         case 'lte':
           return typeof itemValue === 'number' && itemValue <= (filter.value as number);
         case 'in':
-          return Array.isArray(filter.value) && filter.value.includes(itemValue);
+          return Array.isArray(filter.value) && filter.value.includes(itemValue as string | number);
         case 'contains':
           return typeof itemValue === 'string' && itemValue.includes(filter.value as string);
         default:

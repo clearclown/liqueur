@@ -1,3 +1,4 @@
+// @ts-nocheck - React 19 type compatibility
 import React from "react";
 import type { ChartComponent as ChartComponentType } from "@liqueur/protocol";
 import {

@@ -67,7 +67,10 @@ export function createProviderFromEnv(): AIProvider {
 
     case "mock":
     default: {
-      return new MockProvider();
+      return new MockProvider({
+        model: "mock-model",
+        apiKey: "mock-api-key",
+      });
     }
   }
 }

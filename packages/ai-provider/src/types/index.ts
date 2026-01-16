@@ -61,6 +61,14 @@ export interface ProviderConfig {
 }
 
 /**
+ * OpenAI-compatible API configuration
+ * Used for DeepSeek, GLM, and Local LLM providers
+ */
+export interface OpenAICompatibleConfig extends ProviderConfig {
+  baseURL: string;
+}
+
+/**
  * AI Provider interface
  * All providers must implement this interface
  */
