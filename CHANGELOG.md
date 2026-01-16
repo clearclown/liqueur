@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Workspace Dependencies Unification (Phase 63, 2025-01-16)
+
+#### Changed
+- **packages/ai-provider/package.json** - `@liqueur/protocol` dependency:
+  - Changed from `file:../protocol` to `^0.1.0` (version reference)
+- **packages/artifact-store/package.json** - `@liqueur/protocol` dependency:
+  - Changed from `file:../protocol` to `^0.1.0` (version reference)
+- **packages/react/package.json** - `@liqueur/protocol` dependency:
+  - Already using `^0.1.0` (no change, serves as reference)
+
+#### Benefits
+- **Consistency**: All workspace packages use the same dependency format (version references)
+- **npm Workspaces Compatibility**: Version references work seamlessly with npm workspaces auto-linking
+- **Publication Ready**: Proper versioning for potential npm registry publication
+- **Simplified Management**: Uniform dependency declaration across monorepo
+
+#### Technical Details
+- npm workspaces automatically creates symlinks for local packages during `npm install`
+- Version references (`^0.1.0`) are resolved to local workspace packages in development
+- On publication, these references remain as-is for npm registry compatibility
+- Eliminates inconsistency between `file:` protocol and version references
+
+#### Verification (Phase 63)
+- ✅ All tests passing: 98/98 (7 test files)
+- ✅ Type checking: Zero TypeScript errors
+- ✅ Lint: All packages pass ESLint checks
+- ✅ package-lock.json updated correctly with workspace links
+
+---
+
 ### Package README Repository URL Fix (Phase 61, 2025-01-16)
 
 #### Fixed
