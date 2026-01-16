@@ -21,6 +21,15 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "docs": "typedoc src/index.ts --out docs"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ablaze/liqueur.git",
+    "directory": "packages/artifact-store"
+  },
+  "bugs": {
+    "url": "https://github.com/ablaze/liqueur/issues"
+  },
+  "homepage": "https://github.com/ablaze/liqueur#readme",
   "keywords": [
     "artifact",
     "persistence",
