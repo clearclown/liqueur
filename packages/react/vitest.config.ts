@@ -19,7 +19,8 @@ export default defineConfig({
         '**/*.test.tsx',
         '**/tests/**',
         'src/index.ts',
-        'src/hooks/index.ts'
+        'src/hooks/index.ts',
+        'vitest.config.ts'
       ],
       thresholds: {
         lines: 92,
