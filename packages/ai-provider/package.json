@@ -43,7 +43,7 @@
   "author": "Project Liquid Contributors",
   "license": "MIT",
   "dependencies": {
-    "@liqueur/protocol": "file:../protocol"
+    "@liqueur/protocol": "^0.1.0"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
