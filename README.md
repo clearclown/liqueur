@@ -214,6 +214,19 @@ npm run typecheck
 cargo check --workspace
 ```
 
+### コード品質
+
+```bash
+# Lint（全パッケージ）
+npm run lint
+
+# フォーマット（全パッケージ）
+npm run format
+
+# フォーマットチェック（CI用）
+npm run format:check
+```
+
 ## ドキュメント
 
 - [Getting Started](docs/getting-started.md) - 初めてのLiquid View作成
