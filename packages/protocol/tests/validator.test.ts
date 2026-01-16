@@ -142,71 +142,44 @@ describe("SchemaValidator", () => {
    * Test 11: ❌ Empty table columns
    */
   it("should reject table component with empty columns array", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [
-        {
-          type: "table",
-          columns: [],
-          title: "Test Table"
-        }
-      ],
-      data_sources: {}
-    };
+    const schema = createBaseSchema({
+      components: [createTableComponent([], { title: "Test Table" })]
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.EMPTY_TABLE_COLUMNS })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.EMPTY_TABLE_COLUMNS);
   });
 
   /**
    * Test 12: ❌ Dangling data_source reference
    */
   it("should reject component with non-existent data_source reference", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
+    const schema = createBaseSchema({
       components: [
-        {
-          type: "chart",
-          variant: "bar",
+        createChartComponent("bar", {
           data_source: "non_existent_ds",
           title: "Test Chart"
-        }
-      ],
-      data_sources: {}
-    };
+        })
+      ]
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.DANGLING_DATA_SOURCE_REF })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.DANGLING_DATA_SOURCE_REF);
   });
 
   /**
    * Test 13: ✅ Valid chart with data_source
    */
   it("should validate chart component with valid data_source reference", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
+    const schema = createBaseSchema({
       components: [
-        {
-          type: "chart",
-          variant: "bar",
+        createChartComponent("bar", {
           data_source: "sales_data",
           xAxis: "month",
           yAxis: "amount",
           title: "Monthly Sales"
-        }
+        })
       ],
       data_sources: {
-        sales_data: {
-          resource: "sales",
+        sales_data: createDataSource("sales", {
           filters: [
             { field: "status", op: "eq", value: "completed" }
           ],
@@ -215,78 +188,62 @@ describe("SchemaValidator", () => {
             field: "amount",
             by: "month"
           }
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 14: ✅ Valid table with columns
    */
   it("should validate table component with columns", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "stack", direction: "vertical", gap: 16 },
+    const schema = createBaseSchema({
+      layout: createStackLayout("vertical", 16),
       components: [
-        {
-          type: "table",
-          columns: ["name", "price", "quantity"],
+        createTableComponent(["name", "price", "quantity"], {
           data_source: "products_data",
           sortable: true,
           title: "Product List"
-        }
+        })
       ],
       data_sources: {
-        products_data: {
-          resource: "products",
+        products_data: createDataSource("products", {
           sort: { field: "name", direction: "asc" },
           limit: 50
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 15: ✅ Complex schema with multiple components and data_sources
    */
   it("should validate complex schema with 2+ components and 2+ data_sources", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "grid", columns: 2, gap: 24 },
+    const schema = createBaseSchema({
+      layout: createGridLayout(2, 24),
       components: [
-        {
-          type: "chart",
-          variant: "line",
+        createChartComponent("line", {
           data_source: "monthly_revenue",
           xAxis: "month",
           yAxis: "revenue",
           title: "Revenue Trend"
-        },
-        {
-          type: "chart",
-          variant: "pie",
+        }),
+        createChartComponent("pie", {
           data_source: "category_breakdown",
           title: "Sales by Category"
-        },
-        {
-          type: "table",
-          columns: ["product", "sales", "profit"],
+        }),
+        createTableComponent(["product", "sales", "profit"], {
           data_source: "top_products",
           sortable: true,
           title: "Top Products"
-        }
+        })
       ],
       data_sources: {
-        monthly_revenue: {
-          resource: "orders",
+        monthly_revenue: createDataSource("orders", {
           filters: [
             { field: "year", op: "eq", value: 2024 }
           ],
@@ -296,17 +253,15 @@ describe("SchemaValidator", () => {
             by: "month"
           },
           sort: { field: "month", direction: "asc" }
-        },
-        category_breakdown: {
-          resource: "orders",
+        }),
+        category_breakdown: createDataSource("orders", {
           aggregation: {
             type: "sum",
             field: "amount",
             by: "category"
           }
-        },
-        top_products: {
-          resource: "products",
+        }),
+        top_products: createDataSource("products", {
           aggregation: {
             type: "sum",
             field: "sales_amount",
@@ -314,126 +269,85 @@ describe("SchemaValidator", () => {
           },
           sort: { field: "sales_amount", direction: "desc" },
           limit: 10
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 16: ❌ Invalid filter operator
    */
   it("should reject data_source with invalid filter operator", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "users",
+        test_ds: createDataSource("users", {
           filters: [
-            { field: "age", op: "invalid_op", value: 30 }
+            { field: "age", op: "invalid_op" as any, value: 30 }
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_FILTER_OP })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_OP);
   });
 
   /**
    * Test 17: ❌ Invalid aggregation type
    */
   it("should reject data_source with invalid aggregation type", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "sales",
+        test_ds: createDataSource("sales", {
           aggregation: {
-            type: "invalid_agg",
+            type: "invalid_agg" as any,
             field: "amount"
           }
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_AGGREGATION_TYPE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_AGGREGATION_TYPE);
   });
 
   /**
    * Test 18: ❌ Missing resource field in data_source
    */
   it("should reject data_source missing resource field", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
         test_ds: {
           filters: [{ field: "id", op: "eq", value: 1 }]
-        }
+        } as any
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_RESOURCE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_RESOURCE);
   });
 
   /**
    * Test 19: ✅ Valid stack layout with horizontal direction
    */
   it("should validate stack layout with horizontal direction", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "stack", direction: "horizontal" },
+    const schema = createBaseSchema({
+      layout: createStackLayout("horizontal"),
       components: [
-        {
-          type: "chart",
-          variant: "bar",
-          title: "Chart 1"
-        },
-        {
-          type: "chart",
-          variant: "line",
-          title: "Chart 2"
-        }
-      ],
-      data_sources: {}
-    };
+        createChartComponent("bar", { title: "Chart 1" }),
+        createChartComponent("line", { title: "Chart 2" })
+      ]
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 20: ✅ Valid schema with all filter operators
    */
   it("should validate data_source with all valid filter operators", () => {
-    const schema: LiquidViewSchema = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        complex_filters: {
-          resource: "products",
+        complex_filters: createDataSource("products", {
           filters: [
             { field: "id", op: "eq", value: 1 },
             { field: "status", op: "neq", value: "deleted" },
@@ -444,326 +358,220 @@ describe("SchemaValidator", () => {
             { field: "category", op: "in", value: ["electronics", "books"] },
             { field: "name", op: "contains", value: "laptop" }
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+    validateAndExpectValid(validator, schema);
   });
 
   /**
    * Test 21: ❌ "in" operator with scalar value (should be array)
    */
   it("should reject 'in' operator with non-array value", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           filters: [
-            { field: "category", op: "in", value: "electronics" }
+            { field: "category", op: "in", value: "electronics" as any }
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_VALUE_TYPE);
   });
 
   /**
    * Test 22: ❌ "eq" operator with array value (should be scalar)
    */
   it("should reject 'eq' operator with array value", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           filters: [
-            { field: "id", op: "eq", value: [1, 2, 3] }
+            { field: "id", op: "eq", value: [1, 2, 3] as any }
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_FILTER_VALUE_TYPE })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_FILTER_VALUE_TYPE);
   });
 
   /**
    * Test 23: ❌ Missing filter field
    */
   it("should reject filter missing field property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           filters: [
-            { op: "eq", value: 100 }
+            { op: "eq", value: 100 } as any
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
   });
 
   /**
    * Test 24: ❌ Missing filter value
    */
   it("should reject filter missing value property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           filters: [
-            { field: "price", op: "gt" }
+            { field: "price", op: "gt" } as any
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
   });
 
   /**
    * Test 25: ❌ Missing filter op
    */
   it("should reject filter missing op property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           filters: [
-            { field: "price", value: 100 }
+            { field: "price", value: 100 } as any
           ]
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_FILTER_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_FILTER_FIELD);
   });
 
   /**
    * Test 26: ❌ Missing aggregation type
    */
   it("should reject aggregation missing type field", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "sales",
+        test_ds: createDataSource("sales", {
           aggregation: {
             field: "amount"
-          }
-        }
+          } as any
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_AGGREGATION_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_AGGREGATION_FIELD);
   });
 
   /**
    * Test 27: ❌ Missing aggregation field
    */
   it("should reject aggregation missing field property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "sales",
+        test_ds: createDataSource("sales", {
           aggregation: {
             type: "sum"
-          }
-        }
+          } as any
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_AGGREGATION_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_AGGREGATION_FIELD);
   });
 
   /**
    * Test 28: ❌ Invalid sort direction
    */
   it("should reject sort with invalid direction", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
-          sort: { field: "price", direction: "invalid" }
-        }
+        test_ds: createDataSource("products", {
+          sort: { field: "price", direction: "invalid" as any }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_SORT_DIRECTION })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_SORT_DIRECTION);
   });
 
   /**
    * Test 29: ❌ Missing sort field
    */
   it("should reject sort missing field property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
-          sort: { direction: "asc" }
-        }
+        test_ds: createDataSource("products", {
+          sort: { direction: "asc" } as any
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_SORT_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_SORT_FIELD);
   });
 
   /**
    * Test 30: ❌ Missing sort direction
    */
   it("should reject sort missing direction property", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
-          sort: { field: "price" }
-        }
+        test_ds: createDataSource("products", {
+          sort: { field: "price" } as any
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.MISSING_SORT_FIELD })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.MISSING_SORT_FIELD);
   });
 
   /**
    * Test 31: ❌ Negative limit
    */
   it("should reject negative limit value", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           limit: -10
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
   });
 
   /**
    * Test 32: ❌ Zero limit
    */
   it("should reject zero limit value", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
+        test_ds: createDataSource("products", {
           limit: 0
-        }
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
   });
 
   /**
    * Test 33: ❌ Non-number limit
    */
   it("should reject non-number limit value", () => {
-    const schema: any = {
-      version: "1.0",
-      layout: { type: "grid", columns: 1 },
-      components: [],
+    const schema = createBaseSchema({
       data_sources: {
-        test_ds: {
-          resource: "products",
-          limit: "10"
-        }
+        test_ds: createDataSource("products", {
+          limit: "10" as any
+        })
       }
-    };
+    });
 
-    const result = validator.validate(schema);
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContainEqual(
-      expect.objectContaining({ code: ValidationErrorCode.INVALID_LIMIT })
-    );
+    validateAndExpectError(validator, schema, ValidationErrorCode.INVALID_LIMIT);
   });
 });
 
