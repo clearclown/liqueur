@@ -42,5 +42,13 @@ yarn-error.log*
 # MCP Server
 .serena/
 
-# Claude Code Plugins
+# Claude Code
 .claude/*.local.md
+.claude/plans/
+
+# Git Worktrees
+*-worktrees/
+
+# Minified files
+*.min.js
+*.min.css
