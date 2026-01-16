@@ -141,3 +141,69 @@ export function expectValidCostEstimate(estimate: any) {
 
   return estimate;
 }
+
+/**
+ * Environment variable configuration for each provider type
+ */
+const PROVIDER_ENV_MAP: Record<string, Record<string, string | undefined>> = {
+  mock: {
+    AI_PROVIDER: 'mock',
+  },
+  openai: {
+    AI_PROVIDER: 'openai',
+    OPENAI_API_KEY: 'test-openai-key',
+    OPENAI_MODEL: 'gpt-4o-mini',
+  },
+  deepseek: {
+    AI_PROVIDER: 'deepseek',
+    DEEPSEEK_API_KEY: 'test-deepseek-key',
+    DEEPSEEK_MODEL: 'deepseek-chat',
+  },
+  glm: {
+    AI_PROVIDER: 'glm',
+    GLM_API_KEY: 'test-glm-key',
+    GLM_MODEL: 'glm-4.7',
+  },
+  local: {
+    AI_PROVIDER: 'local',
+    LOCAL_LLM_BASE_URL: 'http://localhost:1234/v1',
+    LOCAL_LLM_MODEL: 'local-model',
+  },
+  anthropic: {
+    AI_PROVIDER: 'anthropic',
+    ANTHROPIC_API_KEY: 'test-anthropic-key',
+    ANTHROPIC_MODEL: 'claude-3-haiku-20240307',
+  },
+  gemini: {
+    AI_PROVIDER: 'gemini',
+    GOOGLE_API_KEY: 'test-gemini-key',
+    GEMINI_MODEL: 'gemini-1.5-flash',
+  },
+};
+
+/**
+ * Sets up environment variables for a specific provider type
+ */
+export function setupProviderEnv(providerType: string, overrides?: Record<string, string>) {
+  const envConfig = PROVIDER_ENV_MAP[providerType];
+  if (!envConfig) {
+    throw new Error(`Unknown provider type: ${providerType}`);
+  }
+
+  Object.entries({ ...envConfig, ...overrides }).forEach(([key, value]) => {
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  });
+}
+
+/**
+ * Expects provider to be an instance of the expected class with correct name
+ */
+export function expectProviderInstance(provider: any, expectedClass: any, expectedName: string) {
+  expect(provider).toBeInstanceOf(expectedClass);
+  expect(provider.name).toBe(expectedName);
+  return provider;
+}
