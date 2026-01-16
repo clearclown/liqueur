@@ -7,6 +7,7 @@ import type {
   ListArtifactsQuery,
   ListArtifactsResponse,
 } from '../types';
+import { applyQuery } from './queryHelpers';
 
 /**
  * In-memory implementation of ArtifactStore
@@ -47,71 +48,8 @@ export class InMemoryArtifactStore implements ArtifactStore {
   }
 
   async list(query: ListArtifactsQuery = {}): Promise<ListArtifactsResponse> {
-    let artifacts = Array.from(this.artifacts.values());
-
-    // Filter by userId
-    if (query.userId) {
-      artifacts = artifacts.filter((a) => a.userId === query.userId);
-    }
-
-    // Filter by tags (AND logic)
-    if (query.tags && query.tags.length > 0) {
-      artifacts = artifacts.filter((a) =>
-        query.tags!.every((tag) => a.tags.includes(tag))
-      );
-    }
-
-    // Filter by visibility
-    if (query.visibility) {
-      artifacts = artifacts.filter((a) => a.visibility === query.visibility);
-    }
-
-    // Search in title and description
-    if (query.search) {
-      const searchLower = query.search.toLowerCase();
-      artifacts = artifacts.filter(
-        (a) =>
-          a.title.toLowerCase().includes(searchLower) ||
-          (a.description && a.description.toLowerCase().includes(searchLower))
-      );
-    }
-
-    // Sort
-    const sortBy = query.sortBy || 'createdAt';
-    const sortOrder = query.sortOrder || 'desc';
-
-    artifacts.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      if (sortBy === 'title') {
-        aValue = a.title.toLowerCase();
-        bValue = b.title.toLowerCase();
-      } else {
-        aValue = a[sortBy].getTime();
-        bValue = b[sortBy].getTime();
-      }
-
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-      } else {
-        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-      }
-    });
-
-    const total = artifacts.length;
-
-    // Pagination
-    const offset = query.offset || 0;
-    const limit = query.limit || 20;
-    artifacts = artifacts.slice(offset, offset + limit);
-
-    return {
-      artifacts,
-      total,
-      offset,
-      limit,
-    };
+    const artifacts = Array.from(this.artifacts.values());
+    return applyQuery(artifacts, query);
   }
 
   async update(id: string, input: UpdateArtifactInput): Promise<Artifact> {
