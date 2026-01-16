@@ -6,7 +6,9 @@ package-lock.json
 dist/
 build/
 *.tsbuildinfo
-docs/
+# Auto-generated API docs (exclude generated docs, keep project docs)
+packages/*/docs/
+crates/*/target/doc/
 
 # Test coverage
 coverage/
