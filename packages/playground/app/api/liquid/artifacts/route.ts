@@ -33,11 +33,38 @@ interface CreateArtifactRequest {
 
 /**
  * GET /api/liquid/artifacts
- * 全Artifactのリストを取得
+ * Artifactのリストを取得（クエリパラメータ対応）
+ *
+ * Query parameters:
+ * - search: タイトル・説明での部分一致検索
+ * - sortBy: ソートフィールド (title | createdAt | updatedAt)
+ * - sortOrder: ソート順序 (asc | desc)
+ * - favorites: お気に入りフィルタ (true | false) - 将来の拡張用
+ * - offset: ページネーションオフセット
+ * - limit: ページネーション件数
  */
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    const result = await artifactStore.list();
+    const { searchParams } = new URL(request.url);
+
+    // クエリパラメータの取得
+    const search = searchParams.get("search") || undefined;
+    const sortBy = (searchParams.get("sortBy") as "title" | "createdAt" | "updatedAt") || undefined;
+    const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || undefined;
+    const offsetParam = searchParams.get("offset");
+    const limitParam = searchParams.get("limit");
+
+    // ページネーション パラメータのパース
+    const offset = offsetParam ? parseInt(offsetParam, 10) : undefined;
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+
+    const result = await artifactStore.list({
+      search,
+      sortBy,
+      sortOrder,
+      offset,
+      limit,
+    });
 
     return NextResponse.json(
       {
@@ -48,6 +75,9 @@ export async function GET(): Promise<NextResponse> {
           createdAt: a.createdAt.toISOString(),
           updatedAt: a.updatedAt.toISOString(),
         })),
+        total: result.total,
+        offset: result.offset,
+        limit: result.limit,
       },
       { status: 200 }
     );
