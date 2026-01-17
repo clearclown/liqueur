@@ -2,8 +2,8 @@
 
 [![Quality Gate](https://github.com/ablaze/liqueur/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/ablaze/liqueur/actions/workflows/quality-gate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-112%20passed-brightgreen)](./DONE.md)
-[![Coverage](https://img.shields.io/badge/coverage-88.49%25-green)](./DONE.md)
+[![Tests](https://img.shields.io/badge/tests-271%20passed-brightgreen)](./DONE.md)
+[![Coverage](https://img.shields.io/badge/coverage-95.5%25-brightgreen)](./DONE.md)
 
 **AIで自然言語からダッシュボードを生成 - コード実行なし、スキーマのみで安全に**
 
@@ -198,8 +198,13 @@ curl -X POST http://localhost:3000/api/liquid/generate \
 ### 品質指標
 
 ```
-✅ Tests:        112/112 passed (100% success rate)
-✅ Coverage:     88.49% statements, 86.8% branches, 100% functions
+✅ Tests:        271/271 passed (100% success rate)
+                 - React: 165 tests (98.92% coverage)
+                 - Playground: 106 tests (92.09% coverage)
+✅ Coverage:     95.5%+ statements
+                 - React: 98.92% (90.5% branches)
+                 - Playground: 92.09% (86.84% branches)
+                 - Protocol: 96.76%
 ✅ Build:        Production build successful
 ✅ Type Safety:  100% TypeScript compliance
 ✅ DeepSeek:     9/9 integration tests passed ($0.0014/request)
@@ -418,10 +423,12 @@ cp .env.example .env
 npm run dev -w @liqueur/playground
 ```
 
-**ステータス**: ✅ **Phase 2完了 - プロトタイプ動作可能** 🚀
+**ステータス**: ✅ **Phase 2.5完了 - ダッシュボード管理追加** 🚀
+
+⚠️ **注意**: チャットUI（対話型改善）は未実装。[todo.md](./todo.md)参照
 
 ---
 
 **作成者**: Claude Sonnet 4.5
-**バージョン**: 1.0.0-rc1
+**バージョン**: 1.0.0-rc2
 **最終更新**: 2026-01-17
