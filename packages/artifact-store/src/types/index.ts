@@ -102,6 +102,54 @@ export interface ListArtifactsResponse {
 }
 
 /**
+ * Artifact version - snapshot of an artifact at a specific version
+ */
+export interface ArtifactVersion {
+  /** Version number */
+  version: number;
+
+  /** LiquidView schema at this version */
+  schema: LiquidViewSchema;
+
+  /** Commit message describing changes */
+  message?: string;
+
+  /** Version creation timestamp */
+  createdAt: Date;
+
+  /** Author user ID */
+  authorId: string;
+}
+
+/**
+ * Create version input
+ */
+export interface CreateVersionInput {
+  schema: LiquidViewSchema;
+  message?: string;
+}
+
+/**
+ * Version diff - changes between two versions
+ */
+export interface VersionDiff {
+  fromVersion: number;
+  toVersion: number;
+  changes: VersionChange[];
+}
+
+/**
+ * Single change in version diff
+ */
+export interface VersionChange {
+  type: "add" | "remove" | "modify";
+  path: string; // JSON path (e.g., "components.0.title")
+  oldValue?: any;
+  newValue?: any;
+  description?: string;
+}
+
+/**
  * Artifact store client interface
  */
 export interface ArtifactStore {
@@ -131,4 +179,34 @@ export interface ArtifactStore {
    * Delete artifact
    */
   delete(id: string): Promise<void>;
+
+  /**
+   * Get all versions of an artifact
+   */
+  listVersions(artifactId: string): Promise<ArtifactVersion[]>;
+
+  /**
+   * Get specific version of an artifact
+   */
+  getVersion(artifactId: string, version: number): Promise<ArtifactVersion | null>;
+
+  /**
+   * Create new version (commit current schema)
+   */
+  createVersion(artifactId: string, input: CreateVersionInput, userId: string): Promise<ArtifactVersion>;
+
+  /**
+   * Delete specific version
+   */
+  deleteVersion(artifactId: string, version: number): Promise<void>;
+
+  /**
+   * Get diff between two versions
+   */
+  getDiff(artifactId: string, fromVersion: number, toVersion: number): Promise<VersionDiff>;
+
+  /**
+   * Restore artifact to specific version
+   */
+  restoreVersion(artifactId: string, version: number): Promise<Artifact>;
 }

@@ -7,6 +7,10 @@ export type {
   ListArtifactsQuery,
   ListArtifactsResponse,
   ArtifactStore,
+  ArtifactVersion,
+  CreateVersionInput,
+  VersionDiff,
+  VersionChange,
 } from "./types";
 
 // Stores

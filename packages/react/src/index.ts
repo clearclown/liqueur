@@ -24,6 +24,10 @@ export type {
   ChatInputProps,
 } from "./components/chat";
 
+// Version History Components
+export { VersionTimeline, VersionDiff } from "./components/version-history";
+export type { VersionTimelineProps, VersionDiffProps } from "./components/version-history";
+
 export { GridLayout } from "./layouts/GridLayout";
 export type { GridLayoutComponentProps } from "./layouts/GridLayout";
 
@@ -48,6 +52,12 @@ export type { UseFavoritesOptions, UseFavoritesReturn } from "./hooks/useFavorit
 
 export { useConversation } from "./hooks/useConversation";
 export type { UseConversationOptions, UseConversationReturn } from "./hooks/useConversation";
+
+export { useArtifactVersions } from "./hooks/useArtifactVersions";
+export type {
+  UseArtifactVersionsOptions,
+  UseArtifactVersionsReturn,
+} from "./hooks/useArtifactVersions";
 
 // Types
 export type {

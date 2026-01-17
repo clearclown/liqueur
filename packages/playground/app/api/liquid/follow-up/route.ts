@@ -52,7 +52,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const allowed = checkRateLimit(identifier, 10, 60000);
     if (!allowed) {
       const rateLimitInfo = getRateLimitInfo(identifier);
-      const resetInSeconds = Math.ceil((rateLimitInfo.resetAt - Date.now()) / 1000);
+      const resetInSeconds = rateLimitInfo
+        ? Math.ceil((rateLimitInfo.resetAt - Date.now()) / 1000)
+        : 60;
       return NextResponse.json(
         {
           error: {
