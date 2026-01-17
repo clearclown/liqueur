@@ -9,3 +9,18 @@ export type {
   DashboardListQuery,
   DashboardSort,
 } from "./dashboard";
+
+/**
+ * Chat UI type definitions
+ * チャットUI型定義
+ */
+export type {
+  Message,
+  MessageRole,
+  MessageStatus,
+  Conversation,
+  ArtifactVersion,
+  SchemaChange,
+  FollowUpRequest,
+  FollowUpResponse,
+} from "./chat";

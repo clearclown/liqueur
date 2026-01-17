@@ -15,6 +15,15 @@ export type {
   DashboardSearchProps,
 } from "./components/dashboard-manager";
 
+// Chat UI Components
+export { ChatContainer, MessageList, MessageItem, ChatInput } from "./components/chat";
+export type {
+  ChatContainerProps,
+  MessageListProps,
+  MessageItemProps,
+  ChatInputProps,
+} from "./components/chat";
+
 export { GridLayout } from "./layouts/GridLayout";
 export type { GridLayoutComponentProps } from "./layouts/GridLayout";
 
@@ -37,6 +46,9 @@ export type {
 export { useFavorites } from "./hooks/useFavorites";
 export type { UseFavoritesOptions, UseFavoritesReturn } from "./hooks/useFavorites";
 
+export { useConversation } from "./hooks/useConversation";
+export type { UseConversationOptions, UseConversationReturn } from "./hooks/useConversation";
+
 // Types
 export type {
   Dashboard,
@@ -44,4 +56,12 @@ export type {
   UpdateDashboardInput,
   DashboardListQuery,
   DashboardSort,
+  Message,
+  MessageRole,
+  MessageStatus,
+  Conversation,
+  ArtifactVersion,
+  SchemaChange,
+  FollowUpRequest,
+  FollowUpResponse,
 } from "./types";
