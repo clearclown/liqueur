@@ -14,3 +14,9 @@ export type { MessageItemProps } from "./MessageItem";
 
 export { ChatInput } from "./ChatInput";
 export type { ChatInputProps } from "./ChatInput";
+
+export { ArtifactPreview } from "./ArtifactPreview";
+export type { ArtifactPreviewProps } from "./ArtifactPreview";
+
+export { TypingIndicator } from "./TypingIndicator";
+export type { TypingIndicatorProps } from "./TypingIndicator";
