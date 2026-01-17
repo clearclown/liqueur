@@ -74,7 +74,7 @@ describe("VersionTimeline", () => {
     it("should indicate current version", () => {
       render(<VersionTimeline {...defaultProps} />);
 
-      const currentVersionElement = screen.getByText(/v3/).closest("div");
+      const currentVersionElement = screen.getByTestId("version-item-3");
       expect(currentVersionElement).toHaveClass("version-item--current");
     });
 

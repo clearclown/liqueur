@@ -43,8 +43,8 @@ describe("VersionDiff", () => {
     it("should render diff header", () => {
       render(<VersionDiff {...defaultProps} />);
 
-      expect(screen.getByText(/Version 1/i)).toBeInTheDocument();
-      expect(screen.getByText(/Version 2/i)).toBeInTheDocument();
+      expect(screen.getByText(/v1 → v2/i)).toBeInTheDocument();
+      expect(screen.getByText(/3 changes/i)).toBeInTheDocument();
     });
 
     it("should render all changes", () => {
@@ -58,13 +58,13 @@ describe("VersionDiff", () => {
     it("should render change types with different styles", () => {
       render(<VersionDiff {...defaultProps} />);
 
-      const addChange = screen.getByText(/Added chart component/i).closest("div");
-      const removeChange = screen.getByText(/Removed table component/i).closest("div");
-      const modifyChange = screen.getByText(/Changed layout type/i).closest("div");
+      const addChange = screen.getByTestId("diff-change-0");
+      const removeChange = screen.getByTestId("diff-change-1");
+      const modifyChange = screen.getByTestId("diff-change-2");
 
-      expect(addChange).toHaveClass("add");
-      expect(removeChange).toHaveClass("remove");
-      expect(modifyChange).toHaveClass("modify");
+      expect(addChange).toHaveClass("diff-change--add");
+      expect(removeChange).toHaveClass("diff-change--remove");
+      expect(modifyChange).toHaveClass("diff-change--modify");
     });
 
     it("should render paths", () => {
@@ -130,7 +130,7 @@ describe("VersionDiff", () => {
       render(<VersionDiff diff={addOnlyDiff} />);
 
       expect(screen.getByText(/Added new field/i)).toBeInTheDocument();
-      expect(screen.getByText(/value/i)).toBeInTheDocument();
+      expect(screen.getByText(/追加/i)).toBeInTheDocument();
     });
 
     it("should render remove changes correctly", () => {
@@ -150,7 +150,7 @@ describe("VersionDiff", () => {
       render(<VersionDiff diff={removeOnlyDiff} />);
 
       expect(screen.getByText(/Removed old field/i)).toBeInTheDocument();
-      expect(screen.getByText(/value/i)).toBeInTheDocument();
+      expect(screen.getByText(/削除/i)).toBeInTheDocument();
     });
 
     it("should render modify changes correctly", () => {
@@ -171,8 +171,7 @@ describe("VersionDiff", () => {
       render(<VersionDiff diff={modifyOnlyDiff} />);
 
       expect(screen.getByText(/Modified field/i)).toBeInTheDocument();
-      expect(screen.getByText(/old/i)).toBeInTheDocument();
-      expect(screen.getByText(/new/i)).toBeInTheDocument();
+      expect(screen.getByText(/~ 変更/i)).toBeInTheDocument();
     });
   });
 
@@ -243,9 +242,9 @@ describe("VersionDiff", () => {
       render(<VersionDiff {...defaultProps} />);
 
       // Change type indicators should be visible
-      expect(screen.getByText(/追加/i)).toBeInTheDocument();
-      expect(screen.getByText(/削除/i)).toBeInTheDocument();
-      expect(screen.getByText(/変更/i)).toBeInTheDocument();
+      expect(screen.getByText(/\+ 追加/i)).toBeInTheDocument();
+      expect(screen.getByText(/- 削除/i)).toBeInTheDocument();
+      expect(screen.getByText(/~ 変更/i)).toBeInTheDocument();
     });
   });
 
