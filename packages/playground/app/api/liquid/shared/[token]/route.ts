@@ -5,13 +5,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getShareByToken, validateSharePassword } from '../../artifacts/[id]/share/route';
-import { FileStore } from '@liqueur/artifact-store';
-import path from 'path';
+import { getShareByToken, validateSharePassword } from '../../artifacts/[id]/share/store';
+import { InMemoryArtifactStore } from '@liqueur/artifact-store';
 
-const artifactStore = new FileStore({
-  baseDir: path.join(process.cwd(), '.artifacts'),
-});
+// シングルトンのArtifactストア（本番ではDBを使用）
+const artifactStore = new InMemoryArtifactStore();
+
+type RouteContext = {
+  params: Promise<{ token: string }>;
+};
 
 /**
  * GET /api/liquid/shared/:token
@@ -19,10 +21,10 @@ const artifactStore = new FileStore({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const { token } = params;
+    const { token } = await context.params;
     const password = request.nextUrl.searchParams.get('password');
 
     // 共有情報を取得

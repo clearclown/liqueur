@@ -16,12 +16,24 @@ export type {
 } from "./components/dashboard-manager";
 
 // Chat UI Components
-export { ChatContainer, MessageList, MessageItem, ChatInput } from "./components/chat";
+export {
+  ChatContainer,
+  MessageList,
+  MessageItem,
+  ChatInput,
+  ArtifactPreview,
+  TypingIndicator,
+  ConversationList,
+} from "./components/chat";
 export type {
   ChatContainerProps,
   MessageListProps,
   MessageItemProps,
   ChatInputProps,
+  ArtifactPreviewProps,
+  TypingIndicatorProps,
+  ConversationListProps,
+  ConversationSummary,
 } from "./components/chat";
 
 // Version History Components

@@ -7,19 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-
-interface Comment {
-  id: string;
-  artifactId: string;
-  userId: string;
-  userName: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// コメントストア（本番ではDBを使用）
-const comments = new Map<string, Comment>();
+import { createComment, getCommentsByArtifactId, type Comment } from './store';
 
 interface CreateCommentRequest {
   userId: string;
@@ -27,16 +15,20 @@ interface CreateCommentRequest {
   content: string;
 }
 
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
 /**
  * POST /api/liquid/artifacts/:id/comments
  * コメント作成
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const artifactId = params.id;
+    const { id: artifactId } = await context.params;
     const body: CreateCommentRequest = await request.json();
 
     // バリデーション
@@ -75,7 +67,7 @@ export async function POST(
       updatedAt: now,
     };
 
-    comments.set(commentId, comment);
+    createComment(comment);
 
     return NextResponse.json(comment, { status: 201 });
 
@@ -93,16 +85,14 @@ export async function POST(
  * コメント一覧取得
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const artifactId = params.id;
+    const { id: artifactId } = await context.params;
 
     // Artifact IDでフィルタリング
-    const artifactComments = Array.from(comments.values())
-      .filter(comment => comment.artifactId === artifactId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const artifactComments = getCommentsByArtifactId(artifactId);
 
     return NextResponse.json({
       comments: artifactComments,
@@ -116,30 +106,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-/**
- * コメントストアにアクセスするためのヘルパー関数
- */
-export function getComment(commentId: string): Comment | undefined {
-  return comments.get(commentId);
-}
-
-export function deleteComment(commentId: string): boolean {
-  return comments.delete(commentId);
-}
-
-export function updateComment(commentId: string, content: string): Comment | null {
-  const comment = comments.get(commentId);
-
-  if (!comment) {
-    return null;
-  }
-
-  comment.content = content.trim();
-  comment.updatedAt = new Date();
-
-  comments.set(commentId, comment);
-
-  return comment;
 }

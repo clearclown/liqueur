@@ -1,14 +1,23 @@
 /**
- * Demo Page - Phase 3統合デモ
- * AI生成とArtifact保存の統合フロー
+ * Demo Page - Phase 3/4統合デモ
+ * 3カラムレイアウト: 会話一覧 | チャット | プレビュー+バージョン履歴
  */
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 import type { DatabaseMetadata } from "@liqueur/ai-provider";
-import { LiquidRenderer } from "@liqueur/react";
+import {
+  LiquidRenderer,
+  ChatContainer,
+  ConversationList,
+  VersionTimeline,
+} from "@liqueur/react";
+import { useConversation } from "@liqueur/react";
+import type { ConversationSummary } from "@liqueur/react";
+import type { ArtifactVersion } from "@liqueur/artifact-store";
+import "./demo.css";
 
 /**
  * モックのデータベースメタデータ
@@ -19,195 +28,322 @@ const mockMetadata: DatabaseMetadata = {
       name: "expenses",
       description: "Expense transactions",
       columns: [
-        { name: "id", type: "integer", nullable: false, isPrimaryKey: true, isForeignKey: false },
-        { name: "category", type: "text", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "amount", type: "decimal", nullable: false, isPrimaryKey: false, isForeignKey: false },
-        { name: "date", type: "date", nullable: false, isPrimaryKey: false, isForeignKey: false },
+        {
+          name: "id",
+          type: "integer",
+          nullable: false,
+          isPrimaryKey: true,
+          isForeignKey: false,
+        },
+        {
+          name: "category",
+          type: "text",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
+        {
+          name: "amount",
+          type: "decimal",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
+        {
+          name: "date",
+          type: "date",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
+      ],
+    },
+    {
+      name: "sales",
+      description: "Sales records",
+      columns: [
+        {
+          name: "id",
+          type: "integer",
+          nullable: false,
+          isPrimaryKey: true,
+          isForeignKey: false,
+        },
+        {
+          name: "product",
+          type: "text",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
+        {
+          name: "revenue",
+          type: "decimal",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
+        {
+          name: "month",
+          type: "text",
+          nullable: false,
+          isPrimaryKey: false,
+          isForeignKey: false,
+        },
       ],
     },
   ],
 };
 
+/**
+ * モックの会話一覧
+ */
+const initialConversations: ConversationSummary[] = [];
+
 export default function DemoPage() {
-  const [prompt, setPrompt] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [schema, setSchema] = useState<LiquidViewSchema | null>(null);
-  const [artifactId, setArtifactId] = useState<string | null>(null);
-  const [artifacts, setArtifacts] = useState<any[]>([]);
+  // 会話一覧の状態
+  const [conversations, setConversations] =
+    useState<ConversationSummary[]>(initialConversations);
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | undefined
+  >(undefined);
+
+  // 会話フック
+  const {
+    messages,
+    currentArtifact,
+    sendMessage,
+    clear,
+    isLoading,
+    error,
+  } = useConversation({
+    conversationId: currentConversationId,
+    metadata: mockMetadata,
+  });
+
+  // バージョン履歴の状態（モック）
+  const [versions, setVersions] = useState<ArtifactVersion[]>([]);
+  const [currentVersion, setCurrentVersion] = useState<number | undefined>(
+    undefined
+  );
+
+  // 選択中のArtifact（プレビュー表示用）
+  const [selectedArtifact, setSelectedArtifact] =
+    useState<LiquidViewSchema | null>(null);
+
+  // currentArtifactが変わったらselectedArtifactも更新
+  useEffect(() => {
+    if (currentArtifact) {
+      setSelectedArtifact(currentArtifact);
+      // バージョン履歴を更新（実際のAPIでは/api/liquid/artifacts/:id/versionsから取得）
+      const newVersion: ArtifactVersion = {
+        schema: currentArtifact,
+        version: versions.length + 1,
+        message: messages[messages.length - 1]?.content || "",
+        createdAt: new Date(),
+        authorId: "user-demo",
+      };
+      setVersions((prev) => [...prev, newVersion]);
+      setCurrentVersion(newVersion.version);
+    }
+  }, [currentArtifact]);
 
   /**
-   * AI生成を実行
+   * 新しい会話を開始
    */
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/liquid/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt,
-          metadata: mockMetadata,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to generate schema");
-      }
-
-      const data = await response.json();
-      setSchema(data.schema);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-      setSchema(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleNewConversation = useCallback(() => {
+    const newId = `conv-${Date.now()}`;
+    setCurrentConversationId(newId);
+    clear();
+    setVersions([]);
+    setCurrentVersion(undefined);
+    setSelectedArtifact(null);
+  }, [clear]);
 
   /**
-   * Artifactとして保存
+   * 会話を選択
    */
-  const handleSave = async () => {
-    if (!schema) return;
-
-    try {
-      const response = await fetch("/api/liquid/artifacts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: prompt.substring(0, 50),
-          schema,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save artifact");
-      }
-
-      const data = await response.json();
-      setArtifactId(data.artifact.id);
-      alert(`Artifact saved! ID: ${data.artifact.id}`);
-    } catch (err) {
-      alert(`Save failed: ${err instanceof Error ? err.message : "Unknown error"}`);
-    }
-  };
+  const handleSelectConversation = useCallback((conversationId: string) => {
+    setCurrentConversationId(conversationId);
+    // TODO: 会話履歴をAPIから取得
+  }, []);
 
   /**
-   * Artifact一覧を取得
+   * 会話を削除
    */
-  const handleLoadArtifacts = async () => {
-    try {
-      const response = await fetch("/api/liquid/artifacts");
-      if (!response.ok) {
-        throw new Error("Failed to load artifacts");
-      }
-
-      const data = await response.json();
-      setArtifacts(data.artifacts);
-    } catch (err) {
-      alert(`Load failed: ${err instanceof Error ? err.message : "Unknown error"}`);
+  const handleDeleteConversation = useCallback((conversationId: string) => {
+    setConversations((prev) =>
+      prev.filter((conv) => conv.id !== conversationId)
+    );
+    if (currentConversationId === conversationId) {
+      setCurrentConversationId(undefined);
+      clear();
     }
-  };
+  }, [currentConversationId, clear]);
 
   /**
-   * Artifactをロード
+   * メッセージを送信
    */
-  const handleLoadArtifact = async (id: string) => {
-    try {
-      const response = await fetch(`/api/liquid/artifacts/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to load artifact");
+  const handleSendMessage = useCallback(
+    async (message: string) => {
+      // 会話が開始されていなければ新規作成
+      if (!currentConversationId) {
+        const newId = `conv-${Date.now()}`;
+        setCurrentConversationId(newId);
+
+        // 会話一覧に追加
+        const newConversation: ConversationSummary = {
+          id: newId,
+          title: message.slice(0, 30) + (message.length > 30 ? "..." : ""),
+          updatedAt: new Date(),
+          messageCount: 1,
+          artifactCount: 0,
+        };
+        setConversations((prev) => [newConversation, ...prev]);
       }
 
-      const data = await response.json();
-      setSchema(data.artifact.schema);
-      setArtifactId(id);
-      setPrompt(data.artifact.name);
-    } catch (err) {
-      alert(`Load failed: ${err instanceof Error ? err.message : "Unknown error"}`);
-    }
-  };
+      await sendMessage(message);
+
+      // 会話一覧を更新
+      if (currentConversationId) {
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === currentConversationId
+              ? {
+                  ...conv,
+                  updatedAt: new Date(),
+                  messageCount: messages.length + 2, // user + assistant
+                  artifactCount: (conv.artifactCount || 0) + 1,
+                }
+              : conv
+          )
+        );
+      }
+    },
+    [currentConversationId, sendMessage, messages.length]
+  );
+
+  /**
+   * 会話をクリア
+   */
+  const handleClearConversation = useCallback(() => {
+    clear();
+    setVersions([]);
+    setCurrentVersion(undefined);
+    setSelectedArtifact(null);
+  }, [clear]);
+
+  /**
+   * Artifactプレビューをクリック
+   */
+  const handleArtifactClick = useCallback((schema: LiquidViewSchema) => {
+    setSelectedArtifact(schema);
+  }, []);
+
+  /**
+   * バージョンを選択
+   */
+  const handleVersionClick = useCallback(
+    (version: number) => {
+      const selectedVersion = versions.find((v) => v.version === version);
+      if (selectedVersion) {
+        setCurrentVersion(version);
+        setSelectedArtifact(selectedVersion.schema);
+      }
+    },
+    [versions]
+  );
+
+  /**
+   * バージョンを復元
+   */
+  const handleVersionRestore = useCallback(
+    (version: number) => {
+      const selectedVersion = versions.find((v) => v.version === version);
+      if (selectedVersion) {
+        // 新しいバージョンとして復元
+        const restoredVersion: ArtifactVersion = {
+          schema: selectedVersion.schema,
+          version: versions.length + 1,
+          message: `v${version}から復元`,
+          createdAt: new Date(),
+          authorId: "user-demo",
+        };
+        setVersions((prev) => [...prev, restoredVersion]);
+        setCurrentVersion(restoredVersion.version);
+        setSelectedArtifact(selectedVersion.schema);
+      }
+    },
+    [versions]
+  );
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "system-ui, sans-serif" }}>
-      <h1>Phase 3 Integration Demo</h1>
+    <div className="demo-page">
+      {/* ヘッダー */}
+      <header className="demo-header">
+        <h1 className="demo-title">Project Liquid Demo</h1>
+        <p className="demo-subtitle">
+          AI-Powered Dashboard Generation with Conversational UI
+        </p>
+      </header>
 
-      {/* AI生成セクション */}
-      <section style={{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
-        <h2>1. AI Generation</h2>
-        <div>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Enter your request (e.g., 'Show me my expenses')"
-            rows={3}
-            style={{ width: "100%", marginBottom: "0.5rem" }}
-            disabled={loading}
+      {/* メインコンテンツ - 3カラムレイアウト */}
+      <main className="demo-main">
+        {/* 左カラム: 会話一覧 */}
+        <aside className="demo-sidebar demo-sidebar--left">
+          <ConversationList
+            conversations={conversations}
+            currentConversationId={currentConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={handleNewConversation}
+            onDeleteConversation={handleDeleteConversation}
           />
-          <button onClick={handleGenerate} disabled={loading || !prompt.trim()}>
-            {loading ? "Generating..." : "Generate Schema"}
-          </button>
-        </div>
-        {error && (
-          <div style={{ color: "red", marginTop: "0.5rem" }}>
-            Error: {error}
-          </div>
-        )}
-      </section>
+        </aside>
 
-      {/* スキーマ表示とArtifact保存 */}
-      {schema && (
-        <section style={{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
-          <h2>2. Generated Schema</h2>
-          <pre style={{ background: "#f5f5f5", padding: "1rem", overflow: "auto" }}>
-            {JSON.stringify(schema, null, 2)}
-          </pre>
-          <button onClick={handleSave} style={{ marginTop: "0.5rem" }}>
-            Save as Artifact
-          </button>
-          {artifactId && (
-            <div style={{ color: "green", marginTop: "0.5rem" }}>
-              Saved! Artifact ID: {artifactId}
+        {/* 中央カラム: チャット */}
+        <section className="demo-chat">
+          <ChatContainer
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            error={error}
+            onArtifactClick={handleArtifactClick}
+            onClearConversation={handleClearConversation}
+          />
+        </section>
+
+        {/* 右カラム: プレビュー + バージョン履歴 */}
+        <aside className="demo-sidebar demo-sidebar--right">
+          {/* Artifactプレビュー */}
+          <div className="demo-preview">
+            <div className="demo-preview-header">
+              <h3>Live Preview</h3>
             </div>
-          )}
-        </section>
-      )}
+            <div className="demo-preview-content">
+              {selectedArtifact ? (
+                <LiquidRenderer schema={selectedArtifact} />
+              ) : (
+                <div className="demo-preview-empty">
+                  <p>プレビューがありません</p>
+                  <p className="demo-preview-hint">
+                    チャットでダッシュボードを生成してください
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
 
-      {/* Artifact一覧 */}
-      <section style={{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
-        <h2>3. Saved Artifacts</h2>
-        <button onClick={handleLoadArtifacts}>Load Artifacts</button>
-        {artifacts.length > 0 && (
-          <ul style={{ marginTop: "1rem" }}>
-            {artifacts.map((artifact) => (
-              <li key={artifact.id} style={{ marginBottom: "0.5rem" }}>
-                <strong>{artifact.name}</strong> (ID: {artifact.id})
-                <button
-                  onClick={() => handleLoadArtifact(artifact.id)}
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  Load
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* LiquidViewレンダリング */}
-      {schema && (
-        <section style={{ marginBottom: "2rem", border: "1px solid #ccc", padding: "1rem" }}>
-          <h2>4. LiquidView Rendering</h2>
-          <LiquidRenderer schema={schema} />
-        </section>
-      )}
+          {/* バージョン履歴 */}
+          <div className="demo-versions">
+            <VersionTimeline
+              versions={versions}
+              currentVersion={currentVersion}
+              onVersionClick={handleVersionClick}
+              onRestore={handleVersionRestore}
+            />
+          </div>
+        </aside>
+      </main>
     </div>
   );
 }

@@ -7,16 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-
-// 共有トークンストア（本番ではRedis/DBを使用）
-const shareTokens = new Map<string, {
-  artifactId: string;
-  visibility: 'public' | 'private' | 'team';
-  expiresAt?: Date;
-  password?: string;
-  permissions: 'read' | 'write';
-  createdAt: Date;
-}>();
+import { createShare, deleteSharesByArtifactId, type ShareData } from './store';
 
 interface ShareRequest {
   visibility?: 'public' | 'private' | 'team';
@@ -25,16 +16,20 @@ interface ShareRequest {
   permissions?: 'read' | 'write';
 }
 
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
 /**
  * POST /api/liquid/artifacts/:id/share
  * 共有リンク生成
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const artifactId = params.id;
+    const { id: artifactId } = await context.params;
     const body: ShareRequest = await request.json();
 
     // バリデーション
@@ -60,14 +55,16 @@ export async function POST(
     // 共有トークン生成
     const token = randomBytes(32).toString('hex');
 
-    shareTokens.set(token, {
+    const shareData: ShareData = {
       artifactId,
       visibility,
       expiresAt,
       password: body.password,
       permissions,
       createdAt: new Date(),
-    });
+    };
+
+    createShare(token, shareData);
 
     return NextResponse.json({
       token,
@@ -91,20 +88,14 @@ export async function POST(
  * 共有停止
  */
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const artifactId = params.id;
+    const { id: artifactId } = await context.params;
 
     // 該当するトークンを全て削除
-    let deletedCount = 0;
-    for (const [token, share] of shareTokens.entries()) {
-      if (share.artifactId === artifactId) {
-        shareTokens.delete(token);
-        deletedCount++;
-      }
-    }
+    const deletedCount = deleteSharesByArtifactId(artifactId);
 
     if (deletedCount === 0) {
       return NextResponse.json(
@@ -125,38 +116,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
-
-/**
- * 共有トークンストアにアクセスするためのヘルパー関数
- */
-export function getShareByToken(token: string) {
-  const share = shareTokens.get(token);
-
-  if (!share) {
-    return null;
-  }
-
-  // 有効期限チェック
-  if (share.expiresAt && share.expiresAt <= new Date()) {
-    shareTokens.delete(token);
-    return null;
-  }
-
-  return share;
-}
-
-export function validateSharePassword(token: string, password: string): boolean {
-  const share = shareTokens.get(token);
-
-  if (!share) {
-    return false;
-  }
-
-  // パスワード保護されていない場合はtrue
-  if (!share.password) {
-    return true;
-  }
-
-  return share.password === password;
 }

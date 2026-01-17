@@ -20,3 +20,6 @@ export type { ArtifactPreviewProps } from "./ArtifactPreview";
 
 export { TypingIndicator } from "./TypingIndicator";
 export type { TypingIndicatorProps } from "./TypingIndicator";
+
+export { ConversationList } from "./ConversationList";
+export type { ConversationListProps, ConversationSummary } from "./ConversationList";

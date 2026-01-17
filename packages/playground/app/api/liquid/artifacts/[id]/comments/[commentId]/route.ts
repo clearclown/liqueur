@@ -6,11 +6,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getComment, deleteComment, updateComment } from '../route';
+import { deleteComment, updateComment } from '../store';
 
 interface UpdateCommentRequest {
   content: string;
 }
+
+type RouteContext = {
+  params: Promise<{ id: string; commentId: string }>;
+};
 
 /**
  * PUT /api/liquid/artifacts/:id/comments/:commentId
@@ -18,10 +22,10 @@ interface UpdateCommentRequest {
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; commentId: string } }
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const { commentId } = params;
+    const { commentId } = await context.params;
     const body: UpdateCommentRequest = await request.json();
 
     // バリデーション
@@ -65,11 +69,11 @@ export async function PUT(
  * コメント削除
  */
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string; commentId: string } }
+  _request: NextRequest,
+  context: RouteContext
 ): Promise<NextResponse> {
   try {
-    const { commentId } = params;
+    const { commentId } = await context.params;
 
     // コメント削除
     const deleted = deleteComment(commentId);
