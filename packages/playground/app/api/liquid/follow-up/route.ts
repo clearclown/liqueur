@@ -8,8 +8,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { LiquidViewSchema } from "@liqueur/protocol";
 import type { DatabaseMetadata } from "@liqueur/ai-provider";
-import { ProviderFactory } from "@liqueur/ai-provider";
-import { validateString, applyRateLimit } from "@/lib/apiHelpers";
+import { createProviderFromEnv } from "@liqueur/ai-provider";
+import { validateString, checkRateLimit, getRateLimitInfo } from "@/lib/apiHelpers";
 
 /**
  * Follow-up リクエストボディ
@@ -48,13 +48,16 @@ interface FollowUpResponse {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Rate limiting
-    const rateLimitResult = await applyRateLimit(request, 10, 60000);
-    if (!rateLimitResult.success) {
+    const identifier = request.headers.get("x-forwarded-for") || "anonymous";
+    const allowed = checkRateLimit(identifier, 10, 60000);
+    if (!allowed) {
+      const rateLimitInfo = getRateLimitInfo(identifier);
+      const resetInSeconds = Math.ceil((rateLimitInfo.resetAt - Date.now()) / 1000);
       return NextResponse.json(
         {
           error: {
             code: "RATE_LIMIT_EXCEEDED",
-            message: `Rate limit exceeded. Try again in ${Math.ceil(rateLimitResult.reset! / 1000)}s`,
+            message: `Rate limit exceeded. Try again in ${resetInSeconds}s`,
           },
         },
         { status: 429 }
@@ -92,17 +95,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const messageValidation = validateString(message, 1, 5000);
+    const messageValidation = validateString(message, "message", {
+      minLength: 1,
+      maxLength: 5000,
+    });
     if (!messageValidation.valid) {
-      return NextResponse.json(
-        {
-          error: {
-            code: "INVALID_MESSAGE",
-            message: messageValidation.error,
-          },
-        },
-        { status: 400 }
-      );
+      return messageValidation.response;
     }
 
     if (!currentSchema) {
@@ -130,43 +128,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // AI providerを取得
-    const providerFactory = new ProviderFactory();
-    const provider = providerFactory.createProvider();
+    const provider = createProviderFromEnv();
 
-    // フォローアップ用のシステムプロンプト
-    const systemPrompt = `あなたはダッシュボード更新アシスタントです。
-ユーザーのフォローアップメッセージに基づいて、既存のLiquidViewSchemaを更新してください。
-
-重要な指示:
-1. **既存のスキーマを基に変更のみを適用する**
-2. ユーザーが明示的に変更を求めていない部分は保持する
-3. JSONスキーマのみを出力し、説明文は含めない
-4. 有効なLiquidViewSchema形式であることを確認する
-
-現在のスキーマ:
+    // フォローアップ用のプロンプト（現在のスキーマを含む）
+    const prompt = `現在のダッシュボードスキーマ:
 \`\`\`json
 ${JSON.stringify(currentSchema, null, 2)}
 \`\`\`
 
-ユーザーのフォローアップ: "${message}"
+ユーザーの変更リクエスト: "${message}"
 
-更新されたスキーマをJSON形式で出力してください。`;
+上記のスキーマを、ユーザーの変更リクエストに基づいて更新してください。`;
 
     // AI生成実行
-    const result = await provider.generateSchema({
-      prompt: systemPrompt,
-      metadata,
-      systemPrompt: "You are a dashboard schema updater. Output only valid JSON, no explanations.",
-    });
+    const schema = await provider.generateSchema(prompt, metadata);
 
     // 変更内容を検出（簡易版）
-    const changes: SchemaChange[] = detectChanges(currentSchema, result.schema);
+    const changes: SchemaChange[] = detectChanges(currentSchema, schema);
 
     const response: FollowUpResponse = {
-      schema: result.schema,
+      schema,
       changes,
-      provider: result.metadata.provider,
-      estimatedCost: result.metadata.estimatedCost,
+      provider: provider.constructor.name,
+      estimatedCost: 0, // TODO: プロバイダーからコスト情報を取得
     };
 
     return NextResponse.json(response);

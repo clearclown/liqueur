@@ -36,7 +36,7 @@ export const MessageList: React.FC<MessageListProps> = ({
 
   // 新しいメッセージが追加されたら自動スクロール
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current?.scrollIntoView) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
