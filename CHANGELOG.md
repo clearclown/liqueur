@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.1.0] - 2026-01-18
+
+### Initial Public Release
+
+Project Liquidの初回公開リリース。AI駆動の動的UI生成システム。
+
+#### Highlights
+
+- **Server-Driven UI**: JSONスキーマベース（コード実行なし）
+- **マルチAIプロバイダー**: OpenAI, Anthropic, Gemini, DeepSeek, GLM, Local LLM対応
+- **Row-Level Security**: ユーザー権限の強制適用
+- **95%+テストカバレッジ**: 322ユニット + 38 E2Eテスト
+
+#### Packages
+
+| パッケージ | バージョン | 説明 |
+|-----------|----------|------|
+| @liqueur/protocol | 0.1.0 | コア型定義・バリデーター |
+| @liqueur/react | 0.1.0 | Reactコンポーネントライブラリ |
+| @liqueur/ai-provider | 0.1.0 | AIプロバイダー抽象化 |
+| @liqueur/artifact-store | 0.1.0 | スキーマ永続化 |
+| @liqueur/auth | 0.1.0 | 認証・認可 |
+| @liqueur/db-adapter | 0.1.0 | DBイントロスペクション |
+
+#### Added
+
+- **Core Protocol**
+  - `LiquidViewSchema` - UI定義の型安全なスキーマ
+  - `DataSource` - 宣言的なデータ取得定義
+  - `SchemaValidator` - 厳格なスキーマ検証
+
+- **React Components**
+  - `LiquidRenderer` - JSONからReactへの変換
+  - `ChartComponent` - 4種のチャート（bar, line, pie, area）
+  - `TableComponent` - TanStack Table統合
+  - `GridLayout` / `StackLayout` - レイアウトコンポーネント
+
+- **AI Integration**
+  - `ProviderFactory` - プロバイダー自動選択
+  - 6つのAIプロバイダー実装
+  - レート制限・キャッシング
+
+- **Security**
+  - Row-Level Security強制適用
+  - 入力検証
+  - Fail Fast設計
+
+- **Documentation**
+  - 哲学ドキュメント（docs/philosophy/why-liquid.md）
+  - クイックスタートチュートリアル
+  - コア概念解説
+  - セキュリティポリシー
+  - コントリビューションガイド
+
+#### Quality Metrics
+
+```
+Tests:     322 unit + 38 E2E (100% pass rate)
+Coverage:  97.76% statements
+Build:     Production build successful
+Type:      100% TypeScript compliance
+```
+
+---
+
 ### TypeScript Configuration Unification (Phase 68, 2025-01-16)
 
 #### Changed
