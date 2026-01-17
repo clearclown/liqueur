@@ -92,6 +92,28 @@ describe("GET /api/liquid/metadata", () => {
     });
   });
 
+  describe("TC-META-004: Rate Limiting", () => {
+    it("should enforce rate limits on metadata requests", async () => {
+      const request = createMockRequest(
+        "http://localhost:3000/api/liquid/metadata",
+        "GET",
+        undefined,
+        { "x-forwarded-for": "192.168.1.100" }
+      );
+
+      // Make 31 requests rapidly (limit is 30 per minute)
+      const responses = [];
+      for (let i = 0; i < 31; i++) {
+        const response = await GET(request);
+        responses.push(response);
+      }
+
+      // At least one should be rate limited
+      const rateLimited = responses.some((r) => r.status === 429);
+      expect(rateLimited).toBe(true);
+    });
+  });
+
   describe("TC-META-003: Performance", () => {
     it("should return metadata within acceptable time", async () => {
       const request = createMockRequest(

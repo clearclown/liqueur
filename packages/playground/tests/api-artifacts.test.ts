@@ -69,6 +69,24 @@ describe("POST /api/liquid/artifacts", () => {
       expect(data.error.code).toBe("MISSING_SCHEMA");
     });
 
+    it("should reject malformed JSON body", async () => {
+      // Create a request with invalid JSON
+      const request = new Request("http://localhost:3000/api/liquid/artifacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: "{ invalid json",
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBeDefined();
+      expect(data.error.code).toBe("INVALID_JSON");
+    });
+
     it("should reject empty name", async () => {
       const request = createMockRequest(
         "http://localhost:3000/api/liquid/artifacts",
