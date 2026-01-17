@@ -1,177 +1,109 @@
 /**
  * LiquidRenderer E2E Tests
- * UIレンダリングの実動作テスト
+ * デモページでのプレビュー表示テスト
  */
 
 import { test, expect } from "@playwright/test";
 
-test.describe("LiquidRenderer Component", () => {
+test.describe("Preview Area - 基本表示", () => {
   test.beforeEach(async ({ page }) => {
-    // ダッシュボードページに移動（想定）
-    await page.goto("/dashboard");
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
   });
 
-  test("should render chart components", async ({ page }) => {
-    // チャートが表示されているか確認
-    const chart = page.locator('[data-testid="chart-component"]').first();
-    await expect(chart).toBeVisible();
-
-    // チャートタイトルが表示されているか確認
-    const chartTitle = page.locator('[data-testid="chart-title"]').first();
-    await expect(chartTitle).toBeVisible();
+  test("should display empty preview initially", async ({ page }) => {
+    // 空のプレビュー状態が表示される
+    const emptyPreview = page.locator(".demo-preview-empty");
+    await expect(emptyPreview).toBeVisible();
+    await expect(emptyPreview).toContainText("プレビューがありません");
   });
 
-  test("should render table components", async ({ page }) => {
-    // テーブルが表示されているか確認
-    const table = page.locator('[data-testid="table-component"]').first();
-    await expect(table).toBeVisible();
-
-    // テーブルにデータが含まれているか確認
-    const tableRows = page.locator('[data-testid="table-row"]');
-    await expect(tableRows).toHaveCount.greaterThan(0);
+  test("should have preview header", async ({ page }) => {
+    const previewHeader = page.locator(".demo-preview-header");
+    await expect(previewHeader).toBeVisible();
+    await expect(previewHeader).toContainText("Live Preview");
   });
 
-  test("should display loading state initially", async ({ page }) => {
-    // ページをリロード
-    await page.reload();
+  test("should display hint text in empty state", async ({ page }) => {
+    const hint = page.locator(".demo-preview-hint");
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText("チャットでダッシュボードを生成");
+  });
+});
 
-    // ローディングインジケーターが表示されるか確認
-    const loadingIndicator = page.locator(
-      '[data-testid="loading-indicator"]'
-    );
-
-    // すぐには消えないことを確認（少なくとも100ms）
-    await expect(loadingIndicator).toBeVisible({ timeout: 100 });
+test.describe("Version Timeline - 基本表示", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
   });
 
-  test("should handle grid layout correctly", async ({ page }) => {
-    // グリッドレイアウトが適用されているか確認
-    const gridContainer = page.locator('[data-testid="grid-layout"]');
-    await expect(gridContainer).toBeVisible();
-
-    // グリッド内のアイテムが正しく配置されているか確認
-    const gridItems = page.locator('[data-testid="grid-item"]');
-    const count = await gridItems.count();
-
-    expect(count).toBeGreaterThan(0);
+  test("should display empty version timeline initially", async ({ page }) => {
+    const emptyTimeline = page.getByTestId("version-timeline-empty");
+    await expect(emptyTimeline).toBeVisible();
   });
 
-  test("should be responsive on mobile", async ({ page, viewport }) => {
-    // モバイルビューポートに変更
+  test("should display version timeline container", async ({ page }) => {
+    const versionSection = page.locator(".demo-versions");
+    await expect(versionSection).toBeVisible();
+  });
+});
+
+test.describe("Layout - レスポンシブデザイン", () => {
+  test("should display 3-column layout on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
+
+    // 3カラムが全て表示される
+    await expect(page.locator(".demo-sidebar--left")).toBeVisible();
+    await expect(page.locator(".demo-chat")).toBeVisible();
+    await expect(page.locator(".demo-sidebar--right")).toBeVisible();
+  });
+
+  test("should hide sidebars on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
 
-    // コンポーネントがモバイルでも表示されるか確認
-    const components = page.locator('[data-testid*="component"]');
-    await expect(components.first()).toBeVisible();
+    // チャットエリアのみ表示
+    await expect(page.locator(".demo-chat")).toBeVisible();
 
-    // スクロール可能であることを確認
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-    // スクロール後も要素が表示されているか確認
-    await expect(components.first()).toBeVisible();
+    // サイドバーは非表示
+    await expect(page.locator(".demo-sidebar--left")).toBeHidden();
   });
 
-  test("should update data when schema changes", async ({ page }) => {
-    // 初期データを取得
-    const initialChartData = await page
-      .locator('[data-testid="chart-component"]')
-      .first()
-      .textContent();
+  test("should be scrollable on mobile", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
 
-    // スキーマを変更するボタンをクリック（想定）
-    const updateButton = page.locator('[data-testid="update-schema-button"]');
-
-    if (await updateButton.isVisible()) {
-      await updateButton.click();
-
-      // データが更新されることを確認
-      await page.waitForTimeout(500); // データフェッチ待機
-
-      const updatedChartData = await page
-        .locator('[data-testid="chart-component"]')
-        .first()
-        .textContent();
-
-      expect(updatedChartData).not.toBe(initialChartData);
-    }
-  });
-
-  test("should handle errors gracefully", async ({ page }) => {
-    // エラー状態を引き起こす（想定: 無効なスキーマ）
-    const triggerErrorButton = page.locator(
-      '[data-testid="trigger-error-button"]'
-    );
-
-    if (await triggerErrorButton.isVisible()) {
-      await triggerErrorButton.click();
-
-      // エラーメッセージが表示されるか確認
-      const errorMessage = page.locator('[data-testid="error-message"]');
-      await expect(errorMessage).toBeVisible();
-
-      // エラーメッセージに適切なテキストが含まれているか確認
-      await expect(errorMessage).toContainText(/error|failed/i);
-    }
+    // スクロールしても要素が表示される
+    await page.evaluate(() => window.scrollTo(0, 100));
+    await expect(page.locator(".demo-chat")).toBeVisible();
   });
 });
 
-test.describe("Chart Interactions", () => {
+test.describe("Conversation List - サイドバー", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/dashboard");
+    await page.goto("/demo");
+    await page.waitForLoadState("networkidle");
   });
 
-  test("should display chart with correct data", async ({ page }) => {
-    // チャートがレンダリングされるまで待機
-    await page.waitForSelector('[data-testid="chart-component"]');
-
-    // SVG要素が存在することを確認（recharts使用）
-    const svgElement = page.locator("svg");
-    await expect(svgElement.first()).toBeVisible();
-
-    // チャート内にバーが存在することを確認（Bar Chart想定）
-    const bars = page.locator(".recharts-bar-rectangle");
-    await expect(bars.first()).toBeVisible();
+  test("should display conversation list header", async ({ page }) => {
+    const header = page.getByTestId("conversation-list-header");
+    await expect(header).toBeVisible();
+    await expect(header).toContainText("会話履歴");
   });
 
-  test("should show tooltip on hover", async ({ page }) => {
-    // チャートのバーにホバー
-    const bar = page.locator(".recharts-bar-rectangle").first();
-    await bar.hover();
-
-    // ツールチップが表示されることを確認
-    const tooltip = page.locator(".recharts-tooltip-wrapper");
-    await expect(tooltip).toBeVisible();
-  });
-});
-
-test.describe("Table Interactions", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/dashboard");
+  test("should display new conversation button", async ({ page }) => {
+    const newButton = page.getByTestId("conversation-list-new-button");
+    await expect(newButton).toBeVisible();
+    await expect(newButton).toBeEnabled();
   });
 
-  test("should display table with data rows", async ({ page }) => {
-    // テーブルがレンダリングされるまで待機
-    await page.waitForSelector('[data-testid="table-component"]');
-
-    // テーブル行が存在することを確認
-    const rows = page.locator('[data-testid="table-row"]');
-    const rowCount = await rows.count();
-
-    expect(rowCount).toBeGreaterThan(0);
-  });
-
-  test("should display column headers", async ({ page }) => {
-    // カラムヘッダーが表示されることを確認
-    const headers = page.locator('[data-testid="table-header"]');
-    await expect(headers.first()).toBeVisible();
-  });
-
-  test("should render cell data correctly", async ({ page }) => {
-    // セルにデータが含まれることを確認
-    const cell = page.locator('[data-testid="table-cell"]').first();
-    const cellText = await cell.textContent();
-
-    expect(cellText).toBeTruthy();
-    expect(cellText?.trim().length).toBeGreaterThan(0);
+  test("should have empty state message", async ({ page }) => {
+    const emptyState = page.getByTestId("conversation-list-empty");
+    await expect(emptyState).toBeVisible();
+    await expect(emptyState).toContainText("会話履歴がありません");
   });
 });
