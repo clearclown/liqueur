@@ -35,7 +35,7 @@ export async function POST(
       );
     }
 
-    if (!body.version || typeof body.version !== "number") {
+    if (body.version === undefined || body.version === null || typeof body.version !== "number") {
       return NextResponse.json(
         {
           error: {
@@ -47,7 +47,7 @@ export async function POST(
       );
     }
 
-    if (body.version < 1) {
+    if (body.version < 1 || !Number.isInteger(body.version)) {
       return NextResponse.json(
         {
           error: {

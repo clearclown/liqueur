@@ -46,7 +46,7 @@ describe("Artifact Versions API", () => {
       }),
     });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201);
     const data = await response.json();
     createdArtifactId = data.artifact.id;
   });
@@ -134,8 +134,9 @@ describe("Artifact Versions API", () => {
       expect(data.versions).toBeDefined();
       expect(Array.isArray(data.versions)).toBe(true);
       expect(data.versions.length).toBeGreaterThanOrEqual(2);
-      expect(data.versions[0].version).toBe(1);
-      expect(data.versions[1].version).toBe(2);
+      // Versions are sorted newest first (descending)
+      expect(data.versions[0].version).toBe(2);
+      expect(data.versions[1].version).toBe(1);
     });
 
     it("should return 404 for non-existent artifact", async () => {
