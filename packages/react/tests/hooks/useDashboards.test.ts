@@ -115,6 +115,36 @@ describe("useDashboards", () => {
     expect(result.current.dashboards).toEqual([]);
   });
 
+  it("should handle pagination with offset and limit", async () => {
+    const mockDashboards = [
+      {
+        id: "1",
+        userId: "user1",
+        title: "Dashboard 1",
+        schema: { version: "1.0", layout: { type: "grid", columns: 12 }, components: [] },
+        version: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-01"),
+        tags: [],
+        visibility: "private" as const,
+      },
+    ];
+
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ artifacts: mockDashboards, total: 100, offset: 20, limit: 10 }),
+    });
+
+    renderHook(() => useDashboards({ offset: 20, limit: 10 }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/liquid/artifacts?offset=20&limit=10",
+        expect.any(Object)
+      );
+    });
+  });
+
   it("should refresh dashboards when refresh is called", async () => {
     const mockDashboards = [
       {

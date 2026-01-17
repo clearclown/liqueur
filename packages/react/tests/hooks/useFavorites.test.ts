@@ -148,4 +148,27 @@ describe("useFavorites", () => {
 
     expect(onChange).toHaveBeenCalledTimes(2);
   });
+
+  it("should handle localStorage save errors gracefully", () => {
+    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // Mock localStorage.setItem to throw an error
+    localStorageMock.setItem = vi.fn(() => {
+      throw new Error("QuotaExceededError");
+    });
+
+    const { result } = renderHook(() => useFavorites());
+
+    // Should not throw error
+    act(() => {
+      result.current.toggleFavorite("dashboard-1");
+    });
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      "Failed to save favorites to localStorage:",
+      expect.any(Error)
+    );
+
+    consoleWarnSpy.mockRestore();
+  });
 });

@@ -129,6 +129,22 @@ describe("useDashboardMutations", () => {
         await result.current.updateDashboard("non-existent", input);
       })).rejects.toThrow("Not found");
     });
+
+    it("should handle HTTP error response on update", async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+      });
+
+      const input: UpdateDashboardInput = { title: "Updated" };
+
+      const { result } = renderHook(() => useDashboardMutations());
+
+      await expect(act(async () => {
+        await result.current.updateDashboard("non-existent", input);
+      })).rejects.toThrow("Failed to update dashboard: 404 Not Found");
+    });
   });
 
   describe("deleteDashboard", () => {
@@ -163,6 +179,20 @@ describe("useDashboardMutations", () => {
       await expect(act(async () => {
         await result.current.deleteDashboard("id");
       })).rejects.toThrow("Delete failed");
+    });
+
+    it("should handle HTTP error response on delete", async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+      });
+
+      const { result } = renderHook(() => useDashboardMutations());
+
+      await expect(act(async () => {
+        await result.current.deleteDashboard("dashboard-to-delete");
+      })).rejects.toThrow("Failed to delete dashboard: 403 Forbidden");
     });
   });
 

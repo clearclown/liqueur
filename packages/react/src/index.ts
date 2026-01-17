@@ -7,6 +7,14 @@ export type { ChartComponentProps } from "./components/ChartComponent";
 export { TableComponent } from "./components/TableComponent";
 export type { TableComponentProps } from "./components/TableComponent";
 
+// Dashboard Manager Components
+export { DashboardCard, DashboardList, DashboardSearch } from "./components/dashboard-manager";
+export type {
+  DashboardCardProps,
+  DashboardListProps,
+  DashboardSearchProps,
+} from "./components/dashboard-manager";
+
 export { GridLayout } from "./layouts/GridLayout";
 export type { GridLayoutComponentProps } from "./layouts/GridLayout";
 

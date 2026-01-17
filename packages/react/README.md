@@ -13,6 +13,11 @@ React components for rendering Liquid Protocol schemas
 - **Table components** - Interactive tables with @tanstack/react-table
 - **Layout system** - Grid and Stack layouts
 - **Data fetching hook** - `useLiquidView` for loading data
+- **Dashboard Management** - Hooks and components for managing dashboards
+  - `useDashboards` - Fetch and manage dashboard list
+  - `useDashboardMutations` - Create, update, delete dashboards
+  - `useFavorites` - Favorite management with localStorage
+  - `DashboardCard`, `DashboardList`, `DashboardSearch` - UI components
 - **Loading states** - Built-in loading indicators
 - **Type-safe** - Full TypeScript support
 
@@ -146,6 +151,177 @@ const { data, loading, error } = useLiquidView({ schema });
 - `data: Record<string, unknown[]>` - Data mapped by data_source name
 - `loading: boolean` - Loading state
 - `error: Error | null` - Error if any occurred
+
+### useDashboards
+
+Fetches and manages dashboard list with search, sort, and filter.
+
+```typescript
+const { dashboards, isLoading, error, refresh } = useDashboards({
+  search: "expenses",
+  sort: "created",
+  order: "desc",
+  favorites: false,
+});
+```
+
+**Parameters:**
+- `search?: string` - Search query (title/description)
+- `sort?: 'name' | 'created' | 'updated'` - Sort field
+- `order?: 'asc' | 'desc'` - Sort order
+- `favorites?: boolean` - Show only favorites
+
+**Returns:**
+- `dashboards: Dashboard[]` - Dashboard list
+- `isLoading: boolean` - Loading state
+- `error: Error | null` - Error if any
+- `refresh: () => Promise<void>` - Refresh function
+- `total: number` - Total count
+
+### useDashboardMutations
+
+Provides CRUD operations for dashboards.
+
+```typescript
+const { createDashboard, updateDashboard, deleteDashboard, isCreating } =
+  useDashboardMutations({
+    onCreateSuccess: (dashboard) => console.log("Created:", dashboard.id),
+  });
+
+// Create
+await createDashboard({ title: "New Dashboard", schema: {...} });
+
+// Update
+await updateDashboard("dashboard-id", { title: "Updated Title" });
+
+// Delete
+await deleteDashboard("dashboard-id");
+```
+
+**Returns:**
+- `createDashboard: (data) => Promise<Dashboard>` - Create function
+- `updateDashboard: (id, data) => Promise<Dashboard>` - Update function
+- `deleteDashboard: (id) => Promise<void>` - Delete function
+- `isCreating: boolean` - Creating state
+- `isUpdating: boolean` - Updating state
+- `isDeleting: boolean` - Deleting state
+
+### useFavorites
+
+Manages favorite dashboards with localStorage.
+
+```typescript
+const { favorites, toggleFavorite, isFavorite } = useFavorites();
+
+// Toggle favorite
+toggleFavorite("dashboard-id");
+
+// Check if favorite
+if (isFavorite("dashboard-id")) {
+  console.log("This is a favorite!");
+}
+```
+
+**Returns:**
+- `favorites: Set<string>` - Favorite dashboard IDs
+- `toggleFavorite: (id: string) => void` - Toggle function
+- `isFavorite: (id: string) => boolean` - Check function
+
+## Dashboard Manager Components
+
+### DashboardCard
+
+Displays a dashboard as a card with metadata and actions.
+
+```tsx
+<DashboardCard
+  dashboard={dashboard}
+  onSelect={(d) => console.log("Selected:", d.id)}
+  onFavoriteToggle={(id) => console.log("Toggle:", id)}
+  onEdit={(d) => console.log("Edit:", d.id)}
+  onDelete=(id) => console.log("Delete:", id)}
+/>
+```
+
+### DashboardList
+
+Displays dashboards in a responsive grid layout.
+
+```tsx
+<DashboardList
+  dashboards={dashboards}
+  isLoading={isLoading}
+  error={error}
+  onSelect={handleSelect}
+  onFavoriteToggle={handleFavoriteToggle}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+  renderCard={(dashboard) => <CustomCard {...dashboard} />}
+/>
+```
+
+### DashboardSearch
+
+Provides search, sort, and filter controls.
+
+```tsx
+<DashboardSearch
+  onSearch={(query) => setSearch(query)}
+  onSortChange={(sort) => setSort(sort)}
+  onOrderChange={(order) => setOrder(order)}
+  onFavoritesToggle={(enabled) => setFavorites(enabled)}
+/>
+```
+
+### Complete Example
+
+```tsx
+import {
+  DashboardList,
+  DashboardSearch,
+  useDashboards,
+  useDashboardMutations,
+  useFavorites,
+} from '@liqueur/react';
+
+function DashboardManager() {
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'name' | 'created' | 'updated'>('created');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+
+  const { dashboards, isLoading, error } = useDashboards({
+    search,
+    sort,
+    order,
+    favorites: favoritesOnly,
+  });
+
+  const { deleteDashboard } = useDashboardMutations();
+  const { toggleFavorite } = useFavorites();
+
+  return (
+    <>
+      <DashboardSearch
+        onSearch={setSearch}
+        onSortChange={setSort}
+        onOrderChange={setOrder}
+        onFavoritesToggle={setFavoritesOnly}
+      />
+
+      <DashboardList
+        dashboards={dashboards}
+        isLoading={isLoading}
+        error={error}
+        onSelect={(dashboard) => console.log("Selected:", dashboard)}
+        onFavoriteToggle={toggleFavorite}
+        onEdit={(dashboard) => console.log("Edit:", dashboard)}
+        onDelete={deleteDashboard}
+      />
+    </>
+  );
+}
+```
 
 ## Layouts
 

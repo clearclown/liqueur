@@ -1,7 +1,7 @@
 {
   "name": "@liqueur/react",
-  "version": "0.1.0",
-  "description": "Liquid UI - React component library for rendering LiquidView schemas",
+  "version": "0.2.0",
+  "description": "Liquid UI - React component library for rendering LiquidView schemas with dashboard management",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -55,7 +55,10 @@
     "server-driven-ui",
     "liquidview",
     "chart",
-    "table"
+    "table",
+    "dashboard",
+    "dashboard-management",
+    "favorites"
   ],
   "author": "Project Liquid Contributors",
   "engines": {
