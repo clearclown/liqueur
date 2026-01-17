@@ -1,0 +1,42 @@
+{
+  "name": "@liqueur/db-adapter",
+  "version": "0.1.0",
+  "description": "Database introspection adapters for Project Liquid",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "liqueur",
+    "database",
+    "introspection",
+    "prisma",
+    "drizzle"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@liqueur/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.1.0"
+  },
+  "peerDependencies": {
+    "@prisma/client": "^5.0.0",
+    "prisma": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@prisma/client": {
+      "optional": true
+    },
+    "prisma": {
+      "optional": true
+    }
+  }
+}

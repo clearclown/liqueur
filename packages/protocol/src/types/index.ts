@@ -229,3 +229,75 @@ export interface ValidationResult {
   valid: boolean;
   errors: ValidationError[];
 }
+
+/**
+ * Database Metadata (for introspection)
+ */
+export interface DatabaseMetadata {
+  /** Database tables */
+  tables: Table[];
+  /** Table relations */
+  relations: Relation[];
+  /** Enum definitions */
+  enums?: EnumDefinition[];
+}
+
+/**
+ * Table definition
+ */
+export interface Table {
+  /** Table name */
+  name: string;
+  /** Table columns */
+  columns: Column[];
+  /** Optional table description */
+  description?: string;
+}
+
+/**
+ * Column definition
+ */
+export interface Column {
+  /** Column name */
+  name: string;
+  /** SQL type */
+  type: string;
+  /** Is nullable */
+  nullable: boolean;
+  /** Is primary key */
+  primaryKey?: boolean;
+  /** Is unique */
+  unique?: boolean;
+  /** Default value */
+  defaultValue?: any;
+  /** Optional column description */
+  description?: string;
+}
+
+/**
+ * Table relation
+ */
+export interface Relation {
+  /** Relation name */
+  name: string;
+  /** Source table */
+  fromTable: string;
+  /** Source column */
+  fromColumn: string;
+  /** Target table */
+  toTable: string;
+  /** Target column */
+  toColumn: string;
+  /** Relation type */
+  type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+}
+
+/**
+ * Enum definition
+ */
+export interface EnumDefinition {
+  /** Enum name */
+  name: string;
+  /** Enum values */
+  values: string[];
+}
