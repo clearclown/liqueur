@@ -2,37 +2,37 @@
 
 # Liquid Protocol
 
-**自然言語でダッシュボードを自由自在に。**
+**Transform dashboards with natural language.**
 
-AIドリブンUI生成のためのオープンソースプロトコル
+Open-source protocol for AI-driven UI generation
 
 [![npm](https://img.shields.io/npm/v/@liqueur/protocol?style=flat-square&color=blue)](https://www.npmjs.com/package/@liqueur/protocol)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-[English](./docs/README.en.md) | 日本語
+English | [日本語](./docs/readmeLangs/README.ja.md) | [简体中文](./docs/readmeLangs/README.zh-CN.md) | [繁體中文](./docs/readmeLangs/README.zh-TW.md) | [Русский](./docs/readmeLangs/README.ru.md) | [Українська](./docs/readmeLangs/README.uk.md) | [فارسی](./docs/readmeLangs/README.fa.md) | [العربية](./docs/readmeLangs/README.ar.md)
 
 </div>
 
 ---
 
-## 一言で言うと
+## In a Nutshell
 
-**「交通費を除外して、月別の支出を棒グラフで見せて」**
+**"Exclude transportation costs and show monthly expenses as a bar chart"**
 
-こう言うだけで、ダッシュボードが自動で再構成されます。
+Just say this, and your dashboard automatically reconfigures itself.
 
 <div align="center">
 
 | Before | After |
 |--------|-------|
-| ![初期ダッシュボード](docs/images/dashboard-initial.png) | ![AI更新後](docs/images/dashboard-after-ai.png) |
-| デフォルトのダッシュボード | 「交通費を除外して」と指示した後 |
+| ![Initial Dashboard](docs/images/dashboard-initial.png) | ![After AI Update](docs/images/dashboard-after-ai.png) |
+| Default dashboard | After saying "Exclude transportation" |
 
 </div>
 
 ---
 
-## 30秒で試す
+## Quick Start (30 seconds)
 
 ```bash
 npx create-next-liqueur-app my-dashboard
@@ -40,176 +40,273 @@ cd my-dashboard
 npm run dev
 ```
 
-[http://localhost:3000](http://localhost:3000) を開いて、チャットで指示するだけ。
+Open [http://localhost:3000](http://localhost:3000) and start chatting.
 
 ---
 
-## 目次
+## Table of Contents
 
-- [Claude Artifacts / Gemini Canvas との違い](#claude-artifacts--gemini-canvas-との違い)
-- [解決する問題](#解決する問題)
-- [様々なアプリへの応用](#様々なアプリへの応用)
-- [仕組み](#仕組み)
-- [インストール](#インストール)
-- [サンプルアプリ](#サンプルアプリ)
-- [セキュリティ設計](#セキュリティ設計)
-- [スキーマ仕様](#スキーマ仕様)
-- [ロードマップ](#ロードマップ)
+- [Why Liquid Protocol?](#why-liquid-protocol)
+- [Comparison with Claude Artifacts / Gemini Canvas](#comparison-with-claude-artifacts--gemini-canvas)
+- [Use Cases](#use-cases)
+- [How It Works](#how-it-works)
+- [Installation](#installation)
+- [Developer Setup](#developer-setup)
+- [Security Design](#security-design)
+- [Schema Specification](#schema-specification)
+- [Roadmap](#roadmap)
 
 ---
 
-## Claude Artifacts / Gemini Canvas との違い
+## Why Liquid Protocol?
 
-[Claude Artifacts](https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them) や [Gemini Canvas](https://gemini.google/jp/overview/canvas/) を使ったことがありますか？
+### The Customization Dilemma
 
-AI との会話でダッシュボードやコードを生成できる、素晴らしい機能です。
+Consider a budget tracking app. No matter which app you use, you'll always have requests like:
 
-**Liquid Protocol は、この体験を「自分のアプリ」で実現するためのプロトコルです。**
+> - "Exclude transportation costs - my company reimburses those"
+> - "Family card purchases should be separate - I get reimbursed"
+> - "Tag all spending during my trip as 'travel'"
+> - "I hate red - make it blue and black"
 
-| 機能 | Claude Artifacts | Gemini Canvas | **Liquid Protocol** |
-|------|:---------------:|:-------------:|:-------------------:|
-| AI による UI 生成 | ✅ | ✅ | ✅ |
-| 自分のアプリに組み込み | ❌ | ❌ | **✅** |
-| 自分のデータベース接続 | ❌ | ❌ | **✅** |
+**Current solutions:**
+
+| Approach | Example | Problem |
+|:---------|:--------|:--------|
+| Build everything yourself | Notion, Spreadsheets | Customization becomes the goal. You lose focus |
+| Add more settings | Traditional apps | Settings screens become complex. "Too much freedom" |
+
+### Liquid's Solution
+
+**Just say what you want.**
+
+```
+User: "Exclude transportation costs"
+    ↓
+AI regenerates the dashboard structure
+    ↓
+Filters, charts, and layouts update automatically
+```
+
+No more hunting through settings screens.
+
+---
+
+## Comparison with Claude Artifacts / Gemini Canvas
+
+Have you used [Claude Artifacts](https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them) or [Gemini Canvas](https://gemini.google/overview/canvas/)?
+
+They're amazing features that let you generate dashboards and code through AI conversations.
+
+**Liquid Protocol brings this experience to YOUR app.**
+
+| Feature | Claude Artifacts | Gemini Canvas | **Liquid Protocol** |
+|---------|:---------------:|:-------------:|:-------------------:|
+| AI-powered UI generation | ✅ | ✅ | ✅ |
+| Embed in your own app | ❌ | ❌ | **✅** |
+| Connect your own database | ❌ | ❌ | **✅** |
 | Row-Level Security | ❌ | ❌ | **✅** |
-| コード実行リスク | ⚠️ サンドボックス | ⚠️ サンドボックス | **✅ なし** |
-| オープンソース | ❌ | ❌ | **✅ MIT** |
-| AI プロバイダー選択 | Claude のみ | Gemini のみ | **自由** |
+| Code execution risk | ⚠️ Sandboxed | ⚠️ Sandboxed | **✅ None** |
+| Open Source | ❌ | ❌ | **✅ MIT** |
+| AI provider choice | Claude only | Gemini only | **Any** |
 
-### 要するに
+### In Summary
 
 ```
 Claude Artifacts / Gemini Canvas
-  → 素晴らしい。でも、それは「彼らのアプリ」の中だけ。
+  → Amazing. But only within THEIR apps.
 
 Liquid Protocol
-  → 同じ体験を「あなたのアプリ」で。
-    あなたのデータベース、あなたのユーザーに。
+  → The same experience in YOUR app.
+    Your database, your users.
 ```
 
 ---
 
-## 解決する問題
+## Use Cases
 
-### カスタマイズの二極化
+We're demonstrating with a budget app, but this technology applies to any application:
 
-家計簿アプリを例に考えてみましょう。どのアプリを使っても、必ずこんな要望が出てきます：
+| Application | Traditional Problem | Liquid Solution |
+|:------------|:-------------------|:----------------|
+| **Slack / Discord** | Complex notification settings | "Only notify me for important conversations" |
+| **Stock Trading** | Fixed dashboards | "Show only tech stocks in a pie chart" |
+| **Twitter / SNS** | Opaque algorithm | "Hide political content" |
+| **Project Management** | Jira settings hell | "Show only my tasks this week" |
 
-> - 「交通費は会社持ちだから除外して」
-> - 「家族カードは返金されるから別会計で」
-> - 「旅行中の支出には『旅行』タグをつけて」
-> - 「赤が嫌いだから青と黒にして」
-
-**現状の解決策：**
-
-| アプローチ | 例 | 問題点 |
-|:----------|:---|:-------|
-| 全部自分で作る | Notion, スプレッドシート | カスタマイズが目的化。本来の作業から脱線 |
-| 設定項目を増やす | 従来のアプリ | 設定画面が複雑化。「自由すぎる不自由」 |
-
-### Liquid の解決策
-
-**言葉で伝えるだけ。**
-
-```
-ユーザー: 「交通費は除外して」
-    ↓
-AI がダッシュボードの構造を再生成
-    ↓
-フィルタ・グラフ・レイアウトが自動更新
-```
-
-設定画面を探し回る必要はありません。
+**This technology will become the software standard.**
 
 ---
 
-## 様々なアプリへの応用
-
-今は家計簿で実証していますが、この技術はあらゆるアプリに適用できます：
-
-| アプリ | 従来の問題 | Liquid による解決 |
-|:-------|:----------|:-----------------|
-| **Slack / Discord** | 通知設定が複雑 | 「重要な会話だけ通知して」 |
-| **証券アプリ** | ダッシュボードが固定 | 「テック株だけ円グラフで」 |
-| **Twitter / SNS** | アルゴリズムが不透明 | 「政治関連を非表示に」 |
-| **プロジェクト管理** | Jira の設定地獄 | 「今週の自分のタスクだけ」 |
-
-**将来、この技術はソフトウェアの標準になる。**
-
----
-
-## 仕組み
+## How It Works
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  ユーザー: 「交通費を除外して、棒グラフで見せて」            │
+│  User: "Exclude transportation, show as bar chart"          │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│  AI (Claude / GPT / Gemini)                                 │
+│  AI (Claude / GPT / Gemini / DeepSeek / GLM)                │
 │                                                             │
-│  ⚠️ JSON スキーマのみ出力。JS/SQL は生成しない               │
+│  ⚠️ Outputs JSON schema ONLY. No JS/SQL generation          │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  @liqueur/protocol                                          │
 │                                                             │
-│  ✅ スキーマ検証: 未知フィールドは即拒否                     │
-│  ✅ TypeScript + Rust で二重検証                            │
+│  ✅ Schema validation: Unknown fields rejected immediately  │
+│  ✅ TypeScript + Rust dual validation                       │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  @liqueur/db-adapter                                        │
 │                                                             │
 │  🔒 Row-Level Security                                      │
-│  🔒 SQL インジェクション防止                                 │
+│  🔒 SQL injection prevention                                │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  @liqueur/react                                             │
 │                                                             │
-│  📊 チャート・テーブル・レイアウトを自動レンダリング         │
+│  📊 Auto-render charts, tables, and layouts                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## インストール
+## Installation
 
-### 用途別
+### By Use Case
 
 ```bash
-# スキーマ定義のみ
+# Schema definitions only
 npm install @liqueur/protocol
 
-# React UI 追加
+# Add React UI
 npm install @liqueur/protocol @liqueur/react
 
-# フルスタック（AI + DB）
+# Full stack (AI + Database)
 npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter
 ```
 
-### パッケージ一覧
+### Packages
 
-| パッケージ | 役割 |
-|:----------|:-----|
-| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | スキーマ型定義 & バリデーション |
-| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI コンポーネント |
-| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | AI プロバイダー統合 |
-| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Prisma クエリ実行 |
-| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | スキーマ永続化 |
-| [create-next-liqueur-app](https://www.npmjs.com/package/create-next-liqueur-app) | プロジェクト作成 CLI |
+| Package | Purpose |
+|:--------|:--------|
+| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | Schema types & validation |
+| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI components |
+| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | AI provider integration |
+| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Prisma query execution |
+| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | Schema persistence |
+| [create-next-liqueur-app](https://www.npmjs.com/package/create-next-liqueur-app) | Project scaffolding CLI |
 
 ---
 
-## サンプルアプリ
+## Developer Setup
 
-| サンプル | 説明 | 実行 |
-|:--------|:-----|:-----|
-| [家計簿アプリ](./examples/household-budget) | AI チャット付きフル機能 | `cd examples/household-budget && pnpm dev` |
-| [Playground](./examples/playground) | シンプルなテスト環境 | `cd examples/playground && pnpm dev` |
+### Option 1: Quick Start with CLI
 
-### ローカルで実行
+```bash
+npx create-next-liqueur-app my-dashboard
+cd my-dashboard
+
+# Configure your AI provider
+cp .env.example .env
+# Edit .env with your API key
+
+npm run dev
+```
+
+### Option 2: Add to Existing Project
+
+```bash
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider
+```
+
+### Environment Variables
+
+When using `@liqueur/ai-provider`, configure environment variables for your chosen AI provider:
+
+```bash
+# .env or .env.local
+
+# Choose provider: anthropic, openai, gemini, deepseek, glm, local
+AI_PROVIDER=anthropic
+
+# ─── Anthropic (Claude) ───────────────────────────────
+ANTHROPIC_API_KEY=sk-ant-your-key
+ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+# Models: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
+
+# ─── OpenAI (GPT) ─────────────────────────────────────
+OPENAI_API_KEY=sk-your-key
+OPENAI_MODEL=gpt-4o-mini
+# Models: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
+
+# ─── Google Gemini ────────────────────────────────────
+GOOGLE_API_KEY=your-key
+GEMINI_MODEL=gemini-1.5-flash
+# Models: gemini-2.0-flash-exp, gemini-1.5-pro, gemini-1.5-flash
+
+# ─── DeepSeek ─────────────────────────────────────────
+DEEPSEEK_API_KEY=sk-your-key
+DEEPSEEK_MODEL=deepseek-chat
+# Models: deepseek-chat, deepseek-coder
+
+# ─── GLM (Zhipu AI) ───────────────────────────────────
+GLM_API_KEY=your-key
+GLM_MODEL=glm-4
+# Models: glm-4, glm-4-flash, glm-3-turbo
+
+# ─── Local LLM (Ollama, LM Studio) ────────────────────
+LOCAL_LLM_BASE_URL=http://localhost:1234/v1
+LOCAL_LLM_MODEL=llama3
+```
+
+### Basic Usage
+
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
+import { LiquidRenderer } from '@liqueur/react';
+
+// Create provider from environment variables
+const provider = ProviderFactory.createFromEnv();
+
+// Generate schema from natural language
+const schema = await provider.generateSchema(
+  "Show monthly expenses as a bar chart",
+  databaseMetadata
+);
+
+// Render the dashboard
+<LiquidRenderer schema={schema} data={data} />
+```
+
+### Example: Next.js API Route
+
+```typescript
+// app/api/generate/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { ProviderFactory } from '@liqueur/ai-provider';
+
+export async function POST(request: NextRequest) {
+  const { prompt } = await request.json();
+
+  const provider = ProviderFactory.createFromEnv();
+  const schema = await provider.generateSchema(prompt, metadata);
+
+  return NextResponse.json({ schema });
+}
+```
+
+### Sample Applications
+
+| Sample | Description | Run |
+|:-------|:------------|:----|
+| [Household Budget](./examples/household-budget) | Full-featured with AI chat | `cd examples/household-budget && pnpm dev` |
+| [Playground](./examples/playground) | Simple test environment | `cd examples/playground && pnpm dev` |
+
+### Run from Source
 
 ```bash
 git clone https://github.com/clearclown/liqueur.git
@@ -217,42 +314,42 @@ cd liqueur
 pnpm install && pnpm build
 
 cd examples/household-budget
-cp .env.example .env  # API キー設定
+cp .env.example .env  # Configure API keys
 pnpm dev
 ```
 
 ---
 
-## セキュリティ設計
+## Security Design
 
-### なぜ AI に JavaScript を書かせないのか？
+### Why Not Let AI Write JavaScript?
 
-| 方式 | リスク |
-|:-----|:-------|
-| AI が JS/SQL 生成 | XSS、SQL インジェクション、任意コード実行 |
-| **Liquid: JSON のみ** | 実行コードなし。スキーマ外は拒否 |
+| Approach | Risk |
+|:---------|:-----|
+| AI generates JS/SQL | XSS, SQL injection, arbitrary code execution |
+| **Liquid: JSON only** | No executable code. Unknown fields rejected |
 
-### 3層の防御
+### Three Layers of Defense
 
-1. **AI 出力制限** — JSON スキーマのみ。コード生成なし
-2. **スキーマ検証** — 未知フィールドは即拒否（Fail Fast）
-3. **Row-Level Security** — ユーザーは自分のデータのみアクセス可能
+1. **AI Output Restriction** — JSON schema only. No code generation
+2. **Schema Validation** — Unknown fields rejected immediately (Fail Fast)
+3. **Row-Level Security** — Users can only access their own data
 
 ```
-❌ AI が生成しないもの
+❌ What AI DOES NOT generate
    - JavaScript
    - SQL
-   - シェルコマンド
+   - Shell commands
 
-✅ AI が生成するもの
-   - 検証済み JSON スキーマのみ
+✅ What AI generates
+   - Validated JSON schema only
 ```
 
 ---
 
-## スキーマ仕様
+## Schema Specification
 
-### 基本構造
+### Basic Structure
 
 ```typescript
 interface LiquidViewSchema {
@@ -263,18 +360,18 @@ interface LiquidViewSchema {
 }
 ```
 
-### コンポーネント
+### Components
 
-- `chart` — 棒グラフ、折れ線、円グラフ、面グラフ
-- `table` — データテーブル（ソート対応）
+- `chart` — Bar, line, pie, area charts
+- `table` — Data table (sortable)
 
 ### DataSource
 
 ```typescript
 interface DataSource {
-  resource: string;      // テーブル名
-  filters?: Filter[];    // WHERE 条件
-  aggregation?: {        // GROUP BY + 集計
+  resource: string;      // Table name
+  filters?: Filter[];    // WHERE conditions
+  aggregation?: {        // GROUP BY + aggregation
     type: 'sum' | 'count' | 'avg' | 'min' | 'max';
     field: string;
     by: string;
@@ -284,7 +381,7 @@ interface DataSource {
 }
 ```
 
-### 例：交通費を除外した支出
+### Example: Expenses excluding transportation
 
 ```typescript
 const schema: LiquidViewSchema = {
@@ -294,7 +391,7 @@ const schema: LiquidViewSchema = {
     {
       type: 'chart',
       variant: 'pie',
-      title: '今月の支出内訳',
+      title: 'Monthly Expenses',
       data_source: 'expenses'
     }
   ],
@@ -303,7 +400,7 @@ const schema: LiquidViewSchema = {
       resource: 'transactions',
       filters: [
         { field: 'type', op: 'eq', value: 'EXPENSE' },
-        { field: 'category', op: 'neq', value: '交通費' }  // ← 除外
+        { field: 'category', op: 'neq', value: 'Transportation' }  // ← Excluded
       ],
       aggregation: { type: 'sum', field: 'amount', by: 'category' }
     }
@@ -311,22 +408,22 @@ const schema: LiquidViewSchema = {
 };
 ```
 
-詳細は [@liqueur/protocol](./packages/protocol) を参照。
+See [@liqueur/protocol](./packages/protocol) for details.
 
 ---
 
-## ロードマップ
+## Roadmap
 
-- [x] Phase 1: コアプロトコル & React コンポーネント
-- [x] Phase 2: AI プロバイダー統合
-- [x] Phase 3: サンプルアプリ（家計簿）
-- [ ] Phase 4: コンポーネント追加（カレンダー、マップ等）
-- [ ] Phase 5: リアルタイム協調編集
-- [ ] Phase 6: プラグインシステム
+- [x] Phase 1: Core protocol & React components
+- [x] Phase 2: AI provider integration
+- [x] Phase 3: Sample app (household budget)
+- [ ] Phase 4: Additional components (calendar, map, etc.)
+- [ ] Phase 5: Real-time collaborative editing
+- [ ] Phase 6: Plugin system
 
 ---
 
-## 開発
+## Development
 
 ```bash
 pnpm install
@@ -334,11 +431,11 @@ pnpm build
 pnpm test
 ```
 
-詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ---
 
-## ライセンス
+## License
 
 [MIT](LICENSE)
 
@@ -348,7 +445,7 @@ pnpm test
 
 **Liquid Protocol**
 
-ユーザーが設定と格闘する時代を終わらせる
+End the era of users fighting with settings
 
 [GitHub](https://github.com/clearclown/liqueur) · [npm](https://www.npmjs.com/package/@liqueur/protocol)
 

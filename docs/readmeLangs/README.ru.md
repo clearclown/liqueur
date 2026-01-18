@@ -1,0 +1,365 @@
+<div align="center">
+
+# Liquid Protocol
+
+**Управляйте дашбордами с помощью естественного языка.**
+
+Открытый протокол для генерации UI с помощью ИИ
+
+[![npm](https://img.shields.io/npm/v/@liqueur/protocol?style=flat-square&color=blue)](https://www.npmjs.com/package/@liqueur/protocol)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](../../LICENSE)
+
+[English](../../README.md) | [日本語](./README.ja.md) | [简体中文](./README.zh-CN.md) | [繁體中文](./README.zh-TW.md) | Русский | [Українська](./README.uk.md) | [فارسی](./README.fa.md) | [العربية](./README.ar.md)
+
+</div>
+
+---
+
+## Суть
+
+**«Исключи транспортные расходы и покажи ежемесячные траты в виде столбчатой диаграммы»**
+
+Просто скажите это, и ваш дашборд автоматически перенастроится.
+
+<div align="center">
+
+| До | После |
+|----|-------|
+| ![Исходный дашборд](../images/dashboard-initial.png) | ![После обновления ИИ](../images/dashboard-after-ai.png) |
+| Дашборд по умолчанию | После команды «Исключи транспорт» |
+
+</div>
+
+---
+
+## Быстрый старт (30 секунд)
+
+```bash
+npx create-next-liqueur-app my-dashboard
+cd my-dashboard
+npm run dev
+```
+
+Откройте [http://localhost:3000](http://localhost:3000) и начните общение.
+
+---
+
+## Содержание
+
+- [Почему Liquid Protocol?](#почему-liquid-protocol)
+- [Сравнение с Claude Artifacts / Gemini Canvas](#сравнение-с-claude-artifacts--gemini-canvas)
+- [Варианты использования](#варианты-использования)
+- [Как это работает](#как-это-работает)
+- [Установка](#установка)
+- [Настройка для разработчиков](#настройка-для-разработчиков)
+- [Безопасность](#безопасность)
+- [Спецификация схемы](#спецификация-схемы)
+- [Дорожная карта](#дорожная-карта)
+
+---
+
+## Почему Liquid Protocol?
+
+### Дилемма кастомизации
+
+Возьмём приложение для учёта расходов. Какое бы приложение вы ни использовали, у вас всегда будут такие запросы:
+
+> - «Исключи транспортные расходы — компания их компенсирует»
+> - «Покупки по семейной карте — отдельно, их мне возмещают»
+> - «Отметь все траты во время поездки как "путешествие"»
+> - «Я не люблю красный — сделай синим и чёрным»
+
+**Текущие решения:**
+
+| Подход | Пример | Проблема |
+|:-------|:-------|:---------|
+| Сделать всё самому | Notion, Таблицы | Кастомизация становится целью. Теряется фокус |
+| Добавить больше настроек | Традиционные приложения | Экраны настроек усложняются. «Слишком много свободы» |
+
+### Решение Liquid
+
+**Просто скажите, что вам нужно.**
+
+```
+Пользователь: «Исключи транспортные расходы»
+    ↓
+ИИ перегенерирует структуру дашборда
+    ↓
+Фильтры, графики и макеты обновляются автоматически
+```
+
+Больше не нужно искать нужные настройки.
+
+---
+
+## Сравнение с Claude Artifacts / Gemini Canvas
+
+Вы использовали [Claude Artifacts](https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them) или [Gemini Canvas](https://gemini.google/overview/canvas/)?
+
+Это замечательные функции, позволяющие генерировать дашборды и код через разговор с ИИ.
+
+**Liquid Protocol привносит этот опыт в ВАШЕ приложение.**
+
+| Функция | Claude Artifacts | Gemini Canvas | **Liquid Protocol** |
+|---------|:---------------:|:-------------:|:-------------------:|
+| Генерация UI с помощью ИИ | ✅ | ✅ | ✅ |
+| Встраивание в своё приложение | ❌ | ❌ | **✅** |
+| Подключение своей БД | ❌ | ❌ | **✅** |
+| Row-Level Security | ❌ | ❌ | **✅** |
+| Риск выполнения кода | ⚠️ Песочница | ⚠️ Песочница | **✅ Нет** |
+| Открытый исходный код | ❌ | ❌ | **✅ MIT** |
+| Выбор ИИ-провайдера | Только Claude | Только Gemini | **Любой** |
+
+### Итог
+
+```
+Claude Artifacts / Gemini Canvas
+  → Потрясающе. Но только в ИХ приложениях.
+
+Liquid Protocol
+  → Тот же опыт в ВАШЕМ приложении.
+    Ваша база данных, ваши пользователи.
+```
+
+---
+
+## Варианты использования
+
+Мы демонстрируем на примере бюджетного приложения, но эта технология применима к любому приложению:
+
+| Приложение | Традиционная проблема | Решение Liquid |
+|:-----------|:---------------------|:---------------|
+| **Slack / Discord** | Сложные настройки уведомлений | «Уведомляй только о важных разговорах» |
+| **Биржевые приложения** | Фиксированные дашборды | «Покажи только техносектор круговой диаграммой» |
+| **Twitter / SNS** | Непрозрачный алгоритм | «Скрой политический контент» |
+| **Управление проектами** | Ад настроек Jira | «Покажи только мои задачи на этой неделе» |
+
+**Эта технология станет стандартом программного обеспечения.**
+
+---
+
+## Как это работает
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Пользователь: «Исключи транспорт, покажи столбчатую»       │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  ИИ (Claude / GPT / Gemini / DeepSeek / GLM)                │
+│                                                             │
+│  ⚠️ Выводит ТОЛЬКО JSON-схему. Не генерирует JS/SQL         │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  @liqueur/protocol                                          │
+│                                                             │
+│  ✅ Валидация схемы: неизвестные поля сразу отклоняются     │
+│  ✅ Двойная валидация TypeScript + Rust                     │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  @liqueur/db-adapter                                        │
+│                                                             │
+│  🔒 Row-Level Security                                      │
+│  🔒 Защита от SQL-инъекций                                  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  @liqueur/react                                             │
+│                                                             │
+│  📊 Автоматический рендеринг графиков, таблиц и макетов     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Установка
+
+### По назначению
+
+```bash
+# Только определения схемы
+npm install @liqueur/protocol
+
+# Добавить React UI
+npm install @liqueur/protocol @liqueur/react
+
+# Полный стек (ИИ + БД)
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter
+```
+
+### Пакеты
+
+| Пакет | Назначение |
+|:------|:-----------|
+| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | Типы схемы и валидация |
+| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI-компоненты |
+| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | Интеграция ИИ-провайдеров |
+| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Выполнение Prisma-запросов |
+| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | Сохранение схем |
+| [create-next-liqueur-app](https://www.npmjs.com/package/create-next-liqueur-app) | CLI для создания проекта |
+
+---
+
+## Настройка для разработчиков
+
+### Вариант 1: Быстрый старт с CLI
+
+```bash
+npx create-next-liqueur-app my-dashboard
+cd my-dashboard
+
+# Настройте ИИ-провайдера
+cp .env.example .env
+# Отредактируйте .env, добавив API-ключ
+
+npm run dev
+```
+
+### Вариант 2: Добавление в существующий проект
+
+```bash
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider
+```
+
+### Переменные окружения
+
+При использовании `@liqueur/ai-provider` настройте переменные окружения для выбранного ИИ-провайдера:
+
+```bash
+# .env или .env.local
+
+# Выберите провайдера: anthropic, openai, gemini, deepseek, glm, local
+AI_PROVIDER=anthropic
+
+# ─── Anthropic (Claude) ───────────────────────────────
+ANTHROPIC_API_KEY=sk-ant-your-key
+ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+# Модели: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
+
+# ─── OpenAI (GPT) ─────────────────────────────────────
+OPENAI_API_KEY=sk-your-key
+OPENAI_MODEL=gpt-4o-mini
+# Модели: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
+
+# ─── Google Gemini ────────────────────────────────────
+GOOGLE_API_KEY=your-key
+GEMINI_MODEL=gemini-1.5-flash
+# Модели: gemini-2.0-flash-exp, gemini-1.5-pro, gemini-1.5-flash
+
+# ─── DeepSeek ─────────────────────────────────────────
+DEEPSEEK_API_KEY=sk-your-key
+DEEPSEEK_MODEL=deepseek-chat
+# Модели: deepseek-chat, deepseek-coder
+
+# ─── GLM (Zhipu AI) ───────────────────────────────────
+GLM_API_KEY=your-key
+GLM_MODEL=glm-4
+# Модели: glm-4, glm-4-flash, glm-3-turbo
+
+# ─── Local LLM (Ollama, LM Studio) ────────────────────
+LOCAL_LLM_BASE_URL=http://localhost:1234/v1
+LOCAL_LLM_MODEL=llama3
+```
+
+### Базовое использование
+
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
+import { LiquidRenderer } from '@liqueur/react';
+
+// Создание провайдера из переменных окружения
+const provider = ProviderFactory.createFromEnv();
+
+// Генерация схемы из естественного языка
+const schema = await provider.generateSchema(
+  "Покажи ежемесячные расходы столбчатой диаграммой",
+  databaseMetadata
+);
+
+// Рендеринг дашборда
+<LiquidRenderer schema={schema} data={data} />
+```
+
+### Пример: Next.js API Route
+
+```typescript
+// app/api/generate/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { ProviderFactory } from '@liqueur/ai-provider';
+
+export async function POST(request: NextRequest) {
+  const { prompt } = await request.json();
+
+  const provider = ProviderFactory.createFromEnv();
+  const schema = await provider.generateSchema(prompt, metadata);
+
+  return NextResponse.json({ schema });
+}
+```
+
+### Примеры приложений
+
+| Пример | Описание | Запуск |
+|:-------|:---------|:-------|
+| [Учёт расходов](../../examples/household-budget) | Полнофункциональное с ИИ-чатом | `cd examples/household-budget && pnpm dev` |
+| [Playground](../../examples/playground) | Простая тестовая среда | `cd examples/playground && pnpm dev` |
+
+### Запуск из исходного кода
+
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install && pnpm build
+
+cd examples/household-budget
+cp .env.example .env  # Настройте API-ключи
+pnpm dev
+```
+
+---
+
+## Безопасность
+
+### Почему мы не даём ИИ писать JavaScript?
+
+| Подход | Риск |
+|:-------|:-----|
+| ИИ генерирует JS/SQL | XSS, SQL-инъекции, выполнение произвольного кода |
+| **Liquid: только JSON** | Нет исполняемого кода. Неизвестные поля отклоняются |
+
+### Три уровня защиты
+
+1. **Ограничение вывода ИИ** — Только JSON-схема. Без генерации кода
+2. **Валидация схемы** — Неизвестные поля немедленно отклоняются (Fail Fast)
+3. **Row-Level Security** — Пользователи могут получить доступ только к своим данным
+
+---
+
+## Дорожная карта
+
+- [x] Фаза 1: Основной протокол и React-компоненты
+- [x] Фаза 2: Интеграция ИИ-провайдеров
+- [x] Фаза 3: Пример приложения (бюджет)
+- [ ] Фаза 4: Дополнительные компоненты (календарь, карта и т.д.)
+- [ ] Фаза 5: Совместное редактирование в реальном времени
+- [ ] Фаза 6: Система плагинов
+
+---
+
+## Лицензия
+
+[MIT](../../LICENSE)
+
+---
+
+<div align="center">
+
+**Liquid Protocol**
+
+Положим конец эпохе борьбы пользователей с настройками
+
+[GitHub](https://github.com/clearclown/liqueur) · [npm](https://www.npmjs.com/package/@liqueur/protocol)
+
+</div>
