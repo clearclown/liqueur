@@ -67,7 +67,19 @@ npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-ad
 
 ## Quick Start
 
-### 1. Define a schema
+### Quickest: Use the CLI
+
+```bash
+npx create-next-liqueur-app my-dashboard
+cd my-dashboard
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and start chatting with AI to build your dashboard.
+
+### Manual Setup
+
+#### 1. Define a schema
 
 ```typescript
 import type { LiquidViewSchema } from '@liqueur/protocol';
@@ -93,7 +105,7 @@ const schema: LiquidViewSchema = {
 };
 ```
 
-### 2. Validate the schema
+#### 2. Validate the schema
 
 ```typescript
 import { SchemaValidator } from '@liqueur/protocol';
@@ -106,7 +118,7 @@ if (!result.valid) {
 }
 ```
 
-### 3. Render with React
+#### 3. Render with React
 
 ```tsx
 import { LiquidRenderer } from '@liqueur/react';
@@ -116,7 +128,7 @@ function Dashboard({ schema, data }) {
 }
 ```
 
-### 4. Execute data sources (with Prisma)
+#### 4. Execute data sources (with Prisma)
 
 ```typescript
 import { PrismaExecutor } from '@liqueur/db-adapter';
@@ -132,7 +144,7 @@ const executor = new PrismaExecutor(prisma, {
 const data = await executor.execute(schema.data_sources.expenses, userId);
 ```
 
-### 5. Generate schema with AI (optional)
+#### 5. Generate schema with AI (optional)
 
 ```typescript
 import { ProviderFactory } from '@liqueur/ai-provider';
