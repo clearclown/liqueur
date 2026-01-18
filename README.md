@@ -2,72 +2,124 @@
 
 # Liquid Protocol
 
-**JSON Schema specification for AI-driven dashboard generation**
+**自然言語でダッシュボードを自由自在に。AIドリブンUI生成プロトコル**
 
 [![npm](https://img.shields.io/npm/v/@liqueur/protocol?style=flat-square&color=blue)](https://www.npmjs.com/package/@liqueur/protocol)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+
+[English](./docs/README.en.md) | 日本語
 
 </div>
 
 ---
 
-## What is Liquid?
+## なぜ Liquid Protocol なのか？
 
-Liquid is a **JSON schema specification** and a set of **TypeScript libraries** for building AI-powered dashboards.
+### 問題：カスタマイズの二極化
 
-Instead of letting AI generate executable code (JavaScript/SQL), Liquid constrains AI to output **JSON schemas only**. These schemas are validated, then rendered as UI components.
+家計簿アプリを例に考えてみましょう。世の中には家計簿・収支管理アプリが溢れています。
+
+しかし、どのアプリを使っても必ずこんな要望が出てきます：
+
+> - 「交通費は会社持ちだから、支出から除外して」
+> - 「家族カードの高額利用は返金されるから別会計で」
+> - 「旅行中の支出だけ『旅行』タグをつけて」
+> - 「赤色が嫌いだから青と黒にして」
+> - 「円グラフじゃなくて棒グラフで見たい」
+
+**現状の解決策は2つしかありません：**
+
+| アプローチ | 例 | 問題点 |
+|-----------|-----|--------|
+| **全部自分で作る** | Notion, スプレッドシート | カスタマイズ自体が目的化。本来の「家計管理」から脱線 |
+| **設定項目を増やす** | 従来のアプリ | 設定画面が複雑化。「自由すぎる不自由」に陥る |
+
+### 解決策：自然言語でダッシュボードを再構成
+
+**Liquid Protocol** は、この問題を根本から解決します。
 
 ```
-User: "Show monthly expenses as a bar chart"
-  ↓
-AI outputs JSON schema (not code)
-  ↓
-Schema validated by @liqueur/protocol
-  ↓
-Rendered by @liqueur/react
-  ↓
-Data fetched by @liqueur/db-adapter
+ユーザー: 「交通費は除外して、旅行期間中の支出には旅行タグをつけて」
+    ↓
+AI がダッシュボードの構造自体を再生成
+    ↓
+フィルタ・グラフ・レイアウトが自動で更新
 ```
 
-**Result**: No code execution from AI output. No XSS. No SQL injection.
+<div align="center">
+
+| Before | After |
+|--------|-------|
+| ![初期ダッシュボード](docs/images/dashboard-initial.png) | ![AI更新後](docs/images/dashboard-after-ai.png) |
+| デフォルトのダッシュボード | 「交通費を除外して」と指示した後 |
+
+</div>
 
 ---
 
-## Installation
+## これは家計簿だけの話ではない
 
-### By Use Case
+今は家計簿アプリで実証していますが、この技術は**あらゆるアプリケーション**に適用できます：
 
-Choose the packages you need:
+| アプリケーション | 従来の問題 | Liquid による解決 |
+|-----------------|-----------|------------------|
+| **Slack / Discord** | 通知設定が複雑、チャンネル整理が面倒 | 「重要な会話だけ通知して」で自動整理 |
+| **証券アプリ** | ダッシュボードが固定、見たい指標が見れない | 「テック株だけ円グラフで」で即座に変更 |
+| **Twitter / SNS** | タイムラインのアルゴリズムが不透明 | 「政治関連を非表示に」で自分だけのフィード |
+| **プロジェクト管理** | Jira/Asana の設定地獄 | 「今週の自分のタスクだけ」でビュー生成 |
 
-```bash
-# Schema definition only (types & validation)
-npm install @liqueur/protocol
-
-# React UI (includes protocol)
-npm install @liqueur/protocol @liqueur/react
-
-# Full stack with AI + Database
-npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter
-
-# Everything
-npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter @liqueur/artifact-store
-```
-
-### Package Overview
-
-| Package | Purpose | Required |
-|---------|---------|----------|
-| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | Schema types & validation | **Yes** |
-| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI components (Chart, Table) | For frontend |
-| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | AI schema generation | For AI features |
-| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Prisma query execution | For database |
-| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | Schema persistence | For saving dashboards |
+**将来、この技術はソフトウェアの標準になる。** ユーザーは設定画面と格闘するのではなく、やりたいことを言葉で伝えるだけでいい。
 
 ---
 
-## Quick Start
+## 仕組み：AI + JSON Schema + セキュリティ
 
-### Quickest: Use the CLI
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        ユーザーの要望                            │
+│     「交通費を除外して、月別の支出を棒グラフで見せて」            │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                     AI (Claude / GPT / Gemini)                  │
+│                                                                 │
+│  ⚠️ 重要: AI は JSON スキーマのみを出力                          │
+│     JavaScript や SQL は一切生成しない                          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      @liqueur/protocol                          │
+│                                                                 │
+│  ✅ スキーマ検証: 未知のフィールドは即座に拒否 (Fail Fast)       │
+│  ✅ 型安全: TypeScript + Rust で二重検証                        │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      @liqueur/db-adapter                        │
+│                                                                 │
+│  🔒 Row-Level Security: ユーザーは自分のデータのみアクセス可能   │
+│  🔒 SQL インジェクション防止: ORM 経由のみ、生 SQL は禁止        │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                       @liqueur/react                            │
+│                                                                 │
+│  📊 チャート、テーブル、レイアウトを自動レンダリング              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### なぜ AI に JavaScript を書かせないのか？
+
+| 方式 | リスク |
+|------|--------|
+| AI が JS/SQL を生成 | XSS、SQL インジェクション、任意コード実行 |
+| **Liquid: JSON のみ** | スキーマ外のフィールドは拒否。実行コードなし |
+
+---
+
+## クイックスタート
+
+### 30秒で試す
 
 ```bash
 npx create-next-liqueur-app my-dashboard
@@ -75,11 +127,9 @@ cd my-dashboard
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start chatting with AI to build your dashboard.
+[http://localhost:3000](http://localhost:3000) を開いて、チャットで指示するだけ。
 
-### Manual Setup
-
-#### 1. Define a schema
+### スキーマの例
 
 ```typescript
 import type { LiquidViewSchema } from '@liqueur/protocol';
@@ -90,13 +140,27 @@ const schema: LiquidViewSchema = {
   components: [
     {
       type: 'chart',
-      chart_type: 'bar',
-      title: 'Monthly Expenses',
-      data_source: 'expenses'
+      variant: 'pie',
+      title: '今月の支出内訳',
+      data_source: 'expenses_by_category'
+    },
+    {
+      type: 'chart',
+      variant: 'bar',
+      title: '月別支出推移',
+      data_source: 'monthly_expenses'
     }
   ],
   data_sources: {
-    expenses: {
+    expenses_by_category: {
+      resource: 'transactions',
+      filters: [
+        { field: 'type', op: 'eq', value: 'EXPENSE' },
+        { field: 'category', op: 'neq', value: '交通費' }  // 交通費を除外
+      ],
+      aggregation: { type: 'sum', field: 'amount', by: 'category' }
+    },
+    monthly_expenses: {
       resource: 'transactions',
       filters: [{ field: 'type', op: 'eq', value: 'EXPENSE' }],
       aggregation: { type: 'sum', field: 'amount', by: 'month' }
@@ -105,65 +169,60 @@ const schema: LiquidViewSchema = {
 };
 ```
 
-#### 2. Validate the schema
+---
 
-```typescript
-import { SchemaValidator } from '@liqueur/protocol';
+## インストール
 
-const validator = new SchemaValidator();
-const result = validator.validate(schema);
+### 用途別
 
-if (!result.valid) {
-  console.error(result.errors);
-}
+```bash
+# スキーマ定義のみ（型 & バリデーション）
+npm install @liqueur/protocol
+
+# React UI コンポーネント
+npm install @liqueur/protocol @liqueur/react
+
+# フルスタック（AI + データベース）
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter
 ```
 
-#### 3. Render with React
+### パッケージ一覧
 
-```tsx
-import { LiquidRenderer } from '@liqueur/react';
+| パッケージ | 役割 | npm |
+|-----------|------|-----|
+| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | スキーマ型定義 & バリデーション | ![npm](https://img.shields.io/npm/v/@liqueur/protocol?style=flat-square) |
+| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI コンポーネント（Chart, Table） | ![npm](https://img.shields.io/npm/v/@liqueur/react?style=flat-square) |
+| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | AI プロバイダー統合 | ![npm](https://img.shields.io/npm/v/@liqueur/ai-provider?style=flat-square) |
+| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Prisma クエリ実行 | ![npm](https://img.shields.io/npm/v/@liqueur/db-adapter?style=flat-square) |
+| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | スキーマ永続化 | ![npm](https://img.shields.io/npm/v/@liqueur/artifact-store?style=flat-square) |
+| [create-next-liqueur-app](https://www.npmjs.com/package/create-next-liqueur-app) | プロジェクト作成 CLI | ![npm](https://img.shields.io/npm/v/create-next-liqueur-app?style=flat-square) |
 
-function Dashboard({ schema, data }) {
-  return <LiquidRenderer schema={schema} data={data} />;
-}
-```
+---
 
-#### 4. Execute data sources (with Prisma)
+## サンプルアプリ
 
-```typescript
-import { PrismaExecutor } from '@liqueur/db-adapter';
-import { prisma } from './prisma';
+| サンプル | 説明 | 実行方法 |
+|---------|------|----------|
+| [家計簿アプリ](./examples/household-budget) | AI チャット付きフル機能アプリ | `cd examples/household-budget && pnpm dev` |
+| [Playground](./examples/playground) | シンプルなスキーマテスト | `cd examples/playground && pnpm dev` |
 
-const executor = new PrismaExecutor(prisma, {
-  resourceToModel: {
-    transactions: 'transaction',
-  },
-});
+### ローカルで実行
 
-// Automatically applies Row-Level Security (userId filtering)
-const data = await executor.execute(schema.data_sources.expenses, userId);
-```
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install
+pnpm build
 
-#### 5. Generate schema with AI (optional)
-
-```typescript
-import { ProviderFactory } from '@liqueur/ai-provider';
-
-const provider = ProviderFactory.fromEnv(); // Uses ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.
-
-const result = await provider.generateSchema(
-  'Show monthly expenses as a bar chart',
-  databaseMetadata
-);
-
-if (result.valid) {
-  // Use result.schema
-}
+# 家計簿アプリを実行
+cd examples/household-budget
+cp .env.example .env  # API キーを設定
+pnpm dev
 ```
 
 ---
 
-## Schema Specification
+## スキーマ仕様
 
 ### LiquidViewSchema
 
@@ -172,88 +231,88 @@ interface LiquidViewSchema {
   version: '1.0';
   layout: Layout;
   components: Component[];
-  data_sources?: Record<string, DataSource>;
+  data_sources: Record<string, DataSource>;
 }
 ```
 
-### Components
+### コンポーネント
 
-- `chart` - Line, Bar, Pie, Area charts (powered by Recharts)
-- `table` - Data tables with sorting
+- `chart` - 棒グラフ、折れ線、円グラフ、面グラフ（Recharts）
+- `table` - データテーブル（ソート対応）
 
 ### DataSource
 
 ```typescript
 interface DataSource {
-  resource: string;                    // Table/model name
-  filters?: Filter[];                  // WHERE conditions
-  aggregation?: Aggregation;           // GROUP BY + aggregate
+  resource: string;      // テーブル/モデル名
+  filters?: Filter[];    // WHERE 条件
+  aggregation?: {        // GROUP BY + 集計
+    type: 'sum' | 'count' | 'avg' | 'min' | 'max';
+    field: string;
+    by: string;
+  };
   sort?: { field: string; direction: 'asc' | 'desc' };
   limit?: number;
 }
 ```
 
-See [@liqueur/protocol](./packages/protocol) for full specification.
+詳細は [@liqueur/protocol](./packages/protocol) を参照。
 
 ---
 
-## Examples
+## セキュリティ設計
 
-| Example | Description | Run |
-|---------|-------------|-----|
-| [Household Budget](./examples/household-budget) | Full-featured app with AI chat | `cd examples/household-budget && npm run dev` |
-| [Playground](./examples/playground) | Simple schema testing | `cd examples/playground && npm run dev` |
+### 3層の防御
 
-### Run Example Locally
+1. **AI 出力の制限**: JSON スキーマのみ。実行コードは生成しない
+2. **スキーマ検証**: 未知のフィールドは即座に拒否（Fail Fast）
+3. **Row-Level Security**: ユーザーは自分のデータのみアクセス可能
 
-```bash
-git clone https://github.com/clearclown/liqueur.git
-cd liqueur
-pnpm install
-pnpm build
+### AI に対する制約
 
-# Run household budget app
-cd examples/household-budget
-cp .env.example .env  # Configure your API keys
-pnpm dev
+```
+❌ AI が生成しないもの:
+   - JavaScript コード
+   - SQL クエリ
+   - シェルコマンド
+
+✅ AI が生成するもの:
+   - 検証済み JSON スキーマのみ
 ```
 
 ---
 
-## Why Liquid?
-
-### Security First
-- AI outputs JSON only, never executable code
-- Strict schema validation rejects unknown fields
-- Row-Level Security enforced on every query
-
-### Flexibility
-- Use any AI provider (OpenAI, Anthropic, Gemini, etc.)
-- Use any database with custom adapters
-- Build your own UI/UX on top
-
-### Standards-Based
-- JSON Schema as the universal contract
-- TypeScript for type safety
-- Works with existing backend infrastructure
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
+## 開発
 
 ```bash
-# Development
 pnpm install
 pnpm build
 pnpm test
 ```
 
+詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。
+
 ---
 
-## License
+## ロードマップ
+
+- [x] Phase 1: コアプロトコル & React コンポーネント
+- [x] Phase 2: AI プロバイダー統合
+- [x] Phase 3: サンプルアプリ（家計簿）
+- [ ] Phase 4: より多くのコンポーネント（カレンダー、マップ等）
+- [ ] Phase 5: リアルタイム協調編集
+- [ ] Phase 6: プラグインシステム
+
+---
+
+## ライセンス
 
 [MIT](LICENSE)
+
+---
+
+<div align="center">
+
+**Liquid Protocol** - ユーザーが設定と格闘する時代を終わらせる
 
 </div>
