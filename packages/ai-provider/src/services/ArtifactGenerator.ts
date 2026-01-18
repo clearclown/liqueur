@@ -79,10 +79,19 @@ export class ArtifactGenerator {
     };
   }
 
+  // NOTE: The following methods are kept for potential future use
+  // but are currently unused. They may be useful for:
+  // - _extractJSON: Parsing raw AI responses that aren't already JSON
+  // - _estimateCost: Alternative cost estimation without provider
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+
   /**
    * AI応答からJSONを抽出
+   * @internal Reserved for future use
    */
-  private _extractJSON(text: string): LiquidViewSchema {
+  // @ts-expect-error - Kept for potential future use
+  private __extractJSON(text: string): LiquidViewSchema {
     // マークダウンコードブロックを削除
     let cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "");
 
@@ -114,8 +123,10 @@ export class ArtifactGenerator {
   /**
    * トークン数からコストを推定
    * （DeepSeekの料金: $0.27/1M input tokens, $1.10/1M output tokens）
+   * @internal Reserved for future use
    */
-  private _estimateCost(totalTokens: number): number {
+  // @ts-expect-error - Kept for potential future use
+  private __estimateCost(totalTokens: number): number {
     // 簡易的な推定（入力:出力 = 3:1 と仮定）
     const inputTokens = totalTokens * 0.75;
     const outputTokens = totalTokens * 0.25;
@@ -125,6 +136,8 @@ export class ArtifactGenerator {
 
     return inputCost + outputCost;
   }
+
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * 既存のスキーマを編集
