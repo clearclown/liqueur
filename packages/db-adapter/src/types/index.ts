@@ -2,7 +2,7 @@
  * Database Adapter Types
  */
 
-import type { DatabaseMetadata, Table, Column } from "@liqueur/protocol";
+import type { DatabaseMetadata, Table } from "@liqueur/protocol";
 
 /**
  * Database introspector interface

@@ -4,7 +4,8 @@
  * Types for executing DataSource queries against Prisma
  */
 
-import type { DataSource, FilterOperator } from "@liqueur/protocol";
+// Note: DataSource and FilterOperator are used through the protocol package
+// This file only contains executor-specific type definitions
 
 /**
  * Configuration for DataSource execution
