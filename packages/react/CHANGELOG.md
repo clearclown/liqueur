@@ -106,5 +106,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Vitest test infrastructure
   - React Testing Library integration
 
-[0.2.0]: https://github.com/ablaze/liqueur/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/ablaze/liqueur/releases/tag/v0.1.0
+[0.2.0]: https://github.com/clearclown/liqueur/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/clearclown/liqueur/releases/tag/v0.1.0

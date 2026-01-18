@@ -5,6 +5,7 @@ import type {
   ValidationResult,
   CostEstimate,
   ProviderConfig,
+  StreamChunk,
 } from "../types";
 import { SchemaValidator } from "../validators/SchemaValidator";
 
@@ -109,9 +110,44 @@ SCHEMA SPECIFICATION:
 {
   "version": "1.0",
   "layout": { "type": "grid" | "stack", "columns": number, "gap": number },
-  "components": [ { "type": "chart" | "table", ... } ],
-  "data_sources": { "name": { "resource": "table_name", "filters": [...], "aggregation": {...} } }
+  "components": [
+    {
+      "type": "chart",
+      "variant": "bar" | "line" | "pie" | "area",
+      "title": "string",
+      "data_source": "data_source_name",
+      "x_axis": "column_name",
+      "y_axis": "column_name"
+    },
+    {
+      "type": "table",
+      "title": "string",
+      "data_source": "data_source_name",
+      "columns": ["column1", "column2"]
+    }
+  ],
+  "data_sources": {
+    "data_source_name": {
+      "resource": "table_name",
+      "filters": [
+        { "field": "column_name", "op": "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "in" | "contains", "value": "value" }
+      ],
+      "aggregation": {
+        "type": "sum" | "avg" | "count" | "min" | "max",
+        "field": "column_name",
+        "by": "group_by_column"
+      },
+      "sort": { "field": "column_name", "direction": "asc" | "desc" },
+      "limit": number
+    }
+  }
 }
+
+IMPORTANT:
+- Use "op" (not "operator") for filter operations
+- Use "variant" (not "subtype") for chart types
+- aggregation.type MUST be one of: sum, avg, count, min, max
+- aggregation.by is used for grouping (e.g., "month", "category.name")
 
 OUTPUT VALID JSON ONLY.`;
   }
@@ -135,4 +171,35 @@ OUTPUT VALID JSON ONLY.`;
    * Provider-specific pricing
    */
   protected abstract getCostPerOutputToken(): number;
+
+  /**
+   * Check if streaming is supported
+   * Override in subclass if streaming is implemented
+   */
+  supportsStreaming(): boolean {
+    return false;
+  }
+
+  /**
+   * Generate schema with streaming
+   * Default implementation falls back to non-streaming
+   */
+  async *generateSchemaStream(
+    prompt: string,
+    metadata: DatabaseMetadata
+  ): AsyncGenerator<StreamChunk, void, unknown> {
+    // Default: fall back to non-streaming
+    yield { type: "text", content: "Generating..." };
+
+    try {
+      const schema = await this.generateSchema(prompt, metadata);
+      yield { type: "schema", schema };
+      yield { type: "done" };
+    } catch (error) {
+      yield {
+        type: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }

@@ -13,23 +13,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
-      <body className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
+    <html lang="ja" suppressHydrationWarning>
+      <body className="h-screen flex flex-col bg-gray-50 overflow-hidden" suppressHydrationWarning>
+        <nav className="bg-white shadow-sm border-b h-16 flex-shrink-0">
+          <div className="h-full px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-full">
               <div className="flex items-center">
                 <Link href="/" className="text-xl font-bold text-gray-900">
                   家計簿アプリ
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  ダッシュボード
-                </Link>
                 <Link
                   href="/transactions"
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -40,7 +34,7 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 overflow-hidden">
           {children}
         </main>
       </body>

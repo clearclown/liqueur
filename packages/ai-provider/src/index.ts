@@ -10,6 +10,7 @@ export type {
   ValidationResult,
   ValidationError,
   CostEstimate,
+  StreamChunk,
 } from "./types";
 
 // Providers

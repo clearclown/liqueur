@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@liqueur/ai-provider": "workspace:*",
+    "@liqueur/db-adapter": "workspace:*",
     "@liqueur/protocol": "workspace:*",
     "@liqueur/react": "workspace:*",
     "@prisma/client": "^6.2.1",

@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { ProviderConfig } from "../types";
+import type { ProviderConfig, DatabaseMetadata, StreamChunk } from "../types";
 import { BaseAIProvider } from "./BaseAIProvider";
 
 /**
@@ -73,5 +73,88 @@ export class GeminiProvider extends BaseAIProvider {
     }
     // Default to Flash pricing
     return 0.3 / 1_000_000;
+  }
+
+  /**
+   * Check if streaming is supported
+   */
+  override supportsStreaming(): boolean {
+    return true;
+  }
+
+  /**
+   * Generate schema with streaming response
+   * Uses Gemini's generateContentStream for real-time output
+   */
+  override async *generateSchemaStream(
+    prompt: string,
+    metadata: DatabaseMetadata
+  ): AsyncGenerator<StreamChunk, void, unknown> {
+    // Validation
+    if (!prompt || prompt.trim() === "") {
+      yield { type: "error", error: "Prompt cannot be empty" };
+      return;
+    }
+
+    if (!metadata.tables || metadata.tables.length === 0) {
+      yield { type: "error", error: "Database metadata cannot be empty" };
+      return;
+    }
+
+    const systemPrompt = this.buildSystemPrompt(metadata);
+
+    const model = this.client.getGenerativeModel({
+      model: this.config.model,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 4096,
+        responseMimeType: "application/json",
+      },
+    });
+
+    try {
+      const streamResult = await model.generateContentStream([
+        { text: systemPrompt },
+        { text: prompt },
+      ]);
+
+      let fullText = "";
+
+      // Stream text chunks
+      for await (const chunk of streamResult.stream) {
+        const chunkText = chunk.text();
+        if (chunkText) {
+          fullText += chunkText;
+          yield { type: "text", content: chunkText };
+        }
+      }
+
+      // Parse and validate the complete response
+      try {
+        const parsedSchema = JSON.parse(fullText);
+        const validationResult = this.validateResponse(parsedSchema);
+
+        if (!validationResult.valid) {
+          const errorMessages = validationResult.errors
+            .map((e) => e.message)
+            .join(", ");
+          yield { type: "error", error: `Invalid schema: ${errorMessages}` };
+          return;
+        }
+
+        yield { type: "schema", schema: validationResult.schema! };
+        yield { type: "done" };
+      } catch (parseError) {
+        yield {
+          type: "error",
+          error: `Failed to parse JSON: ${parseError instanceof Error ? parseError.message : "Unknown error"}`,
+        };
+      }
+    } catch (error) {
+      yield {
+        type: "error",
+        error: error instanceof Error ? error.message : "Streaming failed",
+      };
+    }
   }
 }

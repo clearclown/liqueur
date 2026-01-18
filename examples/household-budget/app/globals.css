@@ -63,3 +63,201 @@ body {
 .sample-chip {
   @apply text-sm px-3 py-1.5 bg-gray-100 rounded-full hover:bg-gray-200 cursor-pointer transition-colors;
 }
+
+/* ========================================
+   Split Layout Styles
+   ======================================== */
+
+.split-layout {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.split-layout-left {
+  flex: 7;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #f9fafb;
+}
+
+.split-layout-divider {
+  width: 1px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.split-layout-right {
+  flex: 3;
+  min-width: 320px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+}
+
+/* ========================================
+   Dashboard Panel Styles
+   ======================================== */
+
+.dashboard-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.toolbar-btn {
+  @apply p-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors;
+}
+
+.toolbar-btn-danger {
+  @apply hover:bg-red-50 hover:text-red-600;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+  margin: 0 0.25rem;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ========================================
+   Chat Panel Styles
+   ======================================== */
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chat-message {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+}
+
+.chat-message-user {
+  align-self: flex-end;
+  background: #3b82f6;
+  color: white;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.chat-message-assistant {
+  align-self: flex-start;
+  background: #f3f4f6;
+  color: #1f2937;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.chat-message-content {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.chat-message-time {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+.chat-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.chat-sample-chip {
+  @apply text-xs px-2.5 py-1 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.chat-input-form {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+}
+
+.chat-input {
+  @apply flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-100;
+}
+
+.chat-submit-btn {
+  @apply p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .split-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .split-layout-left {
+    flex: none;
+    min-height: 50vh;
+  }
+
+  .split-layout-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .split-layout-right {
+    flex: none;
+    max-width: none;
+    min-width: auto;
+    height: 50vh;
+  }
+}

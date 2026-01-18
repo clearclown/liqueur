@@ -78,6 +78,16 @@ export async function POST(request: Request) {
     // Sanitize prompt
     const sanitizedPrompt = sanitizePrompt(prompt);
 
+    // Add current date context to the prompt
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const promptWithContext = `Current date: ${now.toISOString().split('T')[0]} (Year: ${currentYear}, Month: ${currentMonth})
+
+User request: ${sanitizedPrompt}
+
+IMPORTANT: When filtering by date, use the current year (${currentYear}) and appropriate month. For "this month" use ${currentYear}-${String(currentMonth).padStart(2, '0')}.`;
+
     // Create AI provider from environment
     const provider = createProviderFromEnv();
 
@@ -86,7 +96,7 @@ export async function POST(request: Request) {
 
     // Generate schema with household budget context
     const result = await generator.generateArtifact({
-      userRequest: sanitizedPrompt,
+      userRequest: promptWithContext,
       metadata: {
         tables: householdBudgetMetadata.tables.map((table) => ({
           name: table.name,
