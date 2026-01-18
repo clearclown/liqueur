@@ -69,6 +69,16 @@ export interface OpenAICompatibleConfig extends ProviderConfig {
 }
 
 /**
+ * Streaming chunk types
+ */
+export interface StreamChunk {
+  type: "text" | "schema" | "done" | "error";
+  content?: string;
+  schema?: LiquidViewSchema;
+  error?: string;
+}
+
+/**
  * AI Provider interface
  * All providers must implement this interface
  */
@@ -86,6 +96,17 @@ export interface AIProvider {
    * @throws Error if generation fails or schema is invalid
    */
   generateSchema(prompt: string, metadata: DatabaseMetadata): Promise<LiquidViewSchema>;
+
+  /**
+   * Generate LiquidView schema with streaming response
+   * @param prompt User's natural language request
+   * @param metadata Database schema information
+   * @returns AsyncGenerator yielding StreamChunks
+   */
+  generateSchemaStream?(
+    prompt: string,
+    metadata: DatabaseMetadata
+  ): AsyncGenerator<StreamChunk, void, unknown>;
 
   /**
    * Validate AI response and parse to schema
@@ -106,6 +127,12 @@ export interface AIProvider {
    * @returns true if ready to use
    */
   isConfigured(): boolean;
+
+  /**
+   * Check if provider supports streaming
+   * @returns true if streaming is supported
+   */
+  supportsStreaming?(): boolean;
 }
 
 /**

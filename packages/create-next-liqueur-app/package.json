@@ -1,0 +1,33 @@
+{
+  "name": "create-next-liqueur-app",
+  "version": "0.1.0",
+  "description": "Create a Next.js app with Liquid Protocol for AI-driven dashboards",
+  "bin": {
+    "create-next-liqueur-app": "bin/index.js"
+  },
+  "files": [
+    "bin",
+    "template"
+  ],
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clearclown/liqueur.git",
+    "directory": "packages/create-next-liqueur-app"
+  },
+  "keywords": [
+    "liquid",
+    "next.js",
+    "dashboard",
+    "ai",
+    "create-app",
+    "scaffolding"
+  ],
+  "author": "Project Liquid Contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -80,53 +80,6 @@ export class ArtifactGenerator {
   }
 
   /**
-   * AI応答からJSONを抽出
-   */
-  private _extractJSON(text: string): LiquidViewSchema {
-    // マークダウンコードブロックを削除
-    let cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "");
-
-    // 前後の空白を削除
-    cleaned = cleaned.trim();
-
-    // JSONのみ抽出（最初の{から最後の}まで）
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("No valid JSON found in AI response");
-    }
-
-    try {
-      const schema = JSON.parse(jsonMatch[0]) as LiquidViewSchema;
-
-      // 基本的な検証
-      if (!schema.version || !schema.layout || !schema.components) {
-        throw new Error("Invalid LiquidViewSchema structure");
-      }
-
-      return schema;
-    } catch (error) {
-      throw new Error(
-        `Failed to parse AI response as JSON: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  }
-
-  /**
-   * トークン数からコストを推定
-   * （DeepSeekの料金: $0.27/1M input tokens, $1.10/1M output tokens）
-   */
-  private _estimateCost(totalTokens: number): number {
-    // 簡易的な推定（入力:出力 = 3:1 と仮定）
-    const inputTokens = totalTokens * 0.75;
-    const outputTokens = totalTokens * 0.25;
-
-    const inputCost = (inputTokens / 1_000_000) * 0.27;
-    const outputCost = (outputTokens / 1_000_000) * 1.1;
-
-    return inputCost + outputCost;
-  }
-
-  /**
    * 既存のスキーマを編集
    */
   async editArtifact(

@@ -1,23 +1,40 @@
 {
   "name": "@liqueur/db-adapter",
   "version": "0.1.0",
-  "description": "Database introspection adapters for Project Liquid",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Database adapter for executing DataSource queries with Prisma",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clearclown/liqueur.git",
+    "directory": "packages/db-adapter"
+  },
+  "bugs": {
+    "url": "https://github.com/clearclown/liqueur/issues"
+  },
+  "homepage": "https://github.com/clearclown/liqueur#readme",
   "keywords": [
     "liqueur",
+    "liquid",
     "database",
-    "introspection",
     "prisma",
-    "drizzle"
+    "datasource",
+    "executor"
   ],
-  "author": "",
+  "author": "Project Liquid Contributors",
   "license": "MIT",
   "dependencies": {
     "@liqueur/protocol": "workspace:*"
@@ -28,15 +45,18 @@
     "vitest": "^1.1.0"
   },
   "peerDependencies": {
-    "@prisma/client": "^5.0.0",
-    "prisma": "^5.0.0"
+    "@prisma/client": "^5.0.0 || ^6.0.0"
   },
   "peerDependenciesMeta": {
     "@prisma/client": {
       "optional": true
-    },
-    "prisma": {
-      "optional": true
     }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

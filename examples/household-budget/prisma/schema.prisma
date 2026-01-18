@@ -1,0 +1,95 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  transactions Transaction[]
+  categories   Category[]
+  budgets      Budget[]
+  artifacts    Artifact[]
+}
+
+// Category (expense/income classification)
+model Category {
+  id        String       @id @default(cuid())
+  name      String
+  type      CategoryType
+  icon      String?
+  color     String?
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  createdAt DateTime     @default(now())
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([userId, name])
+}
+
+enum CategoryType {
+  EXPENSE
+  INCOME
+}
+
+// Transaction (expense/income records)
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Decimal
+  type        TransactionType
+  description String?
+  date        DateTime
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, categoryId])
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+// Budget
+model Budget {
+  id         String   @id @default(cuid())
+  amount     Decimal
+  month      DateTime
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, categoryId, month])
+}
+
+// Saved dashboard (Artifact)
+model Artifact {
+  id        String   @id @default(cuid())
+  name      String
+  schema    String   // LiquidViewSchema as JSON string
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

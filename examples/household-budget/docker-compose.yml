@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  household-budget:
+    build:
+      context: ../..
+      dockerfile: examples/household-budget/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=file:/app/data/dev.db
+      - AI_PROVIDER=deepseek
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-key}
+    volumes:
+      - household-budget-data:/app/data
+
+volumes:
+  household-budget-data:

@@ -4,11 +4,11 @@ AI provider abstraction for LiquidView schema generation
 
 ## Overview
 
-`@liqueur/ai-provider` provides a unified interface for interacting with multiple AI providers (OpenAI, Anthropic, Google Gemini, DeepSeek, GLM) to generate LiquidView schemas from natural language descriptions and database metadata.
+`@liqueur/ai-provider` provides a unified interface for generating LiquidView schemas from natural language using multiple AI providers (OpenAI, Anthropic, Google Gemini, DeepSeek, GLM).
 
 ## Features
 
-- **Multi-provider support** - OpenAI, Anthropic Claude, Google Gemini, DeepSeek, GLM, and custom endpoints
+- **Multi-provider support** - OpenAI, Anthropic Claude, Google Gemini, DeepSeek, GLM
 - **Unified interface** - Single API across all providers
 - **Provider factory** - Automatic provider selection from environment
 - **Type-safe** - Full TypeScript support with strict validation
@@ -49,17 +49,18 @@ const provider = ProviderFactory.fromEnv();
 const metadata = {
   tables: [
     {
-      name: 'sales',
+      name: 'transactions',
       columns: [
-        { name: 'month', type: 'string' },
-        { name: 'amount', type: 'number' }
+        { name: 'date', type: 'datetime' },
+        { name: 'amount', type: 'number' },
+        { name: 'category', type: 'string' }
       ]
     }
   ]
 };
 
 const result = await provider.generateSchema(
-  'Create a bar chart showing monthly sales',
+  'Show monthly expenses as a bar chart',
   metadata
 );
 
@@ -75,7 +76,7 @@ if (result.valid) {
 ```bash
 # OpenAI
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4  # Optional, defaults to gpt-3.5-turbo
+OPENAI_MODEL=gpt-4  # Optional
 
 # Anthropic Claude
 ANTHROPIC_API_KEY=sk-ant-...
@@ -163,17 +164,15 @@ interface AIProvider {
 
 ### Providers
 
-- **OpenAIProvider** - OpenAI GPT models
-- **DeepSeekProvider** - DeepSeek API
-- **GLMProvider** - Zhipu AI GLM models
-- **LocalLLMProvider** - Local OpenAI-compatible endpoints
-- **AnthropicProvider** - Anthropic Claude models
-- **GeminiProvider** - Google Gemini models
-- **MockProvider** - Mock provider for testing
-
-### BaseOpenAIProvider
-
-Base class for OpenAI-compatible providers (OpenAI, DeepSeek, GLM, LocalLLM).
+| Provider | Description |
+|----------|-------------|
+| `OpenAIProvider` | OpenAI GPT models |
+| `AnthropicProvider` | Anthropic Claude models |
+| `GeminiProvider` | Google Gemini models |
+| `DeepSeekProvider` | DeepSeek API |
+| `GLMProvider` | Zhipu AI GLM models |
+| `LocalLLMProvider` | Local OpenAI-compatible endpoints |
+| `MockProvider` | Mock provider for testing |
 
 ### ProviderFactory
 
@@ -193,7 +192,7 @@ class ProviderFactory {
 - `'local-llm'`
 - `'mock'`
 
-## Types
+### Types
 
 ```typescript
 interface DatabaseMetadata {
@@ -237,16 +236,9 @@ npm test
 # Test with coverage
 npm run test:coverage
 
-# Lint
-npm run lint
-
 # Type check
 npm run typecheck
 ```
-
-## Contributing
-
-See the main [repository](https://github.com/ablaze/liqueur) for contribution guidelines.
 
 ## License
 
