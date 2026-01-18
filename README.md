@@ -35,19 +35,33 @@ Data fetched by @liqueur/db-adapter
 
 ## Installation
 
+### By Use Case
+
+Choose the packages you need:
+
 ```bash
-# Core schema definitions
+# Schema definition only (types & validation)
 npm install @liqueur/protocol
 
-# React UI components
-npm install @liqueur/react
+# React UI (includes protocol)
+npm install @liqueur/protocol @liqueur/react
 
-# AI provider abstraction (optional)
-npm install @liqueur/ai-provider
+# Full stack with AI + Database
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter
 
-# Database adapter for Prisma (optional)
-npm install @liqueur/db-adapter
+# Everything
+npm install @liqueur/protocol @liqueur/react @liqueur/ai-provider @liqueur/db-adapter @liqueur/artifact-store
 ```
+
+### Package Overview
+
+| Package | Purpose | Required |
+|---------|---------|----------|
+| [@liqueur/protocol](https://www.npmjs.com/package/@liqueur/protocol) | Schema types & validation | **Yes** |
+| [@liqueur/react](https://www.npmjs.com/package/@liqueur/react) | UI components (Chart, Table) | For frontend |
+| [@liqueur/ai-provider](https://www.npmjs.com/package/@liqueur/ai-provider) | AI schema generation | For AI features |
+| [@liqueur/db-adapter](https://www.npmjs.com/package/@liqueur/db-adapter) | Prisma query execution | For database |
+| [@liqueur/artifact-store](https://www.npmjs.com/package/@liqueur/artifact-store) | Schema persistence | For saving dashboards |
 
 ---
 
@@ -114,20 +128,26 @@ const executor = new PrismaExecutor(prisma, {
   },
 });
 
+// Automatically applies Row-Level Security (userId filtering)
 const data = await executor.execute(schema.data_sources.expenses, userId);
 ```
 
----
+### 5. Generate schema with AI (optional)
 
-## Packages
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
 
-| Package | Description | Install |
-|---------|-------------|---------|
-| [@liqueur/protocol](./packages/protocol) | Schema types & validators | `npm i @liqueur/protocol` |
-| [@liqueur/react](./packages/react) | React component library | `npm i @liqueur/react` |
-| [@liqueur/ai-provider](./packages/ai-provider) | AI provider abstraction | `npm i @liqueur/ai-provider` |
-| [@liqueur/db-adapter](./packages/db-adapter) | Database query executor | `npm i @liqueur/db-adapter` |
-| [@liqueur/artifact-store](./packages/artifact-store) | Schema persistence | `npm i @liqueur/artifact-store` |
+const provider = ProviderFactory.fromEnv(); // Uses ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.
+
+const result = await provider.generateSchema(
+  'Show monthly expenses as a bar chart',
+  databaseMetadata
+);
+
+if (result.valid) {
+  // Use result.schema
+}
+```
 
 ---
 
@@ -167,8 +187,24 @@ See [@liqueur/protocol](./packages/protocol) for full specification.
 
 ## Examples
 
-- [Household Budget App](./examples/household-budget) - Full-featured example with AI chat
-- [Playground](./examples/playground) - Simple schema testing
+| Example | Description | Run |
+|---------|-------------|-----|
+| [Household Budget](./examples/household-budget) | Full-featured app with AI chat | `cd examples/household-budget && npm run dev` |
+| [Playground](./examples/playground) | Simple schema testing | `cd examples/playground && npm run dev` |
+
+### Run Example Locally
+
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install
+pnpm build
+
+# Run household budget app
+cd examples/household-budget
+cp .env.example .env  # Configure your API keys
+pnpm dev
+```
 
 ---
 
@@ -188,6 +224,19 @@ See [@liqueur/protocol](./packages/protocol) for full specification.
 - JSON Schema as the universal contract
 - TypeScript for type safety
 - Works with existing backend infrastructure
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup.
+
+```bash
+# Development
+pnpm install
+pnpm build
+pnpm test
+```
 
 ---
 
