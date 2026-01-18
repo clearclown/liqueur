@@ -223,26 +223,98 @@ AI_PROVIDER=anthropic
 # ─── Anthropic (Claude) ───────────────────────────────
 ANTHROPIC_API_KEY=sk-ant-your-key
 ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+# مدل‌ها: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
 
 # ─── OpenAI (GPT) ─────────────────────────────────────
 OPENAI_API_KEY=sk-your-key
 OPENAI_MODEL=gpt-4o-mini
+# مدل‌ها: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
 
 # ─── Google Gemini ────────────────────────────────────
 GOOGLE_API_KEY=your-key
 GEMINI_MODEL=gemini-1.5-flash
+# مدل‌ها: gemini-2.0-flash-exp, gemini-1.5-pro, gemini-1.5-flash
 
 # ─── DeepSeek ─────────────────────────────────────────
 DEEPSEEK_API_KEY=sk-your-key
 DEEPSEEK_MODEL=deepseek-chat
+# مدل‌ها: deepseek-chat, deepseek-coder
 
 # ─── GLM (Zhipu AI) ───────────────────────────────────
 GLM_API_KEY=your-key
 GLM_MODEL=glm-4
+# مدل‌ها: glm-4, glm-4-flash, glm-3-turbo
 
 # ─── Local LLM (Ollama, LM Studio) ────────────────────
 LOCAL_LLM_BASE_URL=http://localhost:1234/v1
 LOCAL_LLM_MODEL=llama3
+```
+
+<div dir="rtl">
+
+### استفاده پایه
+
+</div>
+
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
+import { LiquidRenderer } from '@liqueur/react';
+
+// ساخت Provider از متغیرهای محیطی
+const provider = ProviderFactory.createFromEnv();
+
+// تولید اسکیما از زبان طبیعی
+const schema = await provider.generateSchema(
+  "هزینه‌های ماهانه را به صورت نمودار میله‌ای نشان بده",
+  databaseMetadata
+);
+
+// رندر داشبورد
+<LiquidRenderer schema={schema} data={data} />
+```
+
+<div dir="rtl">
+
+### مثال: Next.js API Route
+
+</div>
+
+```typescript
+// app/api/generate/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { ProviderFactory } from '@liqueur/ai-provider';
+
+export async function POST(request: NextRequest) {
+  const { prompt } = await request.json();
+
+  const provider = ProviderFactory.createFromEnv();
+  const schema = await provider.generateSchema(prompt, metadata);
+
+  return NextResponse.json({ schema });
+}
+```
+
+<div dir="rtl">
+
+### برنامه‌های نمونه
+
+| نمونه | توضیحات | اجرا |
+|:------|:--------|:-----|
+| [مدیریت بودجه](../../examples/household-budget) | کامل با چت AI | `cd examples/household-budget && pnpm dev` |
+| [Playground](../../examples/playground) | محیط تست ساده | `cd examples/playground && pnpm dev` |
+
+### اجرا از کد منبع
+
+</div>
+
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install && pnpm build
+
+cd examples/household-budget
+cp .env.example .env  # پیکربندی کلیدهای API
+pnpm dev
 ```
 
 <div dir="rtl">

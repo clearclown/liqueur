@@ -236,26 +236,86 @@ AI_PROVIDER=anthropic
 # ─── Anthropic (Claude) ───────────────────────────────
 ANTHROPIC_API_KEY=sk-ant-your-key
 ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+# 模型: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
 
 # ─── OpenAI (GPT) ─────────────────────────────────────
 OPENAI_API_KEY=sk-your-key
 OPENAI_MODEL=gpt-4o-mini
+# 模型: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
 
 # ─── Google Gemini ────────────────────────────────────
 GOOGLE_API_KEY=your-key
 GEMINI_MODEL=gemini-1.5-flash
+# 模型: gemini-2.0-flash-exp, gemini-1.5-pro, gemini-1.5-flash
 
 # ─── DeepSeek ─────────────────────────────────────────
 DEEPSEEK_API_KEY=sk-your-key
 DEEPSEEK_MODEL=deepseek-chat
+# 模型: deepseek-chat, deepseek-coder
 
 # ─── GLM (智譜 AI) ────────────────────────────────────
 GLM_API_KEY=your-key
 GLM_MODEL=glm-4
+# 模型: glm-4, glm-4-flash, glm-3-turbo
 
 # ─── Local LLM (Ollama, LM Studio) ────────────────────
 LOCAL_LLM_BASE_URL=http://localhost:1234/v1
 LOCAL_LLM_MODEL=llama3
+```
+
+### 基本用法
+
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
+import { LiquidRenderer } from '@liqueur/react';
+
+// 從環境變數建立 Provider
+const provider = ProviderFactory.createFromEnv();
+
+// 從自然語言生成 Schema
+const schema = await provider.generateSchema(
+  "用長條圖顯示每月支出",
+  databaseMetadata
+);
+
+// 渲染儀表板
+<LiquidRenderer schema={schema} data={data} />
+```
+
+### 範例：Next.js API Route
+
+```typescript
+// app/api/generate/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { ProviderFactory } from '@liqueur/ai-provider';
+
+export async function POST(request: NextRequest) {
+  const { prompt } = await request.json();
+
+  const provider = ProviderFactory.createFromEnv();
+  const schema = await provider.generateSchema(prompt, metadata);
+
+  return NextResponse.json({ schema });
+}
+```
+
+### 範例應用
+
+| 範例 | 說明 | 執行 |
+|:----|:-----|:----|
+| [家計簿應用](../../examples/household-budget) | 具備 AI 聊天的完整功能 | `cd examples/household-budget && pnpm dev` |
+| [Playground](../../examples/playground) | 簡單測試環境 | `cd examples/playground && pnpm dev` |
+
+### 從原始碼執行
+
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install && pnpm build
+
+cd examples/household-budget
+cp .env.example .env  # 設定 API 金鑰
+pnpm dev
 ```
 
 ---

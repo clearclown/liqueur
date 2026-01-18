@@ -223,26 +223,98 @@ AI_PROVIDER=anthropic
 # ─── Anthropic (Claude) ───────────────────────────────
 ANTHROPIC_API_KEY=sk-ant-your-key
 ANTHROPIC_MODEL=claude-3-5-haiku-20241022
+# النماذج: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
 
 # ─── OpenAI (GPT) ─────────────────────────────────────
 OPENAI_API_KEY=sk-your-key
 OPENAI_MODEL=gpt-4o-mini
+# النماذج: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo
 
 # ─── Google Gemini ────────────────────────────────────
 GOOGLE_API_KEY=your-key
 GEMINI_MODEL=gemini-1.5-flash
+# النماذج: gemini-2.0-flash-exp, gemini-1.5-pro, gemini-1.5-flash
 
 # ─── DeepSeek ─────────────────────────────────────────
 DEEPSEEK_API_KEY=sk-your-key
 DEEPSEEK_MODEL=deepseek-chat
+# النماذج: deepseek-chat, deepseek-coder
 
 # ─── GLM (Zhipu AI) ───────────────────────────────────
 GLM_API_KEY=your-key
 GLM_MODEL=glm-4
+# النماذج: glm-4, glm-4-flash, glm-3-turbo
 
 # ─── Local LLM (Ollama, LM Studio) ────────────────────
 LOCAL_LLM_BASE_URL=http://localhost:1234/v1
 LOCAL_LLM_MODEL=llama3
+```
+
+<div dir="rtl">
+
+### الاستخدام الأساسي
+
+</div>
+
+```typescript
+import { ProviderFactory } from '@liqueur/ai-provider';
+import { LiquidRenderer } from '@liqueur/react';
+
+// إنشاء Provider من متغيرات البيئة
+const provider = ProviderFactory.createFromEnv();
+
+// توليد Schema من اللغة الطبيعية
+const schema = await provider.generateSchema(
+  "اعرض المصروفات الشهرية كرسم بياني شريطي",
+  databaseMetadata
+);
+
+// عرض لوحة المعلومات
+<LiquidRenderer schema={schema} data={data} />
+```
+
+<div dir="rtl">
+
+### مثال: Next.js API Route
+
+</div>
+
+```typescript
+// app/api/generate/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { ProviderFactory } from '@liqueur/ai-provider';
+
+export async function POST(request: NextRequest) {
+  const { prompt } = await request.json();
+
+  const provider = ProviderFactory.createFromEnv();
+  const schema = await provider.generateSchema(prompt, metadata);
+
+  return NextResponse.json({ schema });
+}
+```
+
+<div dir="rtl">
+
+### التطبيقات النموذجية
+
+| النموذج | الوصف | التشغيل |
+|:--------|:------|:--------|
+| [تتبع الميزانية](../../examples/household-budget) | كامل الميزات مع دردشة AI | `cd examples/household-budget && pnpm dev` |
+| [Playground](../../examples/playground) | بيئة اختبار بسيطة | `cd examples/playground && pnpm dev` |
+
+### التشغيل من الكود المصدري
+
+</div>
+
+```bash
+git clone https://github.com/clearclown/liqueur.git
+cd liqueur
+pnpm install && pnpm build
+
+cd examples/household-budget
+cp .env.example .env  # إعداد مفاتيح API
+pnpm dev
 ```
 
 <div dir="rtl">
